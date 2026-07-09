@@ -1,351 +1,337 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 
+export default function Organisation(){
 
-export default function Employees(){
 
+    const [divisions,setDivisions] = useState<any[]>([]);
 
 
-const [employees,setEmployees] =
-useState<any[]>([]);
+    const [position,setPosition] = useState({
 
+        title:"",
+        description:"",
+        division_id:""
 
-const [loading,setLoading] =
-useState(true);
+    });
 
 
 
 
 
+    async function load(){
 
+        const response = await fetch(
+            "/api/staff/organisation/divisions"
+        );
 
-useEffect(()=>{
 
+        const data = await response.json();
 
-async function load(){
 
+        setDivisions(data);
 
+    }
 
-const response = await fetch(
 
-"/api/staff/employees",
 
-{
 
-cache:"no-store"
 
-}
+    useEffect(()=>{
 
-);
+        load();
 
+    },[]);
 
 
 
 
-const data =
-await response.json();
 
 
 
+    async function createPosition(){
 
 
-setEmployees(data);
+        await fetch(
 
-setLoading(false);
+            "/api/staff/organisation/positions",
 
+            {
 
+                method:"POST",
 
-}
+                headers:{
 
+                    "Content-Type":"application/json"
 
+                },
 
+                body:JSON.stringify(position)
 
+            }
 
-load();
+        );
 
 
 
-},[]);
+        setPosition({
 
+            title:"",
+            description:"",
+            division_id:""
 
+        });
 
 
 
+        load();
 
 
+    }
 
 
 
-if(loading){
 
 
-return (
 
-<main
 
-className="
-max-w-7xl
-mx-auto
-px-6
-py-16
-"
 
->
 
+    async function deletePosition(id:string){
 
-<div
 
-className="
-bg-white
-shadow-xl
-border
-border-gray-200
-p-10
-"
+        const confirmDelete =
+            confirm("Delete this position?");
 
->
 
-<p
 
-className="
-text-xl
-font-semibold
-text-[#003B6F]
-"
+        if(!confirmDelete){
 
->
+            return;
 
-Loading employee directory...
+        }
 
-</p>
 
 
-</div>
 
 
-</main>
+        await fetch(
 
-);
+            "/api/staff/organisation/positions",
 
+            {
 
-}
+                method:"DELETE",
 
+                headers:{
 
+                    "Content-Type":"application/json"
 
+                },
 
+                body:JSON.stringify({
 
+                    id
 
+                })
 
+            }
 
+        );
 
-return (
 
-<main
 
-className="
-max-w-7xl
-mx-auto
-px-6
-py-16
-"
+        load();
 
->
 
+    }
 
-<div
 
-className="
-bg-white
-shadow-xl
-border
-border-gray-200
-p-8
-md:p-12
-"
 
->
 
 
 
 
 
 
-{/* HEADER */}
+    return (
 
+        <main
 
-<div
+            className="
+            max-w-7xl
+            mx-auto
+            px-6
+            py-16
+            "
 
-className="
-flex
-justify-between
-items-start
-border-b
-border-gray-200
-pb-8
-"
+        >
 
->
 
+            <div
 
-<div>
+                className="
+                bg-white
+                shadow-xl
+                border
+                border-gray-200
+                p-10
+                "
 
+            >
 
-<h1
 
-className="
-text-4xl
-font-bold
-text-[#003B6F]
-"
 
->
+                <h1
 
-Employee Directory
+                    className="
+                    text-4xl
+                    font-bold
+                    text-[#003B6F]
+                    "
 
-</h1>
+                >
 
+                    Organisation Management
 
+                </h1>
 
 
 
-<p
+                <p className="mt-3 text-gray-600">
 
-className="
-mt-3
-text-gray-600
-"
+                    Manage DHS divisions and organisational positions.
 
->
+                </p>
 
-View and manage DHS personnel records.
 
-</p>
 
 
-</div>
 
 
 
 
+                <section
 
+                    className="
+                    mt-10
+                    border
+                    border-gray-200
+                    p-6
+                    "
 
+                >
 
 
-<Link
 
-href="/staff/employees/create"
+                    <h2
 
-className="
-bg-[#003B6F]
-text-white
-px-6
-py-3
-font-bold
-hover:bg-[#00284d]
-transition
-"
+                        className="
+                        text-2xl
+                        font-bold
+                        text-[#003B6F]
+                        "
 
->
+                    >
 
-+ Add Employee
+                        Create Position
 
-</Link>
+                    </h2>
 
 
 
 
-</div>
 
 
+                    <select
 
+                        className="
+                        border
+                        p-3
+                        w-full
+                        mt-5
+                        "
 
+                        value={position.division_id}
 
+                        onChange={(e)=>
 
+                            setPosition({
 
+                                ...position,
 
+                                division_id:e.target.value
 
-{/* EMPLOYEE GRID */}
+                            })
 
+                        }
 
-<div
+                    >
 
-className="
-mt-10
-grid
-md:grid-cols-3
-gap-6
-"
 
->
+                        <option value="">
 
+                            Select Division
 
+                        </option>
 
 
 
-{
+                        {
+                            divisions.map((division)=>(
 
-employees.map(employee=>(
+                                <option
 
+                                    key={division.id}
 
-<Link
+                                    value={division.id}
 
-key={employee.id}
+                                >
 
-href={`/staff/employees/${employee.id}`}
+                                    {division.name}
 
-className="
-relative
-border
-border-gray-200
-p-6
-shadow-sm
-hover:shadow-lg
-transition
-bg-white
-"
+                                </option>
 
->
+                            ))
+                        }
 
 
+                    </select>
 
 
 
-<div
 
-className="
-absolute
-left-0
-top-0
-h-full
-w-1
-bg-[#003B6F]
-"
 
-/>
 
 
+                    <input
 
+                        className="
+                        border
+                        p-3
+                        w-full
+                        mt-4
+                        "
 
+                        placeholder="Position Title"
 
+                        value={position.title}
 
+                        onChange={(e)=>
 
+                            setPosition({
 
-<h2
+                                ...position,
 
-className="
-text-xl
-font-bold
-text-[#003B6F]
-"
+                                title:e.target.value
 
->
+                            })
 
-{employee.roblox_username}
+                        }
 
-</h2>
+                    />
 
 
 
@@ -353,167 +339,256 @@ text-[#003B6F]
 
 
 
-<p
+                    <textarea
 
-className="
-mt-3
-text-gray-700
-font-semibold
-"
+                        className="
+                        border
+                        p-3
+                        w-full
+                        mt-4
+                        "
 
->
+                        rows={4}
 
-{employee.positions?.title || "No Position"}
+                        placeholder="Position Description"
 
-</p>
+                        value={position.description}
 
+                        onChange={(e)=>
 
+                            setPosition({
 
+                                ...position,
 
+                                description:e.target.value
 
+                            })
 
+                        }
 
-<p
+                    />
 
-className="
-text-gray-600
-"
 
->
 
-{employee.divisions?.name || "No Division"}
 
-</p>
 
 
 
+                    <button
 
+                        onClick={createPosition}
 
+                        className="
+                        mt-5
+                        bg-[#003B6F]
+                        text-white
+                        px-6
+                        py-3
+                        font-bold
+                        "
 
+                    >
 
+                        Create Position
 
+                    </button>
 
-<span
 
-className={`
 
-inline-block
-mt-5
-px-3
-py-1
-text-sm
-font-bold
+                </section>
 
-${
 
-employee.status === "Active"
 
-?
 
-"bg-green-100 text-green-700"
 
-:
 
-"bg-gray-100 text-gray-700"
 
-}
 
-`}
 
->
+                <section className="mt-12">
 
-{employee.status}
 
-</span>
+                    <h2
 
+                        className="
+                        text-3xl
+                        font-bold
+                        text-[#003B6F]
+                        "
 
+                    >
 
+                        Department Structure
 
+                    </h2>
 
 
 
 
 
-<div
 
-className="
-mt-5
-pt-4
-border-t
-border-gray-100
-"
+                    <div className="mt-8 space-y-8">
 
->
 
+                        {
+                            divisions.map((division)=>(
 
-<p
 
-className="
-text-sm
-text-gray-500
-"
+                                <div
 
->
+                                    key={division.id}
 
-Roblox ID
+                                    className="
+                                    border
+                                    border-gray-200
+                                    p-6
+                                    "
 
-</p>
+                                >
 
 
 
-<p
+                                    <h3
 
-className="
-text-sm
-font-semibold
-text-gray-700
-"
+                                        className="
+                                        text-2xl
+                                        font-bold
+                                        "
 
->
+                                    >
 
-{employee.roblox_user_id}
+                                        {division.name}
 
-</p>
+                                    </h3>
 
 
-</div>
 
 
 
 
 
+                                    <div className="mt-5 space-y-3">
 
-</Link>
 
 
+                                        {
+                                            division.positions &&
+                                            division.positions.length > 0
+                                            ?
 
-))
+                                            division.positions.map((position:any)=>(
 
 
-}
+                                                <div
 
+                                                    key={position.id}
 
+                                                    className="
+                                                    bg-[#F5F8FB]
+                                                    border
+                                                    p-4
+                                                    flex
+                                                    justify-between
+                                                    items-center
+                                                    "
 
+                                                >
 
 
-</div>
+                                                    <div>
 
 
+                                                        <p className="font-bold">
 
+                                                            {position.title}
 
+                                                        </p>
 
 
 
-</div>
+                                                        <p className="text-sm text-gray-600">
 
+                                                            {position.description}
 
+                                                        </p>
 
 
+                                                    </div>
 
-</main>
 
 
-);
+
+
+                                                    <button
+
+                                                        onClick={()=>
+                                                            deletePosition(position.id)
+                                                        }
+
+                                                        className="
+                                                        bg-red-600
+                                                        text-white
+                                                        px-4
+                                                        py-2
+                                                        "
+
+                                                    >
+
+                                                        Delete
+
+                                                    </button>
+
+
+
+                                                </div>
+
+
+                                            ))
+
+
+                                            :
+
+                                            <p className="text-gray-500">
+
+                                                No positions created.
+
+                                            </p>
+
+
+                                        }
+
+
+
+                                    </div>
+
+
+
+                                </div>
+
+
+
+                            ))
+                        }
+
+
+
+                    </div>
+
+
+
+                </section>
+
+
+
+
+            </div>
+
+
+
+        </main>
+
+
+    );
 
 
 }
