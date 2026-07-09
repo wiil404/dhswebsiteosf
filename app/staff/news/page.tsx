@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { requirePermission } from "../../lib/requirePermission";
 
 import {
-    getProfile,
     canCreateNews,
     canEditNews,
     canDeleteNews,
@@ -22,367 +21,602 @@ import ToggleButton from "./ToggleButton";
 export default async function StaffNewsPage(){
 
 
-    const profile = await requirePermission(
-        "news.edit"
-    );
+const profile = await requirePermission(
+    "news.edit"
+);
 
 
 
-    if(!profile){
+if(!profile){
 
-        redirect("/staff/login");
+    redirect("/staff/login");
 
+}
+
+
+
+
+
+
+const createAllowed =
+await canCreateNews();
+
+
+const editAllowed =
+await canEditNews();
+
+
+const deleteAllowed =
+await canDeleteNews();
+
+
+const publishAllowed =
+await canPublishNews();
+
+
+
+
+
+
+
+
+const {
+    data:articles,
+    error
+} = await supabase
+
+.from("news")
+
+.select("*")
+
+.order(
+    "date",
+    {
+        ascending:false
     }
+);
 
 
 
 
-    const createAllowed =
-        await canCreateNews();
 
 
 
-    const editAllowed =
-        await canEditNews();
 
 
+return (
 
-    const deleteAllowed =
-        await canDeleteNews();
+<main
 
+className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+"
 
+>
 
-    const publishAllowed =
-        await canPublishNews();
 
+<div
 
+className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-8
+md:p-12
+"
 
+>
 
 
 
 
-    const {
-        data:articles,
-        error
-    } = await supabase
 
-        .from("news")
 
-        .select("*")
 
-        .order(
-            "date",
-            {
-                ascending:false
-            }
-        );
+{/* HEADER */}
 
 
+<div
 
+className="
+flex
+justify-between
+items-start
+border-b
+border-gray-200
+pb-8
+"
 
+>
 
 
+<div>
 
 
-    return (
+<h1
 
-        <main className="max-w-6xl mx-auto px-6 py-12">
+className="
+text-4xl
+font-bold
+text-[#003B6F]
+"
 
+>
 
+Manage News Releases
 
-            <div className="flex justify-between items-center">
+</h1>
 
 
-                <div>
 
 
-                    <h1 className="text-4xl font-bold">
 
-                        Manage News
+<p
 
-                    </h1>
+className="
+mt-3
+text-gray-500
+"
 
+>
 
+Create, edit and manage official DHS releases.
 
-                    <p className="mt-2 text-gray-600">
+</p>
 
-                        Create, edit and manage DHS releases.
 
-                    </p>
 
 
 
+<p
 
-                    <p className="mt-2 text-sm text-gray-500">
+className="
+mt-3
+text-sm
+font-semibold
+text-[#003B6F]
+"
 
-                        Role: {profile.role}
+>
 
-                    </p>
+Role: {profile.role}
 
+</p>
 
 
-                </div>
+</div>
 
 
 
 
 
-                {
-                    createAllowed && (
 
-                        <Link
 
-                            href="/staff/news/create"
 
-                            className="bg-[#003B6F] text-white px-5 py-3 rounded"
+{
 
-                        >
+createAllowed && (
 
-                            New Release
+<Link
 
-                        </Link>
+href="/staff/news/create"
 
-                    )
-                }
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-bold
+hover:bg-[#00284d]
+transition
+"
 
+>
 
++ New Release
 
-            </div>
+</Link>
 
+)
 
+}
 
 
 
+</div>
 
 
-            {
-                error && (
 
-                    <p className="text-red-600 mt-6">
 
-                        {error.message}
 
-                    </p>
 
-                )
-            }
 
 
 
+{
+error && (
 
+<div
 
+className="
+mt-8
+bg-red-50
+border
+border-red-200
+p-5
+text-red-700
+"
 
+>
 
+{error.message}
 
+</div>
 
-            <div className="mt-10 space-y-6">
+)
 
+}
 
-                {
-                    articles?.map((article)=>(
 
 
 
-                        <article
 
-                            key={article.id}
 
-                            className="border rounded-lg p-6"
 
-                        >
 
 
+{/* ARTICLES */}
 
 
-                            <div className="flex justify-between">
+<div
 
+className="
+mt-10
+space-y-6
+"
 
-                                <div>
+>
 
 
-                                    <h2 className="text-2xl font-bold">
 
-                                        {article.title}
 
-                                    </h2>
 
+{
 
+articles?.map((article)=>(
 
-                                    <p className="text-sm text-gray-500 mt-2">
 
-                                        {article.category} • {article.date}
+<article
 
-                                    </p>
+key={article.id}
 
+className="
+relative
+border
+border-gray-200
+bg-white
+p-7
+shadow-sm
+hover:shadow-lg
+transition
+"
 
+>
 
-                                </div>
 
 
 
+<div
 
-                                <span
+className="
+absolute
+left-0
+top-0
+h-full
+w-1
+bg-[#003B6F]
+"
 
-                                    className={
-                                        article.published
+/>
 
-                                        ?
 
-                                        "text-green-700"
 
-                                        :
 
-                                        "text-orange-600"
-                                    }
 
-                                >
 
-                                    {
-                                        article.published
-                                        ?
-                                        "Published"
-                                        :
-                                        "Draft"
-                                    }
 
 
-                                </span>
+<div
 
+className="
+flex
+justify-between
+items-start
+gap-5
+"
 
+>
 
-                            </div>
 
+<div>
 
 
+<h2
 
+className="
+text-2xl
+font-bold
+text-[#003B6F]
+"
 
+>
 
+{article.title}
 
-                            <p className="mt-4">
+</h2>
 
-                                {article.summary}
 
-                            </p>
 
 
 
+<p
 
+className="
+mt-2
+text-sm
+text-gray-500
+"
 
+>
 
+{article.category} • {article.date}
 
+</p>
 
-                            <div className="flex gap-5 mt-6">
 
+</div>
 
 
 
 
-                                <Link
 
-                                    href={`/news/${article.slug}`}
 
-                                    className="underline"
 
-                                >
 
-                                    View
+<span
 
-                                </Link>
+className={`
 
+px-4
+py-1
+text-sm
+font-bold
 
+${
 
+article.published
 
+?
 
+"bg-green-100 text-green-700"
 
+:
 
-                                {
-                                    editAllowed && (
+"bg-orange-100 text-orange-700"
 
-                                        <Link
+}
 
-                                            href={`/staff/news/edit/${article.id}`}
+`}
 
-                                            className="underline"
+>
 
-                                        >
+{
 
-                                            Edit
+article.published
 
-                                        </Link>
+?
 
-                                    )
-                                }
+"Published"
 
+:
 
+"Draft"
 
+}
 
 
+</span>
 
 
 
-                                {
-                                    publishAllowed && (
+</div>
 
-                                        <ToggleButton
 
-                                            id={article.id}
 
-                                            published={article.published}
 
-                                        />
 
-                                    )
-                                }
 
 
 
 
+<p
 
+className="
+mt-5
+text-gray-700
+leading-relaxed
+"
 
+>
 
-                                {
-                                    deleteAllowed && (
+{article.summary}
 
-                                        <DeleteButton
+</p>
 
-                                            id={article.id}
 
-                                        />
 
-                                    )
-                                }
 
 
 
 
 
 
+<div
 
-                            </div>
+className="
+mt-7
+flex
+items-center
+gap-6
+border-t
+border-gray-100
+pt-5
+"
 
+>
 
 
 
 
 
-                        </article>
+<Link
 
+href={`/news/${article.slug}`}
 
+className="
+font-semibold
+text-[#003B6F]
+hover:underline
+"
 
-                    ))
-                }
+>
 
+View
 
+</Link>
 
-            </div>
 
 
 
 
 
 
-        </main>
 
-    );
+
+{
+
+editAllowed && (
+
+<Link
+
+href={`/staff/news/edit/${article.id}`}
+
+className="
+font-semibold
+text-[#003B6F]
+hover:underline
+"
+
+>
+
+Edit
+
+</Link>
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+{
+
+publishAllowed && (
+
+<ToggleButton
+
+id={article.id}
+
+published={article.published}
+
+/>
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+{
+
+deleteAllowed && (
+
+<DeleteButton
+
+id={article.id}
+
+/>
+
+)
+
+}
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</article>
+
+
+
+))
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+</main>
+
+
+);
+
 
 }
