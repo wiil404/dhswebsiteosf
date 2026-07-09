@@ -202,7 +202,7 @@ text-[#003B6F]
 
 >
 
-Secretary Name
+chedvn
 
 </h1>
 
@@ -299,7 +299,7 @@ text-gray-700
 
 >
 
-Secretary Name was appointed as Secretary of Homeland Security to lead the Department's efforts across national security, emergency preparedness, border security, cybersecurity, and public safety.
+Chedvn was appointed as Secretary of Homeland Security to lead the Department's efforts across national security, emergency preparedness, border security, cybersecurity, and public safety.
 
 With extensive experience in public service and leadership, the Secretary works alongside DHS personnel and partner agencies to advance the Department's mission and protect the American people.
 
