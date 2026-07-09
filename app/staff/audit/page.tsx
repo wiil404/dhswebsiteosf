@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 
+
 export default function AuditPage(){
 
 
@@ -27,12 +28,15 @@ export default function AuditPage(){
 
 
 
+
+
     async function loadLogs(){
 
 
         const response = await fetch(
             "/api/staff/audit"
         );
+
 
 
         if(response.status === 403){
@@ -42,6 +46,8 @@ export default function AuditPage(){
             return;
 
         }
+
+
 
 
 
@@ -60,12 +66,12 @@ export default function AuditPage(){
 
 
 
+
     useEffect(()=>{
 
         loadLogs();
 
     },[]);
-
 
 
 
@@ -120,6 +126,7 @@ export default function AuditPage(){
 
 
 
+
     function getCategory(action:string){
 
 
@@ -149,28 +156,25 @@ export default function AuditPage(){
 
 
 
+
     function getSeverityStyle(severity:string){
 
 
-        switch(severity){
+        if(severity === "CRITICAL"){
 
-
-            case "CRITICAL":
-
-                return "bg-red-100 text-red-700";
-
-
-            case "WARNING":
-
-                return "bg-orange-100 text-orange-700";
-
-
-            default:
-
-                return "bg-blue-100 text-blue-700";
-
+            return "bg-red-100 text-red-700";
 
         }
+
+
+        if(severity === "WARNING"){
+
+            return "bg-orange-100 text-orange-700";
+
+        }
+
+
+        return "bg-blue-100 text-blue-700";
 
 
     }
@@ -183,12 +187,48 @@ export default function AuditPage(){
 
 
 
-    const filteredLogs = logs.filter(log=>{
+    function getSeverityBorder(severity:string){
 
 
-        const category = getCategory(log.action);
+        if(severity === "CRITICAL"){
 
-        const severity = log.severity || "INFO";
+            return "bg-red-600";
+
+        }
+
+
+        if(severity === "WARNING"){
+
+            return "bg-orange-500";
+
+        }
+
+
+        return "bg-[#003B6F]";
+
+
+    }
+
+
+
+
+
+
+
+
+
+    const filteredLogs = logs.filter((log)=>{
+
+
+        const category =
+            getCategory(log.action);
+
+
+
+        const severity =
+            log.severity || "INFO";
+
+
 
 
 
@@ -199,6 +239,8 @@ export default function AuditPage(){
             ||
 
             category === filter;
+
+
 
 
 
@@ -216,7 +258,10 @@ export default function AuditPage(){
 
 
 
-        const searchText = (
+
+
+
+        const text = (
 
             log.description +
 
@@ -227,8 +272,9 @@ export default function AuditPage(){
             log.action
 
         )
-
         .toLowerCase();
+
+
 
 
 
@@ -240,7 +286,7 @@ export default function AuditPage(){
 
             matchesSeverity &&
 
-            searchText.includes(
+            text.includes(
                 search.toLowerCase()
             )
 
@@ -259,15 +305,53 @@ export default function AuditPage(){
 
     if(loading){
 
+
         return (
 
-            <main className="max-w-6xl mx-auto px-6 py-12">
+            <main
 
-                Loading audit logs...
+                className="
+                max-w-7xl
+                mx-auto
+                px-6
+                py-16
+                "
+
+            >
+
+                <div
+
+                    className="
+                    bg-white
+                    shadow-xl
+                    border
+                    p-10
+                    "
+
+                >
+
+                    <h1
+
+                        className="
+                        text-xl
+                        font-bold
+                        text-[#003B6F]
+                        "
+
+                    >
+
+                        Loading audit logs...
+
+                    </h1>
+
+
+                </div>
+
 
             </main>
 
         );
+
 
     }
 
@@ -278,166 +362,380 @@ export default function AuditPage(){
 
 
 
+
     return (
 
-        <main className="max-w-6xl mx-auto px-6 py-12">
+        <main
 
+            className="
+            max-w-7xl
+            mx-auto
+            px-6
+            py-16
+            "
 
-
-            <h1 className="text-4xl font-bold">
-
-                DHS Audit Logs
-
-            </h1>
-
-
-
-            <p className="text-gray-600 mt-2">
-
-                Internal monitoring of staff and system activity.
-
-            </p>
+        >
 
 
 
 
+            <div
+
+                className="
+                bg-white
+                shadow-xl
+                border
+                border-gray-200
+                p-10
+                md:p-12
+                "
+
+            >
 
 
 
 
-            <div className="mt-8 flex flex-col md:flex-row gap-4">
 
 
-                <input
+                <div
 
-                    className="border rounded p-3 flex-1"
-
-                    placeholder="Search activity..."
-
-                    value={search}
-
-                    onChange={(e)=>
-                        setSearch(e.target.value)
-                    }
-
-                />
-
-
-
-
-                <select
-
-                    className="border rounded p-3"
-
-                    value={filter}
-
-                    onChange={(e)=>
-                        setFilter(e.target.value)
-                    }
+                    className="
+                    border-b
+                    pb-8
+                    "
 
                 >
 
-                    <option value="ALL">
-                        All Activity
-                    </option>
 
-                    <option value="NEWS">
-                        News Activity
-                    </option>
+                    <h1
 
-                    <option value="STAFF">
-                        Staff Activity
-                    </option>
+                        className="
+                        text-4xl
+                        font-bold
+                        text-[#003B6F]
+                        "
 
-                    <option value="SYSTEM">
-                        System Activity
-                    </option>
+                    >
 
+                        DHS Audit Logs
 
-                </select>
+                    </h1>
 
 
 
+                    <p className="mt-3 text-gray-600">
+
+                        Internal monitoring of staff and system activity.
+
+                    </p>
 
 
-                <select
+                </div>
 
-                    className="border rounded p-3"
 
-                    value={severityFilter}
 
-                    onChange={(e)=>
-                        setSeverityFilter(e.target.value)
-                    }
+
+
+
+
+
+
+                {/* FILTERS */}
+
+
+
+                <div
+
+                    className="
+                    mt-8
+                    grid
+                    md:grid-cols-3
+                    gap-4
+                    "
 
                 >
 
-                    <option value="ALL">
-                        All Severity
-                    </option>
-
-                    <option value="INFO">
-                        INFO
-                    </option>
-
-                    <option value="WARNING">
-                        WARNING
-                    </option>
-
-                    <option value="CRITICAL">
-                        CRITICAL
-                    </option>
 
 
-                </select>
+                    <input
 
+                        className="
+                        border
+                        p-3
+                        "
 
-            </div>
+                        placeholder="Search activity..."
+
+                        value={search}
+
+                        onChange={(e)=>
+                            setSearch(e.target.value)
+                        }
+
+                    />
 
 
 
 
 
 
+                    <select
+
+                        className="
+                        border
+                        p-3
+                        "
+
+                        value={filter}
+
+                        onChange={(e)=>
+                            setFilter(e.target.value)
+                        }
+
+                    >
+
+                        <option value="ALL">
+                            All Activity
+                        </option>
+
+                        <option value="NEWS">
+                            News Activity
+                        </option>
+
+                        <option value="STAFF">
+                            Staff Activity
+                        </option>
+
+                        <option value="SYSTEM">
+                            System Activity
+                        </option>
+
+
+                    </select>
 
 
 
-            <div className="mt-10 space-y-5">
 
 
 
-                {
-                    filteredLogs.map(log=>(
+
+                    <select
+
+                        className="
+                        border
+                        p-3
+                        "
+
+                        value={severityFilter}
+
+                        onChange={(e)=>
+                            setSeverityFilter(e.target.value)
+                        }
+
+                    >
+
+                        <option value="ALL">
+                            All Severity
+                        </option>
+
+                        <option value="INFO">
+                            INFO
+                        </option>
+
+                        <option value="WARNING">
+                            WARNING
+                        </option>
+
+                        <option value="CRITICAL">
+                            CRITICAL
+                        </option>
 
 
-                        <div
-
-                            key={log.id}
-
-                            className="border rounded-lg p-6 shadow-sm"
-
-                        >
+                    </select>
 
 
 
-                            <div className="flex justify-between">
+                </div>
 
 
 
-                                <div>
-
-
-                                    <h2 className="text-xl font-bold">
-
-                                        {getActionName(log.action)}
-
-                                    </h2>
 
 
 
-                                    <p className="text-sm text-gray-500">
 
-                                        {log.target_type || "System"}
+
+
+                <div
+
+                    className="
+                    mt-10
+                    space-y-6
+                    "
+
+                >
+
+
+
+
+
+                    {
+                        filteredLogs.map((log)=>(
+
+
+                            <div
+
+                                key={log.id}
+
+                                className="
+                                relative
+                                border
+                                border-gray-200
+                                p-7
+                                shadow-sm
+                                "
+
+                            >
+
+
+
+                                <div
+
+                                    className={`
+                                    absolute
+                                    left-0
+                                    top-0
+                                    bottom-0
+                                    w-1
+                                    ${getSeverityBorder(log.severity || "INFO")}
+                                    `}
+
+                                />
+
+
+
+
+
+
+                                <div
+
+                                    className="
+                                    flex
+                                    justify-between
+                                    gap-5
+                                    "
+
+                                >
+
+
+
+                                    <div>
+
+
+                                        <h2
+
+                                            className="
+                                            text-xl
+                                            font-bold
+                                            "
+
+                                        >
+
+                                            {getActionName(log.action)}
+
+                                        </h2>
+
+
+
+                                        <p className="text-sm text-gray-500 mt-1">
+
+                                            {log.target_type || "System"}
+
+                                        </p>
+
+
+                                    </div>
+
+
+
+
+
+
+                                    <div className="flex gap-2">
+
+
+                                        <span className="bg-gray-100 px-3 py-1 text-sm font-bold">
+
+                                            {getCategory(log.action)}
+
+                                        </span>
+
+
+
+                                        <span
+
+                                            className={`
+                                            px-3
+                                            py-1
+                                            text-sm
+                                            font-bold
+                                            ${getSeverityStyle(log.severity || "INFO")}
+                                            `}
+
+                                        >
+
+                                            {log.severity || "INFO"}
+
+                                        </span>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+
+
+
+
+
+
+                                <p className="mt-5 text-gray-700">
+
+                                    {log.description || "No description provided"}
+
+                                </p>
+
+
+
+
+
+
+
+
+                                <div className="mt-5 text-sm text-gray-600">
+
+
+                                    <p>
+
+                                        <strong>Performed by:</strong>{" "}
+
+                                        {log.user_email || "System"}
+
+                                    </p>
+
+
+
+                                    <p>
+
+                                        <strong>Date:</strong>{" "}
+
+                                        {
+                                            new Date(
+                                                log.created_at
+                                            )
+                                            .toLocaleString()
+                                        }
 
                                     </p>
 
@@ -448,186 +746,128 @@ export default function AuditPage(){
 
 
 
-                                <div className="flex flex-col items-end gap-2">
 
-
-                                    <span className="bg-gray-100 px-3 py-1 rounded text-sm font-semibold">
-
-                                        {getCategory(log.action)}
-
-                                    </span>
-
-
-
-                                    <span
-
-                                        className={`px-3 py-1 rounded text-sm font-semibold ${getSeverityStyle(log.severity || "INFO")}`}
-
-                                    >
-
-                                        {log.severity || "INFO"}
-
-                                    </span>
-
-
-                                </div>
-
-
-
-                            </div>
-
-
-
-
-
-
-
-                            <div className="mt-5">
-
-                                <p>
-                                    {log.description || "No description provided"}
-                                </p>
 
 
                                 {
-                                    log.target_type === "Staff" &&
-                                    log.details?.staff_email && (
+                                    log.details &&
 
-                                        <p className="text-sm text-gray-500 mt-2">
+                                    Object.keys(log.details).length > 0 && (
 
-                                            Staff Account:
-                                            {" "}
-                                            {log.details.staff_email}
 
-                                        </p>
+                                        <button
+
+                                            onClick={()=>{
+
+
+                                                if(expanded === log.id){
+
+                                                    setExpanded(null);
+
+                                                }
+                                                else{
+
+                                                    setExpanded(log.id);
+
+                                                }
+
+
+                                            }}
+
+                                            className="
+                                            mt-5
+                                            text-[#003B6F]
+                                            font-bold
+                                            "
+
+                                        >
+
+                                            {
+                                                expanded === log.id
+
+                                                ?
+
+                                                "Hide Details"
+
+                                                :
+
+                                                "View Details"
+
+                                            }
+
+
+                                        </button>
+
 
                                     )
                                 }
 
+
+
+
+
+
+
+
+                                {
+                                    expanded === log.id && (
+
+
+                                        <pre
+
+                                            className="
+                                            mt-5
+                                            bg-[#F5F8FB]
+                                            border
+                                            p-5
+                                            text-sm
+                                            overflow-x-auto
+                                            "
+
+                                        >
+
+                                            {
+                                                JSON.stringify(
+                                                    log.details,
+                                                    null,
+                                                    2
+                                                )
+                                            }
+
+
+                                        </pre>
+
+
+                                    )
+                                }
+
+
+
+
+
+
+
                             </div>
 
 
 
+                        ))
+                    }
 
 
 
 
 
-                            <div className="mt-5 text-sm text-gray-600">
+                </div>
 
-
-                                <p>
-
-                                    <strong>Performed by:</strong>{" "}
-
-                                    {log.user_email || "System"}
-
-                                </p>
-
-
-                                <p>
-
-                                    <strong>Date:</strong>{" "}
-
-                                    {new Date(
-                                        log.created_at
-                                    ).toLocaleString()}
-
-                                </p>
-
-
-                            </div>
-
-
-
-
-
-
-
-
-
-                            {
-                                log.details &&
-
-                                Object.keys(log.details).length > 0 && (
-
-                                <button
-
-                                    onClick={()=>{
-
-                                        setExpanded(
-                                            expanded === log.id
-                                            ? null
-                                            : log.id
-                                        );
-
-                                    }}
-
-                                    className="mt-5 text-sm underline"
-
-                                >
-
-                                    {
-                                        expanded === log.id
-
-                                        ?
-
-                                        "Hide Details"
-
-                                        :
-
-                                        "View Details"
-
-                                    }
-
-                                </button>
-
-                                )
-
-                            }
-
-
-
-
-
-
-
-
-
-                            {
-                                expanded === log.id && (
-
-                                    <pre className="mt-4 bg-gray-100 rounded p-4 text-sm overflow-x-auto">
-
-                                        {
-                                            JSON.stringify(
-                                                log.details,
-                                                null,
-                                                2
-                                            )
-                                        }
-
-                                    </pre>
-
-                                )
-
-                            }
-
-
-
-
-
-                        </div>
-
-
-                    ))
-                }
 
 
 
 
 
             </div>
+
+
 
 
 
