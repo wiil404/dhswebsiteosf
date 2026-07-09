@@ -357,7 +357,7 @@ export default function LoginPage(){
                                 focus:border-[#003B6F]
                                 "
 
-                                placeholder="name@example.com"
+                                placeholder="name@gov.us"
 
                                 value={email}
 
