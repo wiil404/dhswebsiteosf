@@ -8,7 +8,6 @@ export const dynamic = "force-dynamic";
 export default async function NewsPage(){
 
 
-
     const {
         data:news,
         error
@@ -16,19 +15,7 @@ export default async function NewsPage(){
 
         .from("news")
 
-        .select(`
-            *,
-            employees(
-                roblox_username,
-                email,
-                positions(
-                    title
-                ),
-                divisions(
-                    name
-                )
-            )
-        `)
+        .select("*")
 
         .eq(
             "published",
@@ -45,7 +32,6 @@ export default async function NewsPage(){
 
 
 
-
     if(error){
 
         console.error(
@@ -54,6 +40,75 @@ export default async function NewsPage(){
         );
 
     }
+
+
+
+
+
+
+
+    const articlesWithAuthors = await Promise.all(
+
+        (news || []).map(async(article)=>{
+
+
+            let author = null;
+
+
+            if(article.author_id){
+
+
+                const {
+                    data:employee
+                } = await supabaseAdmin
+
+                    .from("employees")
+
+                    .select(`
+                        roblox_username,
+
+                        positions(
+                            title
+                        ),
+
+                        divisions(
+                            name
+                        )
+
+                    `)
+
+                    .eq(
+                        "id",
+                        article.author_id
+                    )
+
+                    .single();
+
+
+
+                author = employee;
+
+
+            }
+
+
+
+
+
+            return {
+
+                ...article,
+
+                author
+
+            };
+
+
+        })
+
+    );
+
+
 
 
 
@@ -88,6 +143,8 @@ export default async function NewsPage(){
                 "
 
             >
+
+
 
 
 
@@ -179,12 +236,13 @@ export default async function NewsPage(){
 
 
 
+
                 {
-                    news && news.length > 0
+                    articlesWithAuthors.length > 0
 
                     ?
 
-                    news.map((item)=>(
+                    articlesWithAuthors.map((item)=>(
 
 
                         <article
@@ -311,13 +369,12 @@ export default async function NewsPage(){
 
                                     >
 
-                                    {
-                                        new Date(
-                                            item.date || item.created_at
-                                        )
-                                        .toLocaleDateString()
-                                    }
-
+                                        {
+                                            new Date(
+                                                item.date || item.created_at
+                                            )
+                                            .toLocaleDateString()
+                                        }
 
                                     </p>
 
@@ -365,6 +422,7 @@ export default async function NewsPage(){
                                     "
 
                                 >
+
 
 
 
@@ -425,6 +483,7 @@ export default async function NewsPage(){
 
 
 
+
                                         <p
 
                                             className="
@@ -435,7 +494,7 @@ export default async function NewsPage(){
                                         >
 
                                             {
-                                                item.employees?.roblox_username ||
+                                                item.author?.roblox_username ||
                                                 "DHS Staff"
                                             }
 
@@ -455,7 +514,7 @@ export default async function NewsPage(){
                                         >
 
                                             {
-                                                item.employees?.positions?.title ||
+                                                item.author?.positions?.title ||
                                                 "Staff Member"
                                             }
 
@@ -466,7 +525,7 @@ export default async function NewsPage(){
 
 
                                         {
-                                            item.employees?.divisions?.name && (
+                                            item.author?.divisions?.name && (
 
                                                 <p
 
@@ -478,7 +537,7 @@ export default async function NewsPage(){
                                                 >
 
                                                     {
-                                                        item.employees.divisions.name
+                                                        item.author.divisions.name
                                                     }
 
                                                 </p>
@@ -488,7 +547,9 @@ export default async function NewsPage(){
 
 
 
+
                                     </div>
+
 
 
 
@@ -502,6 +563,7 @@ export default async function NewsPage(){
 
 
                             </div>
+
 
 
 
@@ -534,12 +596,18 @@ export default async function NewsPage(){
 
 
 
+
+
                 </div>
 
 
 
 
+
+
             </div>
+
+
 
 
 
