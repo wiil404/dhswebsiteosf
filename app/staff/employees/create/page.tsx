@@ -15,9 +15,6 @@ const router = useRouter();
 
 const [divisions,setDivisions]=useState<any[]>([]);
 
-const [positions,setPositions]=useState<any[]>([]);
-
-
 
 const [form,setForm]=useState({
 
@@ -43,25 +40,27 @@ const [form,setForm]=useState({
 
 
 
+
+
+
 useEffect(()=>{
 
 
 async function load(){
 
 
-const res =
-await fetch(
+const res = await fetch(
 "/api/staff/organisation/divisions"
 );
 
 
-setDivisions(
-await res.json()
-);
+const data = await res.json();
+
+
+setDivisions(data);
 
 
 }
-
 
 
 load();
@@ -76,59 +75,63 @@ load();
 
 
 
+
 async function submit(){
 
 
-    const response =
-        await fetch(
-            "/api/staff/employees",
-            {
+const response = await fetch(
 
-                method:"POST",
+"/api/staff/employees",
 
-                headers:{
+{
 
-                    "Content-Type":"application/json"
+method:"POST",
 
-                },
+headers:{
 
-                body:JSON.stringify(form)
+"Content-Type":"application/json"
 
-            }
+},
 
-        );
+body:JSON.stringify(form)
 
+}
 
-
-
-    const result =
-        await response.json();
+);
 
 
 
 
-    if(!response.ok){
 
-
-        alert(
-            result.error || "Failed creating employee"
-        );
-
-
-        return;
-
-
-    }
+const result = await response.json();
 
 
 
 
-    router.push(
-        "/staff/employees"
-    );
+
+if(!response.ok){
+
+
+alert(
+result.error || "Failed creating employee"
+);
+
+
+return;
 
 
 }
+
+
+
+
+router.push(
+"/staff/employees"
+);
+
+
+}
+
 
 
 
@@ -139,19 +142,150 @@ async function submit(){
 
 return (
 
-<main className="
-max-w-3xl
+<main
+
+className="
+relative
+min-h-screen
+py-16
+"
+
+>
+
+
+
+
+
+{/* BACKGROUND */}
+
+<div
+
+className="
+absolute
+inset-0
+-z-10
+bg-[#003B6F]
+overflow-hidden
+"
+
+>
+
+
+<div
+
+className="
+absolute
+inset-0
+opacity-10
+bg-[linear-gradient(45deg,transparent_45%,white_46%,transparent_47%),linear-gradient(-45deg,transparent_45%,white_46%,transparent_47%)]
+bg-[length:120px_120px]
+"
+
+/>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<section
+
+className="
+max-w-4xl
 mx-auto
 px-6
-py-12
-">
+"
+
+>
 
 
-<h1 className="
+<div
+
+className="
+bg-white
+shadow-2xl
+border
+border-gray-200
+"
+
+>
+
+
+{/* GOLD BAR */}
+
+<div
+
+className="
+h-2
+bg-[#F2C94C]
+"
+
+/>
+
+
+
+
+
+
+<div
+
+className="
+p-8
+md:p-12
+"
+
+>
+
+
+
+
+
+
+<div
+
+className="
+border-b
+pb-8
+"
+
+>
+
+
+<p
+
+className="
+uppercase
+tracking-[0.2em]
+text-sm
+font-bold
+text-[#003B6F]
+"
+
+>
+
+Department of Homeland Security
+
+</p>
+
+
+
+
+<h1
+
+className="
+mt-4
 text-4xl
 font-bold
 text-[#003B6F]
-">
+"
+
+>
 
 Create Employee
 
@@ -159,26 +293,64 @@ Create Employee
 
 
 
-
-<input
+<p
 
 className="
-border
-p-3
-w-full
-mt-6
+mt-3
+text-gray-600
 "
 
-placeholder="Roblox Username"
+>
 
-onChange={
-e=>
+Add a new member of personnel to the DHS employee directory.
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* FORM */}
+
+
+
+<div
+
+className="
+mt-10
+space-y-5
+"
+
+>
+
+
+
+
+
+
+
+
+<FormInput
+
+label="Roblox Username"
+
+placeholder="Enter Roblox username"
+
+onChange={(value)=>
 
 setForm({
 
 ...form,
 
-roblox_username:e.target.value
+roblox_username:value
 
 })
 
@@ -191,52 +363,20 @@ roblox_username:e.target.value
 
 
 
-<input
 
-className="
-border
-p-3
-w-full
-mt-4
-"
+<FormInput
 
-placeholder="Roblox User ID"
+label="Roblox User ID"
 
-onChange={
-e=>
+placeholder="Enter Roblox user ID"
+
+onChange={(value)=>
 
 setForm({
 
 ...form,
 
-roblox_user_id:e.target.value
-
-})
-
-}
-
-/>
-
-<input
-
-className="
-border
-p-3
-w-full
-mt-4
-"
-
-placeholder="DHS Email Address"
-
-onChange={
-
-e=>
-
-setForm({
-
-...form,
-
-email:e.target.value
+roblox_user_id:value
 
 })
 
@@ -245,6 +385,57 @@ email:e.target.value
 />
 
 
+
+
+
+
+
+
+<FormInput
+
+label="DHS Email Address"
+
+placeholder="employee@dhs.gov"
+
+onChange={(value)=>
+
+setForm({
+
+...form,
+
+email:value
+
+})
+
+}
+
+/>
+
+
+
+
+
+
+
+
+
+<div>
+
+
+<label
+
+className="
+block
+font-bold
+text-gray-700
+mb-2
+"
+
+>
+
+Division
+
+</label>
 
 
 
@@ -252,13 +443,16 @@ email:e.target.value
 
 className="
 border
+border-gray-300
 p-3
 w-full
-mt-4
+focus:border-[#003B6F]
+outline-none
 "
 
-onChange={
-e=>
+value={form.division_id}
+
+onChange={(e)=>
 
 setForm({
 
@@ -273,7 +467,7 @@ division_id:e.target.value
 >
 
 
-<option>
+<option value="">
 
 Select Division
 
@@ -282,8 +476,11 @@ Select Division
 
 
 {
+
 divisions.map(
+
 division=>(
+
 
 <option
 
@@ -297,6 +494,7 @@ value={division.id}
 
 </option>
 
+
 )
 
 )
@@ -304,9 +502,118 @@ value={division.id}
 }
 
 
+
 </select>
 
 
+
+</div>
+
+
+
+
+
+
+
+
+
+<div>
+
+
+<label
+
+className="
+block
+font-bold
+text-gray-700
+mb-2
+"
+
+>
+
+Status
+
+</label>
+
+
+
+<select
+
+className="
+border
+border-gray-300
+p-3
+w-full
+"
+
+value={form.status}
+
+onChange={(e)=>
+
+setForm({
+
+...form,
+
+status:e.target.value
+
+})
+
+}
+
+>
+
+
+<option>
+
+Active
+
+</option>
+
+
+<option>
+
+Inactive
+
+</option>
+
+
+<option>
+
+Leave
+
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div>
+
+
+<label
+
+className="
+block
+font-bold
+text-gray-700
+mb-2
+"
+
+>
+
+Notes
+
+</label>
 
 
 
@@ -315,15 +622,17 @@ value={division.id}
 
 className="
 border
+border-gray-300
 p-3
 w-full
-mt-4
+min-h-[120px]
 "
 
-placeholder="Notes"
+placeholder="Additional employee information..."
 
-onChange={
-e=>
+value={form.notes}
+
+onChange={(e)=>
 
 setForm({
 
@@ -339,6 +648,15 @@ notes:e.target.value
 
 
 
+</div>
+
+
+
+
+
+
+
+
 
 
 <button
@@ -349,9 +667,11 @@ className="
 mt-6
 bg-[#003B6F]
 text-white
-px-6
+px-8
 py-3
-rounded
+font-bold
+hover:bg-[#00284d]
+transition
 "
 
 >
@@ -363,7 +683,113 @@ Create Employee
 
 
 
+
+</div>
+
+
+
+
+
+
+
+
+
+</div>
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
 </main>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function FormInput({
+
+label,
+
+placeholder,
+
+onChange
+
+}:{
+
+label:string;
+
+placeholder:string;
+
+onChange:(value:string)=>void;
+
+}){
+
+
+return (
+
+<div>
+
+
+<label
+
+className="
+block
+font-bold
+text-gray-700
+mb-2
+"
+
+>
+
+{label}
+
+</label>
+
+
+
+<input
+
+className="
+border
+border-gray-300
+p-3
+w-full
+focus:outline-none
+focus:border-[#003B6F]
+"
+
+placeholder={placeholder}
+
+onChange={(e)=>
+
+onChange(
+e.target.value
+)
+
+}
+
+/>
+
+
+</div>
+
 
 );
 
