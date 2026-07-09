@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+:root {
+  --dhs-blue: #003B6F;
+  --dhs-light-blue: #0071BC;
+}
+
+body {
+  background: #003B6F;
+  color: #222;
+}
+
+.ProseMirror h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+
+.ProseMirror ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+}
+
+
+.ProseMirror ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+}
+
+
+.ProseMirror strong {
+    font-weight: 700;
+}
+
+
+.ProseMirror em {
+    font-style: italic;
+}
+
+.ProseMirror {
+    min-height:250px;
+}
+
+
+.ProseMirror h1 {
+    font-size:2rem;
+    font-weight:700;
+    margin:1rem 0;
+}
+
+
+.ProseMirror h2 {
+    font-size:1.5rem;
+    font-weight:700;
+    margin:1rem 0;
+}
+
+
+.ProseMirror h3 {
+    font-size:1.25rem;
+    font-weight:700;
+    margin:1rem 0;
+}
+
+
+.ProseMirror ul {
+    list-style-type:disc;
+    padding-left:2rem;
+}
+
+
+.ProseMirror ol {
+    list-style-type:decimal;
+    padding-left:2rem;
+}
+
+
+.ProseMirror blockquote {
+    border-left:4px solid #003B6F;
+    padding-left:1rem;
+    font-style:italic;
+}
+
+
+.ProseMirror hr {
+    margin:2rem 0;
+}
+
+.article-content h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+
+.article-content h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+
+.article-content h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: .75rem;
+}
+
+
+.article-content ul {
+    list-style-type: disc;
+    margin-left: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+
+.article-content ol {
+    list-style-type: decimal;
+    margin-left: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+
+.article-content blockquote {
+    border-left: 4px solid #003B6F;
+    padding-left: 1rem;
+    font-style: italic;
+    margin: 1rem 0;
+}
+
+
+.article-content a {
+    color: #0066cc;
+    text-decoration: underline;
+}
