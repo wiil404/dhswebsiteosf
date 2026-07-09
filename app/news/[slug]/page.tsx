@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "../../lib/supabase-admin";
 import { notFound } from "next/navigation";
-
+export const dynamic = "force-dynamic";
 
 async function getRobloxAvatar(userId:string){
 
