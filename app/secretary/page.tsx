@@ -145,7 +145,7 @@ shadow-lg
 
 <Image
 
-src="/leadership/secretary.jpg"
+src="/leadership/secretary.png"
 
 alt="Secretary of Homeland Security"
 
