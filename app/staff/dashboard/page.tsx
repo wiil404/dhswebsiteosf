@@ -46,9 +46,6 @@ export default async function Dashboard(){
 
 
 
-    /*
-        Get employee information
-    */
 
 
     const {
@@ -71,7 +68,6 @@ export default async function Dashboard(){
             divisions(
                 name
             )
-
         `)
 
         .eq(
@@ -80,7 +76,6 @@ export default async function Dashboard(){
         )
 
         .single();
-
 
 
 
@@ -124,307 +119,334 @@ export default async function Dashboard(){
 
 
 
-    return (
 
-        <main className="max-w-6xl mx-auto px-6 py-12">
+return (
 
+<main
 
+className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+"
 
-            <div className="
-                flex
-                justify-between
-                items-center
-                border-b
-                pb-8
-            ">
+>
 
 
-                <div>
+<div
 
+className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-8
+md:p-12
+"
 
-                    <h1 className="
-                        text-4xl
-                        font-bold
-                        text-[#003B6F]
-                    ">
+>
 
-                        DHS Staff Dashboard
 
-                    </h1>
 
 
 
-                    <p className="mt-2 text-gray-600">
 
-                        Welcome back, {employee?.roblox_username || profile.email}
 
-                    </p>
+{/* HEADER */}
 
 
-                </div>
+<div
 
+className="
+flex
+justify-between
+items-center
+border-b
+border-gray-200
+pb-8
+"
 
+>
 
 
+<div>
 
-                <form action={logout}>
 
+<h1
 
-                    <button
+className="
+text-4xl
+font-bold
+text-[#003B6F]
+"
 
-                        className="
-                            bg-red-600
-                            text-white
-                            px-5
-                            py-2
-                            rounded
-                            font-semibold
-                            hover:bg-red-700
-                        "
+>
 
-                    >
+DHS Staff Dashboard
 
-                        Logout
+</h1>
 
-                    </button>
 
 
-                </form>
+<p
 
+className="
+mt-3
+text-gray-500
+"
 
-            </div>
+>
 
+Welcome back,{" "}
 
+{
+employee?.roblox_username ||
+profile.email
+}
 
+</p>
 
 
+</div>
 
 
 
 
-            {/* Staff Profile */}
 
 
-            <div className="
-                mt-8
-                border
-                rounded-lg
-                p-6
-                bg-gray-50
-                flex
-                items-center
-                gap-5
-            ">
 
 
+<form action={logout}>
 
-                <div className="
-                    w-16
-                    h-16
-                    rounded-full
-                    bg-[#003B6F]
-                    text-white
-                    flex
-                    items-center
-                    justify-center
-                    text-2xl
-                    font-bold
-                ">
 
+<button
 
-                    {
-                        employee?.roblox_username
-                        ?.charAt(0)
-                        ||
-                        profile.email.charAt(0)
-                    }
+className="
+bg-red-600
+text-white
+px-6
+py-3
+font-semibold
+hover:bg-red-700
+transition
+"
 
+>
 
-                </div>
+Logout
 
+</button>
 
 
+</form>
 
 
-                <div>
 
+</div>
 
-                    <h2 className="text-xl font-bold">
 
 
-                        {
-                            employee?.roblox_username ||
-                            profile.email
-                        }
 
 
-                    </h2>
 
 
 
 
-                    <p className="text-gray-600">
+{/* PROFILE */}
 
 
-                        {
-                            employee?.positions?.[0]?.title ||
-                            "Staff Member"
-                        }
+<div
 
+className="
+mt-10
+border
+border-[#D9E4EF]
+bg-[#F5F8FB]
+p-7
+flex
+items-center
+gap-6
+"
 
-                    </p>
+>
 
 
+<div
 
+className="
+w-20
+h-20
+rounded-full
+bg-[#003B6F]
+text-white
+flex
+items-center
+justify-center
+text-3xl
+font-bold
+"
 
-                    <p className="text-sm text-gray-500">
+>
 
+{
 
-                        {
-                            employee?.divisions?.[0]?.name ||
-                            "Department of Homeland Security"
-                        }
+employee?.roblox_username
+?.charAt(0)
 
+||
 
-                    </p>
+profile.email.charAt(0)
 
+}
 
 
+</div>
 
-                    <p className="text-sm text-gray-500 mt-1">
 
-                        Role: {profile.role}
 
-                    </p>
 
 
-                </div>
 
 
 
-            </div>
+<div>
 
 
+<h2
 
+className="
+text-2xl
+font-bold
+text-gray-900
+"
 
+>
 
 
+{
+employee?.roblox_username ||
+profile.email
+}
 
 
+</h2>
 
-            <div className="mt-10 grid md:grid-cols-2 gap-6">
 
 
 
 
+<p
 
+className="
+mt-1
+text-[#003B6F]
+font-semibold
+"
 
-                {
-                    createNews && (
+>
 
-                        <PortalCard
+{
 
-                            href="/staff/news/create"
+employee?.positions?.[0]?.title ||
 
-                            title="Create Press Release"
+"Staff Member"
 
-                            description="Publish new DHS statements, notices and releases."
+}
 
-                        />
+</p>
 
-                    )
-                }
 
 
 
 
+<p
 
+className="
+text-gray-600
+"
 
+>
 
-                {
-                    (
-                        editNews ||
-                        deleteNews
-                    ) && (
+{
 
-                        <PortalCard
+employee?.divisions?.[0]?.name ||
 
-                            href="/staff/news"
+"Department of Homeland Security"
 
-                            title="Manage News Releases"
+}
 
-                            description="Edit, publish and manage existing releases."
+</p>
 
-                        />
 
-                    )
-                }
 
 
 
 
+<p
 
+className="
+mt-2
+text-sm
+text-gray-500
+"
 
+>
 
-                {
-                    manageUsers && (
+Role: {profile.role}
 
-                        <PortalCard
+</p>
 
-                            href="/staff/users"
 
-                            title="Staff Management"
 
-                            description="Manage staff accounts, roles and permissions."
+</div>
 
-                        />
 
-                    )
-                }
 
+</div>
 
 
 
 
 
 
-                {
-                    manageOrganisation && (
 
-                        <PortalCard
 
-                            href="/staff/organisation"
 
-                            title="Organisation Management"
+{/* PORTAL GRID */}
 
-                            description="Manage divisions, positions and department structure."
 
-                        />
+<div
 
-                    )
-                }
+className="
+mt-12
+grid
+md:grid-cols-2
+gap-6
+"
 
+>
 
 
 
 
 
+{
+createNews && (
 
-                {
-                    manageUsers && (
+<PortalCard
 
-                        <PortalCard
+href="/staff/news/create"
 
-                            href="/staff/employees"
+title="Create Press Release"
 
-                            title="Employee Directory"
+description="Publish new DHS statements, notices and official releases."
 
-                            description="View and manage DHS personnel records."
+/>
 
-                        />
+)
 
-                    )
-                }
+}
 
 
 
@@ -433,49 +455,161 @@ export default async function Dashboard(){
 
 
 
-                <PortalCard
+{
 
-                    href="/news"
+(editNews || deleteNews) && (
 
-                    title="Public News Portal"
+<PortalCard
 
-                    description="View published DHS releases."
+href="/staff/news"
 
-                />
+title="Manage News Releases"
 
+description="Edit, publish and manage existing DHS announcements."
 
+/>
 
+)
 
+}
 
 
 
-                {
-                    viewAudit && (
 
-                        <PortalCard
 
-                            href="/staff/audit"
 
-                            title="Audit Logs"
 
-                            description="Review staff actions and system activity."
 
-                        />
 
-                    )
-                }
+{
+manageUsers && (
 
+<PortalCard
 
+href="/staff/users"
 
+title="Staff Management"
 
+description="Manage staff accounts, access and user roles."
 
-            </div>
+/>
 
+)
 
+}
 
-        </main>
 
-    );
+
+
+
+
+
+
+
+{
+manageOrganisation && (
+
+<PortalCard
+
+href="/staff/organisation"
+
+title="Organisation Management"
+
+description="Manage divisions, positions and department structure."
+
+/>
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+{
+manageUsers && (
+
+<PortalCard
+
+href="/staff/employees"
+
+title="Employee Directory"
+
+description="View and manage DHS employee records."
+
+/>
+
+)
+
+}
+
+
+
+
+
+
+
+
+<PortalCard
+
+href="/news"
+
+title="Public News Portal"
+
+description="View publicly released DHS statements."
+
+/>
+
+
+
+
+
+
+
+
+
+{
+viewAudit && (
+
+<PortalCard
+
+href="/staff/audit"
+
+title="Audit Logs"
+
+description="Review staff actions and system activity."
+
+/>
+
+)
+
+}
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+</div>
+
+
+</main>
+
+
+);
 
 
 }
@@ -490,60 +624,126 @@ export default async function Dashboard(){
 
 function PortalCard({
 
-    href,
-    title,
-    description
+href,
+title,
+description
 
 }:{
 
-    href:string;
-    title:string;
-    description:string;
+href:string;
+
+title:string;
+
+description:string;
 
 }){
 
 
-    return (
+return (
 
-        <Link
+<Link
 
-            href={href}
+href={href}
 
-            className="
-                border
-                rounded-lg
-                p-6
-                hover:bg-gray-50
-                transition
-                shadow-sm
-            "
+className="
+group
+relative
+overflow-hidden
+border
+border-gray-200
+bg-white
+p-7
+shadow-sm
+transition
+duration-300
+hover:-translate-y-1
+hover:shadow-xl
+"
 
-        >
-
-
-            <h2 className="
-                text-xl
-                font-bold
-                text-[#003B6F]
-            ">
-
-                {title}
-
-            </h2>
+>
 
 
+<div
 
-            <p className="mt-2 text-gray-600">
+className="
+absolute
+left-0
+top-0
+h-full
+w-1
+bg-[#003B6F]
+group-hover:bg-[#F2C94C]
+transition
+"
 
-                {description}
-
-            </p>
+/>
 
 
 
-        </Link>
 
-    );
+
+<h2
+
+className="
+text-xl
+font-bold
+text-[#003B6F]
+"
+
+>
+
+{title}
+
+</h2>
+
+
+
+
+
+<p
+
+className="
+mt-3
+text-gray-600
+leading-relaxed
+"
+
+>
+
+{description}
+
+</p>
+
+
+
+
+
+<p
+
+className="
+mt-6
+text-sm
+font-bold
+text-[#003B6F]
+opacity-0
+group-hover:opacity-100
+transition
+"
+
+>
+
+Open Portal →
+
+</p>
+
+
+
+
+
+</Link>
+
+
+);
 
 
 }
