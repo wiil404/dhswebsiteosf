@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "../../../lib/supabase-server";
 import { createAuditLog } from "../../../lib/audit";
 import { getProfile } from "../../../lib/permissions";
+import { revalidatePath } from "next/cache";
 
 
 export async function POST(request: Request){
@@ -122,7 +123,7 @@ export async function POST(request: Request){
 
             .from("news")
 
-            .select("id,title")
+            .select("id,title,slug")
 
             .eq("id", id)
 
@@ -219,7 +220,10 @@ export async function POST(request: Request){
 
 
 
-
+        // Refresh pages that show news
+        revalidatePath("/");
+        revalidatePath("/news");
+        revalidatePath(`/news/${article.slug}`); // harmless, but see note below
 
 
 
