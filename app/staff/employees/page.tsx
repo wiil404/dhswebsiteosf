@@ -1,39 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-
-export default function Organisation(){
-
-
-    const [divisions,setDivisions] = useState<any[]>([]);
-
-
-    const [position,setPosition] = useState({
-
-        title:"",
-        description:"",
-        division_id:""
-
-    });
+import Link from "next/link";
 
 
 
+export default function Employees(){
 
 
-    async function load(){
+    const [employees,setEmployees] = useState<any[]>([]);
 
-        const response = await fetch(
-            "/api/staff/organisation/divisions"
-        );
+    const [loading,setLoading] = useState(true);
 
 
-        const data = await response.json();
-
-
-        setDivisions(data);
-
-    }
 
 
 
@@ -41,7 +20,63 @@ export default function Organisation(){
 
     useEffect(()=>{
 
+
+        async function load(){
+
+
+            try{
+
+
+                const response = await fetch(
+
+                    "/api/staff/employees",
+
+                    {
+
+                        cache:"no-store"
+
+                    }
+
+                );
+
+
+
+                const data = await response.json();
+
+
+
+                setEmployees(data);
+
+
+
+            }
+            catch(error){
+
+
+                console.error(
+                    "EMPLOYEE LOAD ERROR:",
+                    error
+                );
+
+
+            }
+            finally{
+
+
+                setLoading(false);
+
+
+            }
+
+
+        }
+
+
+
+
         load();
+
+
 
     },[]);
 
@@ -51,99 +86,58 @@ export default function Organisation(){
 
 
 
-    async function createPosition(){
 
 
-        await fetch(
-
-            "/api/staff/organisation/positions",
-
-            {
-
-                method:"POST",
-
-                headers:{
-
-                    "Content-Type":"application/json"
-
-                },
-
-                body:JSON.stringify(position)
-
-            }
-
-        );
+    if(loading){
 
 
+        return (
 
-        setPosition({
+            <main
 
-            title:"",
-            description:"",
-            division_id:""
+                className="
+                max-w-7xl
+                mx-auto
+                px-6
+                py-16
+                "
 
-        });
-
-
-
-        load();
-
-
-    }
+            >
 
 
+                <div
+
+                    className="
+                    bg-white
+                    shadow-xl
+                    border
+                    border-gray-200
+                    p-10
+                    "
+
+                >
+
+                    <h1
+
+                        className="
+                        text-xl
+                        font-bold
+                        text-[#003B6F]
+                        "
+
+                    >
+
+                        Loading employee directory...
+
+                    </h1>
 
 
+                </div>
 
 
-
-
-
-    async function deletePosition(id:string){
-
-
-        const confirmDelete =
-            confirm("Delete this position?");
-
-
-
-        if(!confirmDelete){
-
-            return;
-
-        }
-
-
-
-
-
-        await fetch(
-
-            "/api/staff/organisation/positions",
-
-            {
-
-                method:"DELETE",
-
-                headers:{
-
-                    "Content-Type":"application/json"
-
-                },
-
-                body:JSON.stringify({
-
-                    id
-
-                })
-
-            }
+            </main>
 
         );
-
-
-
-        load();
 
 
     }
@@ -170,6 +164,7 @@ export default function Organisation(){
         >
 
 
+
             <div
 
                 className="
@@ -184,391 +179,51 @@ export default function Organisation(){
 
 
 
-                <h1
+
+
+                {/* HEADER */}
+
+
+                <div
 
                     className="
-                    text-4xl
-                    font-bold
-                    text-[#003B6F]
-                    "
-
-                >
-
-                    Organisation Management
-
-                </h1>
-
-
-
-                <p className="mt-3 text-gray-600">
-
-                    Manage DHS divisions and organisational positions.
-
-                </p>
-
-
-
-
-
-
-
-
-                <section
-
-                    className="
-                    mt-10
-                    border
+                    flex
+                    justify-between
+                    items-center
+                    border-b
                     border-gray-200
-                    p-6
+                    pb-8
                     "
 
                 >
 
 
 
-                    <h2
+                    <div>
 
-                        className="
-                        text-2xl
-                        font-bold
-                        text-[#003B6F]
-                        "
 
-                    >
+                        <h1
 
-                        Create Position
+                            className="
+                            text-4xl
+                            font-bold
+                            text-[#003B6F]
+                            "
 
-                    </h2>
+                        >
 
+                            Employee Directory
 
+                        </h1>
 
 
 
 
-                    <select
+                        <p className="mt-3 text-gray-600">
 
-                        className="
-                        border
-                        p-3
-                        w-full
-                        mt-5
-                        "
+                            View and manage DHS personnel records.
 
-                        value={position.division_id}
-
-                        onChange={(e)=>
-
-                            setPosition({
-
-                                ...position,
-
-                                division_id:e.target.value
-
-                            })
-
-                        }
-
-                    >
-
-
-                        <option value="">
-
-                            Select Division
-
-                        </option>
-
-
-
-                        {
-                            divisions.map((division)=>(
-
-                                <option
-
-                                    key={division.id}
-
-                                    value={division.id}
-
-                                >
-
-                                    {division.name}
-
-                                </option>
-
-                            ))
-                        }
-
-
-                    </select>
-
-
-
-
-
-
-
-                    <input
-
-                        className="
-                        border
-                        p-3
-                        w-full
-                        mt-4
-                        "
-
-                        placeholder="Position Title"
-
-                        value={position.title}
-
-                        onChange={(e)=>
-
-                            setPosition({
-
-                                ...position,
-
-                                title:e.target.value
-
-                            })
-
-                        }
-
-                    />
-
-
-
-
-
-
-
-                    <textarea
-
-                        className="
-                        border
-                        p-3
-                        w-full
-                        mt-4
-                        "
-
-                        rows={4}
-
-                        placeholder="Position Description"
-
-                        value={position.description}
-
-                        onChange={(e)=>
-
-                            setPosition({
-
-                                ...position,
-
-                                description:e.target.value
-
-                            })
-
-                        }
-
-                    />
-
-
-
-
-
-
-
-                    <button
-
-                        onClick={createPosition}
-
-                        className="
-                        mt-5
-                        bg-[#003B6F]
-                        text-white
-                        px-6
-                        py-3
-                        font-bold
-                        "
-
-                    >
-
-                        Create Position
-
-                    </button>
-
-
-
-                </section>
-
-
-
-
-
-
-
-
-
-                <section className="mt-12">
-
-
-                    <h2
-
-                        className="
-                        text-3xl
-                        font-bold
-                        text-[#003B6F]
-                        "
-
-                    >
-
-                        Department Structure
-
-                    </h2>
-
-
-
-
-
-
-                    <div className="mt-8 space-y-8">
-
-
-                        {
-                            divisions.map((division)=>(
-
-
-                                <div
-
-                                    key={division.id}
-
-                                    className="
-                                    border
-                                    border-gray-200
-                                    p-6
-                                    "
-
-                                >
-
-
-
-                                    <h3
-
-                                        className="
-                                        text-2xl
-                                        font-bold
-                                        "
-
-                                    >
-
-                                        {division.name}
-
-                                    </h3>
-
-
-
-
-
-
-
-                                    <div className="mt-5 space-y-3">
-
-
-
-                                        {
-                                            division.positions &&
-                                            division.positions.length > 0
-                                            ?
-
-                                            division.positions.map((position:any)=>(
-
-
-                                                <div
-
-                                                    key={position.id}
-
-                                                    className="
-                                                    bg-[#F5F8FB]
-                                                    border
-                                                    p-4
-                                                    flex
-                                                    justify-between
-                                                    items-center
-                                                    "
-
-                                                >
-
-
-                                                    <div>
-
-
-                                                        <p className="font-bold">
-
-                                                            {position.title}
-
-                                                        </p>
-
-
-
-                                                        <p className="text-sm text-gray-600">
-
-                                                            {position.description}
-
-                                                        </p>
-
-
-                                                    </div>
-
-
-
-
-
-                                                    <button
-
-                                                        onClick={()=>
-                                                            deletePosition(position.id)
-                                                        }
-
-                                                        className="
-                                                        bg-red-600
-                                                        text-white
-                                                        px-4
-                                                        py-2
-                                                        "
-
-                                                    >
-
-                                                        Delete
-
-                                                    </button>
-
-
-
-                                                </div>
-
-
-                                            ))
-
-
-                                            :
-
-                                            <p className="text-gray-500">
-
-                                                No positions created.
-
-                                            </p>
-
-
-                                        }
-
-
-
-                                    </div>
-
-
-
-                                </div>
-
-
-
-                            ))
-                        }
+                        </p>
 
 
 
@@ -576,12 +231,325 @@ export default function Organisation(){
 
 
 
-                </section>
+
+
+
+
+
+                    <Link
+
+                        href="/staff/employees/create"
+
+                        className="
+                        bg-[#003B6F]
+                        text-white
+                        px-6
+                        py-3
+                        font-bold
+                        hover:bg-[#00284d]
+                        transition
+                        "
+
+                    >
+
+                        Add Employee
+
+                    </Link>
+
+
+
+
+                </div>
+
+
+
+
+
+
+
+
+
+                {/* EMPLOYEE CARDS */}
+
+
+
+                <div
+
+                    className="
+                    mt-10
+                    grid
+                    md:grid-cols-3
+                    gap-6
+                    "
+
+                >
+
+
+
+
+                    {
+                        employees.map((employee)=>(
+
+
+
+                            <Link
+
+
+                                key={employee.id}
+
+
+                                href={`/staff/employees/${employee.id}`}
+
+
+                                className="
+                                relative
+                                bg-white
+                                border
+                                border-gray-200
+                                p-6
+                                shadow-sm
+                                hover:shadow-xl
+                                transition
+                                "
+
+                            >
+
+
+
+
+
+                                <div
+
+                                    className="
+                                    absolute
+                                    left-0
+                                    top-0
+                                    bottom-0
+                                    w-1
+                                    bg-[#003B6F]
+                                    "
+
+                                />
+
+
+
+
+
+
+
+
+
+                                <h2
+
+                                    className="
+                                    text-xl
+                                    font-bold
+                                    text-[#003B6F]
+                                    "
+
+                                >
+
+                                    {employee.roblox_username}
+
+                                </h2>
+
+
+
+
+
+
+
+
+
+                                <div className="mt-4">
+
+
+                                    <p className="font-semibold text-gray-900">
+
+                                        {
+                                            employee.positions?.title ||
+                                            "No Position"
+                                        }
+
+                                    </p>
+
+
+
+
+
+                                    <p className="text-gray-600">
+
+                                        {
+                                            employee.divisions?.name ||
+                                            "No Division"
+                                        }
+
+                                    </p>
+
+
+
+                                </div>
+
+
+
+
+
+
+
+
+
+                                <div
+
+                                    className="
+                                    mt-5
+                                    "
+
+                                >
+
+
+
+                                    {
+                                        employee.status === "Active"
+
+                                        ?
+
+                                        <span
+
+                                            className="
+                                            inline-block
+                                            bg-green-100
+                                            text-green-700
+                                            px-3
+                                            py-1
+                                            text-sm
+                                            font-bold
+                                            "
+
+                                        >
+
+                                            Active
+
+                                        </span>
+
+
+                                        :
+
+                                        <span
+
+                                            className="
+                                            inline-block
+                                            bg-gray-100
+                                            text-gray-700
+                                            px-3
+                                            py-1
+                                            text-sm
+                                            font-bold
+                                            "
+
+                                        >
+
+                                            {employee.status}
+
+                                        </span>
+
+                                    }
+
+
+
+                                </div>
+
+
+
+
+
+
+
+
+
+                                <div
+
+                                    className="
+                                    mt-6
+                                    pt-4
+                                    border-t
+                                    border-gray-100
+                                    "
+
+                                >
+
+
+
+                                    <p className="text-xs uppercase text-gray-500">
+
+                                        Roblox ID
+
+                                    </p>
+
+
+
+                                    <p className="text-sm font-semibold text-gray-700">
+
+                                        {employee.roblox_user_id}
+
+                                    </p>
+
+
+
+                                </div>
+
+
+
+
+
+
+                            </Link>
+
+
+
+                        ))
+                    }
+
+
+
+
+                </div>
+
+
+
+
+
+
+
+                {
+                    employees.length === 0 && (
+
+
+                        <div
+
+                            className="
+                            mt-10
+                            text-center
+                            text-gray-500
+                            "
+
+                        >
+
+                            No employees found.
+
+                        </div>
+
+
+                    )
+                }
+
+
+
 
 
 
 
             </div>
+
 
 
 
