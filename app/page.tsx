@@ -2,6 +2,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import Image from "next/image";
 import Link from "next/link";
 import { supabaseAdmin } from "./lib/supabase-admin";
+export const dynamic = "force-dynamic";
 
 
 export default async function Home() {
