@@ -1,127 +1,70 @@
-import {NextResponse} from "next/server";
-import {supabaseAdmin} from "../../../../lib/supabase-admin";
-import {getProfile} from "../../../../lib/permissions";
+import { NextResponse } from "next/server";
+import { supabaseAdmin } from "../../../../lib/supabase-admin";
 
 
 export async function GET(){
 
 
-const {data,error}=await supabaseAdmin
+    const {
+        data,
+        error
 
-.from("divisions")
+    } = await supabaseAdmin
 
-.select(`
-*,
-employees(
-roblox_username
-)
-`)
+        .from("divisions")
 
-.order("name");
+        .select(`
+            id,
+            name,
 
+            positions(
+                id,
+                title,
+                description
+            )
 
+        `)
 
-if(error){
-
-return NextResponse.json(
-{
-error:error.message
-},
-{
-status:500
-}
-);
-
-}
-
-
-return NextResponse.json(data);
-
-
-}
+        .order(
+            "name",
+            {
+                ascending:true
+            }
+        );
 
 
 
 
 
-
-export async function POST(request:Request){
-
-
-const profile = await getProfile();
+    if(error){
 
 
+        return NextResponse.json(
 
-if(
-!profile ||
-profile.role !== "Administrator"
-){
+            {
+                error:error.message
+            },
 
-return NextResponse.json(
-{
-error:"Unauthorized"
-},
-{
-status:403
-}
-);
+            {
+                status:500
+            }
 
-}
+        );
 
 
-
-
-const {
-
-name,
-abbreviation,
-description
-
-}=await request.json();
-
-
-
-
-
-const {data,error}=await supabaseAdmin
-
-.from("divisions")
-
-.insert({
-
-name,
-
-abbreviation,
-
-description
-
-})
-
-.select()
-
-.single();
+    }
 
 
 
 
 
 
-if(error){
 
-return NextResponse.json(
-{
-error:error.message
-},
-{
-status:500
-}
-);
+    return NextResponse.json(
 
-}
+        data || []
 
-
-
-return NextResponse.json(data);
+    );
 
 
 }
