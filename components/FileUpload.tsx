@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../app/lib/supabase";
+import { supabaseBrowser } from "../app/lib/supabase-browser";
 
 
 interface Attachment {
@@ -71,7 +71,7 @@ export default function FileUpload({
 
 
 
-            const {error}=await supabase
+            const {error}=await supabaseBrowser
                 .storage
                 .from("news-files")
                 .upload(
@@ -91,7 +91,7 @@ export default function FileUpload({
 
 
 
-            const {data}=supabase
+            const {data}=supabaseBrowser
                 .storage
                 .from("news-files")
                 .getPublicUrl(
