@@ -1,144 +1,152 @@
 "use client";
 
-import {useEffect,useState} from "react";
-
+import { useEffect, useState } from "react";
 
 
 export default function Organisation(){
 
 
+    const [divisions,setDivisions] = useState<any[]>([]);
 
-const [divisions,setDivisions] =
-useState<any[]>([]);
 
+    const [position,setPosition] = useState({
 
+        title:"",
+        description:"",
+        division_id:""
 
+    });
 
 
-const [position,setPosition] =
-useState({
 
-title:"",
-description:"",
-division_id:""
 
-});
 
+    async function load(){
 
+        const response = await fetch(
+            "/api/staff/organisation/divisions"
+        );
 
 
+        const data = await response.json();
 
 
+        setDivisions(data);
 
+    }
 
 
-async function load(){
 
 
-const response = await fetch(
-"/api/staff/organisation/divisions"
-);
 
+    useEffect(()=>{
 
-const data =
-await response.json();
+        load();
 
+    },[]);
 
 
-setDivisions(data);
 
 
 
-}
 
 
+    async function createPosition(){
 
 
+        await fetch(
 
+            "/api/staff/organisation/positions",
 
+            {
 
-useEffect(()=>{
+                method:"POST",
 
-load();
+                headers:{
 
-},[]);
+                    "Content-Type":"application/json"
 
+                },
 
+                body:JSON.stringify(position)
 
+            }
 
+        );
 
 
 
+        setPosition({
 
+            title:"",
+            description:"",
+            division_id:""
 
-async function createPosition(){
+        });
 
 
 
-await fetch(
+        load();
 
-"/api/staff/organisation/positions",
 
-{
+    }
 
-method:"POST",
 
-headers:{
 
-"Content-Type":"application/json"
 
-},
 
-body:JSON.stringify(position)
 
-}
 
-);
 
 
+    async function deletePosition(id:string){
 
 
+        const confirmDelete =
+            confirm("Delete this position?");
 
-setPosition({
 
-title:"",
-description:"",
-division_id:""
 
-});
+        if(!confirmDelete){
 
+            return;
 
+        }
 
 
 
-load();
 
 
+        await fetch(
 
-}
+            "/api/staff/organisation/positions",
 
+            {
 
+                method:"DELETE",
 
+                headers:{
 
+                    "Content-Type":"application/json"
 
+                },
 
+                body:JSON.stringify({
 
+                    id
 
+                })
 
-async function deletePosition(id:string){
+            }
 
+        );
 
 
-if(
-!confirm(
-"Delete this position?"
-)
 
-){
+        load();
 
-return;
 
-}
+    }
 
 
 
@@ -146,41 +154,57 @@ return;
 
 
 
-await fetch(
 
-"/api/staff/organisation/positions",
 
-{
+    return (
 
-method:"DELETE",
+        <main
 
-headers:{
+            className="
+            max-w-7xl
+            mx-auto
+            px-6
+            py-16
+            "
 
-"Content-Type":"application/json"
+        >
 
-},
 
-body:JSON.stringify({
+            <div
 
-id
+                className="
+                bg-white
+                shadow-xl
+                border
+                border-gray-200
+                p-10
+                "
 
-})
+            >
 
-}
 
-);
 
+                <h1
 
+                    className="
+                    text-4xl
+                    font-bold
+                    text-[#003B6F]
+                    "
 
+                >
 
+                    Organisation Management
 
-load();
+                </h1>
 
 
 
-}
+                <p className="mt-3 text-gray-600">
 
+                    Manage DHS divisions and organisational positions.
 
+                </p>
 
 
 
@@ -188,637 +212,383 @@ load();
 
 
 
-return (
 
-<main
+                <section
 
-className="
-max-w-7xl
-mx-auto
-px-6
-py-16
-"
+                    className="
+                    mt-10
+                    border
+                    border-gray-200
+                    p-6
+                    "
 
->
+                >
 
 
 
-<div
+                    <h2
 
-className="
-bg-white
-shadow-xl
-border
-border-gray-200
-p-8
-md:p-12
-"
+                        className="
+                        text-2xl
+                        font-bold
+                        text-[#003B6F]
+                        "
 
->
+                    >
 
+                        Create Position
 
+                    </h2>
 
 
 
 
 
 
-{/* HEADER */}
+                    <select
 
+                        className="
+                        border
+                        p-3
+                        w-full
+                        mt-5
+                        "
 
-<div
+                        value={position.division_id}
 
-className="
-border-b
-border-gray-200
-pb-8
-"
+                        onChange={(e)=>
 
->
+                            setPosition({
 
+                                ...position,
 
-<h1
+                                division_id:e.target.value
 
-className="
-text-4xl
-font-bold
-text-[#003B6F]
-"
+                            })
 
->
+                        }
 
-Organisation Management
+                    >
 
-</h1>
 
+                        <option value="">
 
+                            Select Division
 
+                        </option>
 
 
-<p
 
-className="
-mt-3
-text-gray-600
-"
+                        {
+                            divisions.map((division)=>(
 
->
+                                <option
 
-Manage DHS divisions, positions, and organisational structure.
+                                    key={division.id}
 
-</p>
+                                    value={division.id}
 
+                                >
 
-</div>
+                                    {division.name}
 
+                                </option>
 
+                            ))
+                        }
 
 
+                    </select>
 
 
 
 
 
-{/* CREATE POSITION */}
 
 
-<section
+                    <input
 
-className="
-mt-10
-border
-border-gray-200
-p-7
-"
+                        className="
+                        border
+                        p-3
+                        w-full
+                        mt-4
+                        "
 
->
+                        placeholder="Position Title"
 
+                        value={position.title}
 
+                        onChange={(e)=>
 
-<h2
+                            setPosition({
 
-className="
-text-2xl
-font-bold
-text-[#003B6F]
-"
+                                ...position,
 
->
+                                title:e.target.value
 
-Create Position
+                            })
 
-</h2>
+                        }
 
+                    />
 
 
 
 
 
-<div
 
-className="
-mt-6
-space-y-4
-"
 
->
+                    <textarea
 
+                        className="
+                        border
+                        p-3
+                        w-full
+                        mt-4
+                        "
 
+                        rows={4}
 
+                        placeholder="Position Description"
 
+                        value={position.description}
 
-<select
+                        onChange={(e)=>
 
-className="
-w-full
-border
-border-gray-300
-p-4
-focus:border-[#003B6F]
-outline-none
-"
+                            setPosition({
 
-value={
-position.division_id
-}
+                                ...position,
 
-onChange={e=>
+                                description:e.target.value
 
-setPosition({
+                            })
 
-...position,
+                        }
 
-division_id:e.target.value
+                    />
 
-})
 
-}
 
->
 
 
-<option value="">
 
-Select Division
 
-</option>
+                    <button
 
+                        onClick={createPosition}
 
+                        className="
+                        mt-5
+                        bg-[#003B6F]
+                        text-white
+                        px-6
+                        py-3
+                        font-bold
+                        "
 
+                    >
 
+                        Create Position
 
-{
+                    </button>
 
-divisions.map(
 
-division=>(
 
+                </section>
 
-<option
 
-key={division.id}
 
-value={division.id}
 
->
 
-{division.name}
 
-</option>
 
 
-)
 
-)
+                <section className="mt-12">
 
-}
 
+                    <h2
 
+                        className="
+                        text-3xl
+                        font-bold
+                        text-[#003B6F]
+                        "
 
-</select>
+                    >
 
+                        Department Structure
 
+                    </h2>
 
 
 
 
 
 
+                    <div className="mt-8 space-y-8">
 
-<input
 
-className="
-w-full
-border
-border-gray-300
-p-4
-focus:border-[#003B6F]
-outline-none
-"
+                        {
+                            divisions.map((division)=>(
 
-placeholder="Position Title"
 
-value={
-position.title
-}
+                                <div
 
-onChange={e=>
+                                    key={division.id}
 
-setPosition({
+                                    className="
+                                    border
+                                    border-gray-200
+                                    p-6
+                                    "
 
-...position,
+                                >
 
-title:e.target.value
 
-})
 
-}
+                                    <h3
 
-/>
+                                        className="
+                                        text-2xl
+                                        font-bold
+                                        "
 
+                                    >
 
+                                        {division.name}
 
+                                    </h3>
 
 
 
 
 
-<textarea
 
-className="
-w-full
-border
-border-gray-300
-p-4
-focus:border-[#003B6F]
-outline-none
-"
 
-rows={4}
+                                    <div className="mt-5 space-y-3">
 
-placeholder="Position Description"
 
-value={
-position.description
-}
 
-onChange={e=>
+                                        {
+                                            division.positions &&
+                                            division.positions.length > 0
+                                            ?
 
-setPosition({
+                                            division.positions.map((position:any)=>(
 
-...position,
 
-description:e.target.value
+                                                <div
 
-})
+                                                    key={position.id}
 
-}
+                                                    className="
+                                                    bg-[#F5F8FB]
+                                                    border
+                                                    p-4
+                                                    flex
+                                                    justify-between
+                                                    items-center
+                                                    "
 
-/>
+                                                >
 
 
+                                                    <div>
 
 
+                                                        <p className="font-bold">
 
+                                                            {position.title}
 
+                                                        </p>
 
-<button
 
-onClick={createPosition}
 
-className="
-bg-[#003B6F]
-text-white
-px-7
-py-3
-font-bold
-hover:bg-[#00284d]
-transition
-"
+                                                        <p className="text-sm text-gray-600">
 
->
+                                                            {position.description}
 
-Create Position
+                                                        </p>
 
-</button>
 
+                                                    </div>
 
 
 
 
-</div>
 
+                                                    <button
 
+                                                        onClick={()=>
+                                                            deletePosition(position.id)
+                                                        }
 
-</section>
+                                                        className="
+                                                        bg-red-600
+                                                        text-white
+                                                        px-4
+                                                        py-2
+                                                        "
 
+                                                    >
 
+                                                        Delete
 
+                                                    </button>
 
 
 
+                                                </div>
 
 
+                                            ))
 
-{/* STRUCTURE */}
 
+                                            :
 
-<section
+                                            <p className="text-gray-500">
 
-className="
-mt-14
-"
+                                                No positions created.
 
->
+                                            </p>
 
 
+                                        }
 
-<h2
 
-className="
-text-3xl
-font-bold
-text-[#003B6F]
-"
 
->
+                                    </div>
 
-Department Structure
 
-</h2>
 
+                                </div>
 
 
 
+                            ))
+                        }
 
 
 
+                    </div>
 
-<div
 
-className="
-mt-8
-space-y-8
-"
 
->
+                </section>
 
 
 
 
+            </div>
 
-{
 
-divisions.map(
 
-division=>(
+        </main>
 
 
-<div
-
-key={division.id}
-
-className="
-border
-border-gray-200
-p-7
-shadow-sm
-"
-
->
-
-
-
-
-
-<div
-
-className="
-border-b
-border-gray-100
-pb-4
-"
-
->
-
-
-<h3
-
-className="
-text-2xl
-font-bold
-text-[#003B6F]
-"
-
->
-
-{division.name}
-
-</h3>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div
-
-className="
-mt-6
-space-y-4
-"
-
->
-
-
-
-
-
-
-{
-
-division.positions?.length
-
-?
-
-division.positions.map(
-
-(position:any)=>(
-
-
-<div
-
-key={position.id}
-
-className="
-flex
-justify-between
-items-center
-bg-[#F5F8FB]
-border
-border-[#D9E4EF]
-p-5
-"
-
->
-
-
-
-<div>
-
-
-<p
-
-className="
-font-bold
-text-gray-900
-"
-
->
-
-{position.title}
-
-</p>
-
-
-
-
-
-<p
-
-className="
-text-sm
-text-gray-600
-mt-1
-"
-
->
-
-{position.description}
-
-</p>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<button
-
-onClick={()=>deletePosition(position.id)}
-
-className="
-bg-red-600
-text-white
-px-4
-py-2
-font-semibold
-hover:bg-red-700
-transition
-"
-
->
-
-Delete
-
-</button>
-
-
-
-
-
-
-</div>
-
-
-)
-
-
-
-
-
-:
-(
-<p
-
-className="
-text-gray-500
-"
-
->
-
-No positions created.
-
-</p>
-
-
-)
-}
-
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-)
-
-
-)
-
-}
-
-
-
-
-
-</div>
-
-
-
-
-
-
-</section>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-</main>
-
-
-);
+    );
 
 
 }
