@@ -75,47 +75,7 @@ export async function POST(request: Request){
     */
 
 
-    const {
-        data:profile,
-        error:profileError
 
-    } = await supabaseAdmin
-
-        .from("profiles")
-
-        .select(
-            `
-            employee_id
-            `
-        )
-
-        .eq(
-            "id",
-            user.id
-        )
-
-        .single();
-
-
-
-
-
-
-    if(profileError || !profile?.employee_id){
-
-
-        return NextResponse.json(
-            {
-                error:
-                "Your account is not linked to an employee profile"
-            },
-            {
-                status:400
-            }
-        );
-
-
-    }
 
 
 
