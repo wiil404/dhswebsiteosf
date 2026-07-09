@@ -6,293 +6,294 @@ import Editor from "../../../../components/Editor";
 import FileUpload from "../../../../components/FileUpload";
 
 
+
 export default function CreateNews(){
 
-    const router = useRouter();
 
+const router = useRouter();
 
-    const [title,setTitle] = useState("");
-    const [slug,setSlug] = useState("");
-    const [category,setCategory] = useState("Press Release");
-    const [summary,setSummary] = useState("");
-    const [content,setContent] = useState("");
 
-    const [published,setPublished] = useState(true);
 
-    const [featured,setFeatured] = useState(false);
+const [title,setTitle] = useState("");
+const [slug,setSlug] = useState("");
+const [category,setCategory] = useState("Press Release");
+const [summary,setSummary] = useState("");
+const [content,setContent] = useState("");
 
+const [published,setPublished] = useState(true);
+const [featured,setFeatured] = useState(false);
 
-    const [attachments,setAttachments] = useState<
-        {
-            name:string;
-            url:string;
-        }[]
-    >([]);
 
 
-    const [featuredImage,setFeaturedImage] = useState("");
+const [attachments,setAttachments] = useState<
+{
+    name:string;
+    url:string;
+}[]
+>([]);
 
-    const [loading,setLoading] = useState(false);
 
-    const [checkingPermission,setCheckingPermission] = useState(true);
 
+const [featuredImage,setFeaturedImage] = useState("");
 
+const [loading,setLoading] = useState(false);
 
+const [checkingPermission,setCheckingPermission] = useState(true);
 
 
-    useEffect(()=>{
 
 
-        async function checkPermission(){
 
 
-            const response = await fetch(
-                "/api/profile"
-            );
 
+useEffect(()=>{
 
 
-            if(!response.ok){
+async function checkPermission(){
 
-                router.push("/staff/login");
 
-                return;
+const response = await fetch(
+    "/api/profile"
+);
 
-            }
 
 
+if(!response.ok){
 
-            const profile = await response.json();
+    router.push("/staff/login");
 
+    return;
 
+}
 
-            if(
-                profile.role === "Administrator" ||
-                profile.role === "Editor" ||
-                profile.role === "Public Affairs Officer"
-            ){
 
-                setCheckingPermission(false);
 
-            }
-            else{
+const profile = await response.json();
 
-                router.push("/staff/news");
 
-            }
 
 
-        }
 
+if(
 
+profile.role === "Administrator" ||
+profile.role === "Editor" ||
+profile.role === "Public Affairs Officer"
 
-        checkPermission();
+){
 
+    setCheckingPermission(false);
 
-    },[]);
+}
 
+else{
 
+    router.push("/staff/news");
 
+}
 
 
 
+}
 
 
-    function generateSlug(value:string){
 
+checkPermission();
 
-        return value
 
-            .toLowerCase()
+},[]);
 
-            .trim()
 
-            .replace(
-                /[^a-z0-9]+/g,
-                "-"
-            )
 
-            .replace(
-                /^-+|-+$/g,
-                "" 
-            );
 
 
-    }
 
 
 
 
+function generateSlug(value:string){
 
 
+return value
 
+.toLowerCase()
 
-    async function createArticle(){
+.trim()
 
+.replace(
+    /[^a-z0-9]+/g,
+    "-"
+)
 
-        setLoading(true);
+.replace(
+    /^-+|-+$/g,
+    ""
+);
 
 
+}
 
-        try{
 
 
-            const response = await fetch(
-                "/api/news/create",
-                {
 
-                    method:"POST",
 
-                    headers:{
 
-                        "Content-Type":"application/json"
 
-                    },
 
 
-                    body:JSON.stringify({
+async function createArticle(){
 
-                        title,
 
-                        slug,
+setLoading(true);
 
-                        category,
 
-                        summary,
 
-                        content,
+try{
 
-                        published,
 
-                        featured,
+const response = await fetch(
 
-                        attachments,
+"/api/news/create",
 
-                        featuredImage
+{
 
-                    })
+method:"POST",
 
-                }
-            );
+headers:{
 
+"Content-Type":"application/json"
 
+},
 
-            const result =
-                await response.json();
+body:JSON.stringify({
 
+title,
 
+slug,
 
+category,
 
-            if(result.error){
+summary,
 
-                alert(result.error);
+content,
 
-                setLoading(false);
+published,
 
-                return;
+featured,
 
-            }
+attachments,
 
+featuredImage
 
+})
 
+}
 
-            router.push("/staff/news");
+);
 
 
-        }
-        catch(error){
 
 
-            console.error(
-                "CREATE ERROR:",
-                error
-            );
 
+const result =
+await response.json();
 
-            alert(
-                "Something went wrong creating the article"
-            );
 
 
-            setLoading(false);
 
 
-        }
+if(result.error){
 
+alert(result.error);
 
-    }
+setLoading(false);
 
+return;
 
+}
 
 
 
 
 
-    if(checkingPermission){
+router.push("/staff/news");
 
 
-        return (
 
-            <main className="max-w-4xl mx-auto px-6 py-12">
+}
 
-                <h1 className="text-2xl font-bold">
+catch(error){
 
-                    Checking permissions...
 
-                </h1>
+console.error(
+"CREATE ERROR:",
+error
+);
 
-            </main>
 
-        );
+alert(
+"Something went wrong creating the article"
+);
 
-    }
 
+setLoading(false);
 
 
+}
 
 
 
+}
 
-    return (
 
-        <main className="max-w-4xl mx-auto px-6 py-12">
 
 
-            <h1 className="text-4xl font-bold text-[#003B6F]">
 
-                Create Press Release
 
-            </h1>
 
 
 
+if(checkingPermission){
 
 
-            <input
+return (
 
-                className="border p-3 w-full mt-6 rounded"
+<main className="
+max-w-5xl
+mx-auto
+px-6
+py-16
+">
 
-                placeholder="Title"
 
-                value={title}
+<div className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-10
+">
 
-                onChange={(e)=>{
+<h1 className="
+text-2xl
+font-bold
+text-[#003B6F]
+">
 
+Checking permissions...
 
-                    const value=e.target.value;
+</h1>
 
 
-                    setTitle(value);
+</div>
 
 
-                    setSlug(
-                        generateSlug(value)
-                    );
+</main>
 
+);
 
-                }}
 
-            />
+}
 
 
 
@@ -300,74 +301,85 @@ export default function CreateNews(){
 
 
 
-            <input
 
-                className="border p-3 w-full mt-4 rounded"
 
-                placeholder="Slug"
+return (
 
-                value={slug}
+<main
 
-                onChange={(e)=>
-                    setSlug(e.target.value)
-                }
+className="
+max-w-5xl
+mx-auto
+px-6
+py-16
+"
 
-            />
+>
 
 
+<div
 
+className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-8
+md:p-12
+"
 
+>
 
 
 
-            <select
 
-                className="border p-3 w-full mt-4 rounded"
 
-                value={category}
+{/* HEADER */}
 
-                onChange={(e)=>
-                    setCategory(e.target.value)
-                }
 
-            >
+<div
 
-                <option>
-                    Press Release
-                </option>
+className="
+border-b
+border-gray-200
+pb-8
+"
 
-                <option>
-                    Public Notice
-                </option>
+>
 
-                <option>
-                    Statement
-                </option>
 
+<h1
 
-            </select>
+className="
+text-4xl
+font-bold
+text-[#003B6F]
+"
 
+>
 
+Create Press Release
 
+</h1>
 
 
 
+<p
 
-            <textarea
+className="
+mt-3
+text-gray-500
+"
 
-                className="border p-3 w-full mt-4 rounded"
+>
 
-                placeholder="Summary"
+Create and publish official DHS statements, notices and releases.
 
-                rows={3}
+</p>
 
-                value={summary}
 
-                onChange={(e)=>
-                    setSummary(e.target.value)
-                }
+</div>
 
-            />
 
 
 
@@ -375,135 +387,154 @@ export default function CreateNews(){
 
 
 
-            <Editor
 
-                value={content}
+{/* FORM */}
 
-                onChange={setContent}
 
-            />
+<div className="mt-10 space-y-5">
 
 
 
 
 
+<input
 
+className="
+w-full
+border
+border-gray-300
+p-4
+focus:outline-none
+focus:border-[#003B6F]
+"
 
-            <FileUpload
+placeholder="Title"
 
-                attachments={attachments}
+value={title}
 
-                setAttachments={setAttachments}
+onChange={(e)=>{
 
-                featuredImage={featuredImage}
 
-                setFeaturedImage={setFeaturedImage}
+const value=e.target.value;
 
-            />
 
+setTitle(value);
 
 
+setSlug(
+generateSlug(value)
+);
 
 
+}}
 
+/>
 
 
 
-            <div className="mt-6 space-y-3 border rounded-lg p-5 bg-gray-50">
 
 
-                <label className="flex items-center gap-3">
 
 
-                    <input
 
-                        type="checkbox"
+<input
 
-                        checked={published}
+className="
+w-full
+border
+border-gray-300
+p-4
+focus:outline-none
+focus:border-[#003B6F]
+"
 
-                        onChange={(e)=>
-                            setPublished(e.target.checked)
-                        }
+placeholder="Slug"
 
-                    />
+value={slug}
 
+onChange={(e)=>
+setSlug(e.target.value)
+}
 
-                    <span className="font-semibold">
+/>
 
-                        Publish immediately
 
-                    </span>
 
 
-                </label>
 
 
 
 
 
+<select
 
-                <label
+className="
+w-full
+border
+border-gray-300
+p-4
+focus:outline-none
+focus:border-[#003B6F]
+"
 
-                    className={`
-                        flex
-                        items-center
-                        gap-3
-                        ${
-                            !published
-                            ?
-                            "opacity-50"
-                            :
-                            ""
-                        }
-                    `}
+value={category}
 
-                >
+onChange={(e)=>
+setCategory(e.target.value)
+}
 
+>
 
-                    <input
 
-                        type="checkbox"
+<option>
+Press Release
+</option>
 
-                        disabled={!published}
 
-                        checked={featured}
+<option>
+Public Notice
+</option>
 
-                        onChange={(e)=>
-                            setFeatured(e.target.checked)
-                        }
 
-                    />
+<option>
+Statement
+</option>
 
 
+</select>
 
-                    <span className="font-semibold">
 
-                        Feature on homepage statement block
 
-                    </span>
 
 
 
-                </label>
 
 
 
+<textarea
 
+className="
+w-full
+border
+border-gray-300
+p-4
+focus:outline-none
+focus:border-[#003B6F]
+"
 
-                {
-                    featured && published && (
+placeholder="Summary"
 
-                        <p className="text-sm text-[#003B6F]">
+rows={4}
 
-                            This release will appear as the main featured statement on the DHS homepage.
+value={summary}
 
-                        </p>
+onChange={(e)=>
+setSummary(e.target.value)
+}
 
-                    )
-                }
+/>
 
 
-            </div>
 
 
 
@@ -511,46 +542,272 @@ export default function CreateNews(){
 
 
 
-            <button
+<div className="
+border
+border-gray-200
+p-5
+">
 
-                onClick={createArticle}
+<Editor
 
-                disabled={loading}
+value={content}
 
-                className="
-                    mt-6
-                    bg-[#003B6F]
-                    text-white
-                    px-6
-                    py-3
-                    rounded
-                    font-semibold
-                    hover:bg-[#00284d]
-                "
+onChange={setContent}
 
-            >
+/>
 
-                {
-                    loading
-                    ?
-                    "Saving..."
-                    :
-                    published
-                    ?
-                    "Publish Release"
-                    :
-                    "Save as Draft"
-                }
+</div>
 
 
-            </button>
 
 
 
 
 
-        </main>
 
-    );
+<FileUpload
+
+attachments={attachments}
+
+setAttachments={setAttachments}
+
+featuredImage={featuredImage}
+
+setFeaturedImage={setFeaturedImage}
+
+/>
+
+
+
+
+
+
+
+
+
+
+{/* OPTIONS */}
+
+
+<div
+
+className="
+mt-8
+border
+border-[#D9E4EF]
+bg-[#F5F8FB]
+p-6
+space-y-5
+"
+
+>
+
+
+
+
+
+
+<label
+
+className="
+flex
+items-center
+gap-3
+"
+
+>
+
+
+<input
+
+type="checkbox"
+
+checked={published}
+
+onChange={(e)=>
+setPublished(e.target.checked)
+}
+
+/>
+
+
+<span className="
+font-semibold
+text-gray-800
+">
+
+Publish immediately
+
+</span>
+
+
+</label>
+
+
+
+
+
+
+
+
+
+
+<label
+
+className={`
+flex
+items-center
+gap-3
+
+${
+!published
+?
+"opacity-50"
+:
+""
+}
+
+`}
+
+>
+
+
+<input
+
+type="checkbox"
+
+disabled={!published}
+
+checked={featured}
+
+onChange={(e)=>
+setFeatured(e.target.checked)
+}
+
+/>
+
+
+
+<span className="
+font-semibold
+text-gray-800
+">
+
+Feature on homepage statement block
+
+</span>
+
+
+</label>
+
+
+
+
+
+
+
+
+
+{
+featured && published && (
+
+<p
+
+className="
+text-sm
+text-[#003B6F]
+font-medium
+"
+
+>
+
+This release will appear as the main featured statement on the DHS homepage.
+
+</p>
+
+)
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<button
+
+onClick={createArticle}
+
+disabled={loading}
+
+className="
+mt-8
+bg-[#003B6F]
+text-white
+px-8
+py-3
+font-bold
+hover:bg-[#00284d]
+transition
+disabled:opacity-50
+"
+
+>
+
+
+{
+
+loading
+
+?
+
+"Saving..."
+
+:
+
+published
+
+?
+
+"Publish Release"
+
+:
+
+"Save as Draft"
+
+}
+
+
+</button>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</main>
+
+
+);
+
 
 }
