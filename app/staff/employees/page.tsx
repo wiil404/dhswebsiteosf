@@ -3,187 +3,517 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+
+
 export default function Employees(){
 
-    const [employees,setEmployees] = useState<any[]>([]);
-    const [loading,setLoading] = useState(true);
 
 
-    useEffect(()=>{
+const [employees,setEmployees] =
+useState<any[]>([]);
 
-        async function load(){
 
-            const response = await fetch(
-                "/api/staff/employees",
-                {
-                    cache:"no-store"
-                }
-            );
+const [loading,setLoading] =
+useState(true);
 
-            const data = await response.json();
 
-            setEmployees(data);
 
-            setLoading(false);
 
-        }
 
 
-        load();
 
-    },[]);
+useEffect(()=>{
 
 
+async function load(){
 
-    if(loading){
 
-        return (
 
-            <main className="p-12">
-                Loading employees...
-            </main>
+const response = await fetch(
 
-        );
+"/api/staff/employees",
 
-    }
+{
 
+cache:"no-store"
 
+}
 
-    return (
+);
 
-        <main className="
-        max-w-7xl
-        mx-auto
-        px-6
-        py-12
-        ">
 
 
-            <div className="
-            flex
-            justify-between
-            items-center
-            ">
 
-                <h1 className="
-                text-4xl
-                font-bold
-                text-[#003B6F]
-                ">
 
-                    Employee Directory
+const data =
+await response.json();
 
-                </h1>
 
 
-                <Link
 
-                href="/staff/employees/create"
 
-                className="
-                bg-[#003B6F]
-                text-white
-                px-5
-                py-3
-                rounded
-                "
+setEmployees(data);
 
-                >
+setLoading(false);
 
-                    Add Employee
 
-                </Link>
 
+}
 
-            </div>
 
 
 
-            <div className="
-            mt-10
-            grid
-            md:grid-cols-3
-            gap-6
-            ">
 
+load();
 
-            {
-                employees.map(employee=>(
 
 
-                    <Link
+},[]);
 
-                    key={employee.id}
 
-                    href={`/staff/employees/${employee.id}`}
 
-                    className="
-                    border
-                    rounded-lg
-                    p-6
-                    hover:shadow-lg
-                    "
 
-                    >
 
 
-                        <h2 className="
-                        text-xl
-                        font-bold
-                        ">
 
-                            {employee.roblox_username}
 
-                        </h2>
 
 
+if(loading){
 
-                        <p className="text-gray-600 mt-2">
 
-                            {employee.positions?.title || "No Position"}
+return (
 
-                        </p>
+<main
 
+className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+"
 
+>
 
-                        <p className="text-gray-600">
 
-                            {employee.divisions?.name || "No Division"}
+<div
 
-                        </p>
+className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-10
+"
 
+>
 
+<p
 
-                        <p className="mt-3 font-semibold">
+className="
+text-xl
+font-semibold
+text-[#003B6F]
+"
 
-                            Status: {employee.status}
+>
 
-                        </p>
+Loading employee directory...
 
+</p>
 
-                        <p className="
-                        text-sm
-                        text-gray-500
-                        mt-2
-                        ">
 
-                            Roblox ID: {employee.roblox_user_id}
+</div>
 
-                        </p>
 
+</main>
 
-                    </Link>
+);
 
 
-                ))
-            }
+}
 
 
-            </div>
 
 
-        </main>
 
-    );
+
+
+
+
+return (
+
+<main
+
+className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+"
+
+>
+
+
+<div
+
+className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-8
+md:p-12
+"
+
+>
+
+
+
+
+
+
+{/* HEADER */}
+
+
+<div
+
+className="
+flex
+justify-between
+items-start
+border-b
+border-gray-200
+pb-8
+"
+
+>
+
+
+<div>
+
+
+<h1
+
+className="
+text-4xl
+font-bold
+text-[#003B6F]
+"
+
+>
+
+Employee Directory
+
+</h1>
+
+
+
+
+
+<p
+
+className="
+mt-3
+text-gray-600
+"
+
+>
+
+View and manage DHS personnel records.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+<Link
+
+href="/staff/employees/create"
+
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-bold
+hover:bg-[#00284d]
+transition
+"
+
+>
+
++ Add Employee
+
+</Link>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* EMPLOYEE GRID */}
+
+
+<div
+
+className="
+mt-10
+grid
+md:grid-cols-3
+gap-6
+"
+
+>
+
+
+
+
+
+{
+
+employees.map(employee=>(
+
+
+<Link
+
+key={employee.id}
+
+href={`/staff/employees/${employee.id}`}
+
+className="
+relative
+border
+border-gray-200
+p-6
+shadow-sm
+hover:shadow-lg
+transition
+bg-white
+"
+
+>
+
+
+
+
+
+<div
+
+className="
+absolute
+left-0
+top-0
+h-full
+w-1
+bg-[#003B6F]
+"
+
+/>
+
+
+
+
+
+
+
+
+<h2
+
+className="
+text-xl
+font-bold
+text-[#003B6F]
+"
+
+>
+
+{employee.roblox_username}
+
+</h2>
+
+
+
+
+
+
+
+<p
+
+className="
+mt-3
+text-gray-700
+font-semibold
+"
+
+>
+
+{employee.positions?.title || "No Position"}
+
+</p>
+
+
+
+
+
+
+
+<p
+
+className="
+text-gray-600
+"
+
+>
+
+{employee.divisions?.name || "No Division"}
+
+</p>
+
+
+
+
+
+
+
+
+
+<span
+
+className={`
+
+inline-block
+mt-5
+px-3
+py-1
+text-sm
+font-bold
+
+${
+
+employee.status === "Active"
+
+?
+
+"bg-green-100 text-green-700"
+
+:
+
+"bg-gray-100 text-gray-700"
+
+}
+
+`}
+
+>
+
+{employee.status}
+
+</span>
+
+
+
+
+
+
+
+
+
+<div
+
+className="
+mt-5
+pt-4
+border-t
+border-gray-100
+"
+
+>
+
+
+<p
+
+className="
+text-sm
+text-gray-500
+"
+
+>
+
+Roblox ID
+
+</p>
+
+
+
+<p
+
+className="
+text-sm
+font-semibold
+text-gray-700
+"
+
+>
+
+{employee.roblox_user_id}
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+</Link>
+
+
+
+))
+
+
+}
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+</main>
+
+
+);
+
 
 }
