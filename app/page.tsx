@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { supabaseAdmin } from "./lib/supabase-admin";
 export const dynamic = "force-dynamic";
+import Breadcrumb from "@/components/Breadcrumb";
 
 
 export default async function Home() {
@@ -67,6 +68,7 @@ return (
 
 <main>
 
+    <Breadcrumb />
 
 <HeroCarousel />
 
