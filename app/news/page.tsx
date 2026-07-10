@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { supabaseAdmin } from "../lib/supabase-admin";
-
+import Breadcrumb from "@/components/Breadcrumb";
 export const dynamic = "force-dynamic";
 
 
@@ -119,7 +119,7 @@ export default async function NewsPage(){
     return (
 
         <main
-
+<Breadcrumb />
             className="
             max-w-7xl
             mx-auto
