@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAdmin } from "../../app/lib/supabase-admin";
 
 
 
