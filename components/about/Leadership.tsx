@@ -1,55 +1,25 @@
 import Image from "next/image";
-import { supabaseAdmin } from "../../app/lib/supabase-admin";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 
 
 
+const executiveRoles = [
 
-const leadershipRoles = [
-
-{
-title:
 "Secretary of Homeland Security",
 
-description:
-"Leading the Department of Homeland Security and directing the overall mission of protecting the nation, strengthening communities, and coordinating Department operations."
-},
-
-
-{
-title:
 "Deputy Secretary of Homeland Security",
 
-description:
-"Supporting the Secretary and assisting with Department-wide coordination, strategic planning, and operational effectiveness."
-},
-
-
-{
-title:
 "Chief of Staff",
 
-description:
-"Managing executive operations, supporting senior leadership, and ensuring Department priorities are effectively carried out."
-},
+"Special Response Team Commander",
 
+"Secret Service Director",
 
-{
-title:
-"General Counsel",
+"CBP Commissioner",
 
-description:
-"Providing legal guidance, oversight, and support to ensure Department operations remain professional and compliant."
-},
+"Under Secretary for Aviation Operations",
 
-
-{
-title:
-"Under Secretary",
-
-description:
-"Supporting senior Department leadership and assisting with strategic initiatives across DHS operations."
-}
-
+"Under Secretary for Public Affairs"
 
 ];
 
@@ -57,91 +27,69 @@ description:
 
 
 
+const divisionRoles = [
+
+{
+division:"Special Response Team",
+positions:[
+
+"Special Agent in Charge (SRT)",
+
+"Assistant Special Agent in Charge (SRT)"
+
+]
+},
 
 
+{
+division:"United States Secret Service",
+positions:[
+
+"Deputy Director",
+
+"Assistant Director",
+
+"Special Agent in Charge (SS)"
+
+]
+},
 
 
-async function getLeadership(){
+{
+division:"United States Customs and Border Protection",
+positions:[
+
+"CBP Deputy Commissioner",
+
+"Supervisory Customs Agent"
+
+]
+},
 
 
+{
+division:"Law Enforcement Helicopter Taskforce",
+positions:[
 
-const {
+"Senior Flight Officer",
 
-data
+"Flight Officer"
 
-} = await supabaseAdmin
-
-.from("employees")
-
-.select(`
-
-roblox_username,
-
-roblox_user_id,
-
-positions(
-title
-)
-
-`)
-
-.eq(
-"status",
-"Active"
-);
+]
+},
 
 
+{
+division:"Public Affairs",
+positions:[
 
+"Public Affairs Staff"
 
-
-if(!data)
-return [];
-
-
-
-
-
-
-return leadershipRoles.map(role=>{
-
-
-const person =
-data.find(
-
-(employee:any)=>
-
-employee.positions?.title === role.title
-
-);
-
-
-
-
-
-return {
-
-
-...role,
-
-
-username:
-person?.roblox_username || "Vacant",
-
-
-userId:
-person?.roblox_user_id || null
-
-
-};
-
-
-
-});
-
-
-
-
+]
 }
+
+];
+
 
 
 
@@ -154,12 +102,10 @@ person?.roblox_user_id || null
 async function getAvatar(id:number){
 
 
-
 try{
 
 
-const response =
-await fetch(
+const response = await fetch(
 
 `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=true`
 
@@ -167,29 +113,151 @@ await fetch(
 
 
 
-const json =
+const data =
 await response.json();
-
 
 
 
 return (
 
-json.data?.[0]?.imageUrl
+data.data?.[0]?.imageUrl
+
 ||
 "/leadership/default.png"
 
 );
 
 
-
 }
 
 catch{
 
-
 return "/leadership/default.png";
 
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+async function getEmployeeByPosition(position:string){
+
+
+const {
+
+data:role
+
+}=await supabaseAdmin
+
+.from("positions")
+
+.select("id")
+
+.eq(
+"title",
+position
+)
+
+.single();
+
+
+
+
+if(!role)
+return null;
+
+
+
+
+
+const {
+
+data:employee
+
+}=await supabaseAdmin
+
+.from("employees")
+
+.select(`
+
+roblox_username,
+
+roblox_user_id
+
+`)
+
+.eq(
+"position_id",
+role.id
+)
+
+.eq(
+"status",
+"Active"
+)
+
+.single();
+
+
+
+
+if(
+!employee ||
+!employee.roblox_username ||
+!employee.roblox_user_id
+)
+
+return null;
+
+
+
+return {
+
+...employee,
+
+position
+
+};
+
+
+}
+
+
+
+
+
+
+
+
+
+async function getLeadership(){
+
+
+const executive:any[] = [];
+
+
+
+
+for(
+const role of executiveRoles
+){
+
+
+const employee =
+await getEmployeeByPosition(role);
+
+
+
+if(employee){
+
+executive.push(employee);
 
 }
 
@@ -197,6 +265,62 @@ return "/leadership/default.png";
 }
 
 
+
+
+const divisions:any[] = [];
+
+
+
+
+for(
+const division of divisionRoles
+){
+
+
+for(
+const position of division.positions
+){
+
+
+const employee =
+await getEmployeeByPosition(position);
+
+
+
+if(employee){
+
+
+divisions.push({
+
+...employee,
+
+division:division.division
+
+
+});
+
+
+}
+
+
+}
+
+
+}
+
+
+
+
+return {
+
+executive,
+
+divisions
+
+};
+
+
+}
 
 
 
@@ -210,38 +334,13 @@ export default async function Leadership(){
 
 
 
-const leaders =
-await getLeadership();
+const {
 
+executive,
 
+divisions
 
-
-
-
-const leadersWithAvatar =
-await Promise.all(
-
-leaders.map(async leader=>({
-
-
-...leader,
-
-
-avatar:
-
-leader.userId
-?
-await getAvatar(leader.userId)
-:
-"/leadership/default.png"
-
-
-}))
-
-);
-
-
-
+}=await getLeadership();
 
 
 
@@ -254,8 +353,8 @@ return (
 <section
 
 className="
-py-20
-bg-white
+py-24
+bg-gray-50
 "
 
 >
@@ -272,6 +371,12 @@ px-6
 >
 
 
+
+
+
+
+
+{/* EXECUTIVE */}
 
 
 <div
@@ -294,9 +399,10 @@ text-[#003B6F]
 
 >
 
-Executive Leadership
+EXECUTIVE LEADERSHIP
 
 </p>
+
 
 
 
@@ -312,11 +418,9 @@ text-[#003B6F]
 
 >
 
-Leading The Department
+The People Leading DHS
 
 </h2>
-
-
 
 
 
@@ -325,25 +429,135 @@ Leading The Department
 
 className="
 mt-5
-text-lg
-text-gray-600
 max-w-3xl
 mx-auto
+text-gray-600
 "
 
 >
 
-The Department is guided by experienced leaders responsible
-for strategic direction, operational excellence, and advancing
+The Department is led by senior officials responsible for
+directing operations, managing divisions, and advancing
 the DHS mission.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+<div
+
+className="
+grid
+md:grid-cols-2
+lg:grid-cols-4
+gap-8
+mt-16
+"
+
+>
+
+
+{
+
+executive.map(async(person:any)=>(
+
+
+<LeaderCard
+
+key={person.position}
+
+person={person}
+
+/>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* DIVISION LEADERSHIP */}
+
+
+
+{
+
+divisions.length > 0 &&
+
+
+<section
+
+className="
+mt-24
+"
+
+>
+
+
+<div
+
+className="
+text-center
+"
+
+>
+
+
+<p
+
+className="
+uppercase
+tracking-[0.3em]
+font-black
+text-[#003B6F]
+"
+
+>
+
+DIVISION LEADERSHIP
 
 </p>
 
 
 
 
-</div>
+<h2
 
+className="
+mt-4
+text-4xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+Command Staff
+
+</h2>
+
+
+
+
+</div>
 
 
 
@@ -357,189 +571,43 @@ the DHS mission.
 className="
 grid
 md:grid-cols-3
-gap-8
-mt-14
+lg:grid-cols-5
+gap-6
+mt-12
 "
 
 >
-
-
-
 
 
 {
 
-leadersWithAvatar.map(
-
-leader=>(
+divisions.map(async(person:any)=>(
 
 
+<LeaderCard
 
-<div
+key={person.position}
 
-key={leader.title}
+person={person}
 
-className="
-bg-gray-50
-border
-shadow-lg
-overflow-hidden
-hover:-translate-y-2
-transition
-"
-
->
-
-
-
-
-
-
-<div
-
-className="
-h-2
-bg-[#F2C94C]
-"
+small
 
 />
 
 
+))
 
-
-
-
-<div
-
-className="
-p-8
-text-center
-"
-
->
-
-
-
-<div
-
-className="
-relative
-mx-auto
-w-40
-h-40
-rounded-full
-overflow-hidden
-border-4
-border-[#003B6F]
-"
-
->
-
-
-
-<Image
-
-src={leader.avatar}
-
-alt={leader.username}
-
-fill
-
-className="
-object-cover
-"
-
-/>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<h3
-
-className="
-mt-6
-text-2xl
-font-black
-text-[#003B6F]
-"
-
->
-
-{leader.username}
-
-</h3>
-
-
-
-
-
-
-
-<p
-
-className="
-mt-2
-font-black
-text-gray-900
-"
-
->
-
-{leader.title}
-
-</p>
-
-
-
-
-
-
-
-<p
-
-className="
-mt-5
-text-gray-600
-leading-relaxed
-"
-
->
-
-{leader.description}
-
-</p>
-
-
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-)
-
-
-)
 
 }
 
 
-
 </div>
+
+
+</section>
+
+
+}
 
 
 
@@ -548,6 +616,210 @@ leading-relaxed
 
 
 </section>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+async function LeaderCard({
+
+person,
+
+small=false
+
+}:{
+
+person:any,
+
+small?:boolean
+
+}){
+
+
+const avatar =
+await getAvatar(
+person.roblox_user_id
+);
+
+
+
+
+return (
+
+<div
+
+className={
+
+`
+bg-white
+shadow-xl
+border
+text-center
+${
+
+small
+
+?
+
+"p-4"
+
+:
+
+"p-6"
+
+}
+
+`
+
+}
+
+>
+
+
+<div
+
+className={
+
+`
+relative
+mx-auto
+rounded-full
+overflow-hidden
+border-4
+border-[#003B6F]
+
+${
+
+small
+
+?
+
+"w-20 h-20"
+
+:
+
+"w-36 h-36"
+
+}
+
+`
+
+}
+
+>
+
+
+<Image
+
+src={avatar}
+
+fill
+
+alt={person.position}
+
+className="
+object-cover
+"
+
+/>
+
+
+</div>
+
+
+
+
+
+<h3
+
+className={
+
+`
+font-black
+text-[#003B6F]
+
+${
+
+small
+
+?
+
+"text-lg mt-4"
+
+:
+
+"text-xl mt-6"
+
+}
+
+`
+
+}
+
+>
+
+{person.roblox_username}
+
+</h3>
+
+
+
+
+
+
+<p
+
+className="
+font-bold
+mt-2
+"
+
+>
+
+{person.position}
+
+</p>
+
+
+
+
+
+{
+
+small &&
+
+<p
+
+className="
+text-sm
+text-gray-500
+mt-2
+"
+
+>
+
+{person.division}
+
+</p>
+
+}
+
+
+
+
+
+</div>
 
 
 );
