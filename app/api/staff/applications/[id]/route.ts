@@ -75,81 +75,78 @@ async function getEmployee(){
 
 
 
-function hasAccess(
-    employee:any
-){
+function hasAccess(employee:any){
 
 
-    if(!employee)
+    if(!employee){
         return false;
+    }
 
 
 
     const position =
-        Array.isArray(employee.positions)
-
-        ? employee.positions[0]?.title || ""
-
-        : employee.positions?.title || "";
+        employee.positions?.[0]?.title
+        ||
+        "";
 
 
 
+    console.log(
+        "CHECKING POSITION:",
+        position
+    );
 
 
 
     const allowedRoles = [
 
-
-        // Office of Secretary
+        // OSDHS
 
         "Secretary of Homeland Security",
+
         "Deputy Secretary of Homeland Security",
+
         "Chief of Staff",
+
         "Under Secretary",
 
-
-
-        // Secret Service
+        // SS
 
         "Deputy Special Agent in Charge (SS)",
+
         "Special Agent in Charge (SS)",
+
         "Assistant Director",
+
         "Deputy Director",
+
         "Secret Service Director",
-
-
 
         // LEHT
 
         "Flight Officer",
+
         "Senior Flight Officer",
+
         "Under Secretary for Aviation Operations",
 
-
-
-        // Public Affairs
+        // PAO
 
         "Under Secretary for Public Affairs",
-
-
 
         // CBP
 
         "Supervisory Customs Agent",
-        "CBP Deputy Commissioner",
-        "CBP Commissioner"
 
+        "CBP Deputy Commissioner",
+
+        "CBP Commissioner"
 
     ];
 
 
 
-
-    return allowedRoles.some(role =>
-
-        position.includes(role)
-
-    );
+    return allowedRoles.includes(position);
 
 
 }
