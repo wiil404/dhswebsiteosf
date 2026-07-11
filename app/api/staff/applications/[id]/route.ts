@@ -289,15 +289,15 @@ export async function GET(
 
             application_answers(
 
-                id,
+    id,
 
-                answer,
+    answer,
 
-                questions(
-                    question
-                )
+    application_questions(
+        question
+    )
 
-            ),
+),
 
 
             application_reviews(
