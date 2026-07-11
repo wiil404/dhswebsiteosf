@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import Breadcrumb from "@/components/Breadcrumb";
 
 export default function RecruitmentPage(){
 
@@ -72,7 +72,7 @@ px-6
 py-20
 ">
 
-
+<Breadcrumb />
 
 <div className="
 bg-white
