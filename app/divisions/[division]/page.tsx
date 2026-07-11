@@ -82,7 +82,7 @@ discord:true,
 
 
 discordLink:
-"https://discord.gg/YOURDISCORD"
+"https://discord.gg/YNmyjdqUp"
 
 },
 
