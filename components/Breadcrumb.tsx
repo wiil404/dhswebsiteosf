@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 const names: Record<string, string> = {
     about: "About",
-    careers: "Careers",
+    recruitment: "Careers",
     secretary: "Secretary",
     news: "News",
     divisions: "Divisions",
