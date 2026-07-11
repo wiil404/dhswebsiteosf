@@ -1,109 +1,129 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
-const names: Record<string, string> = {
-    about: "About",
-    recruitment: "Careers",
-    secretary: "Secretary",
-    news: "News",
-    divisions: "Divisions",
-    documents: "Resources",
 
-    staff: "Staff Dashboard",
-    dashboard: "Dashboard",
-    login: "Login",
+export default function Breadcrumb({
+items=[]
+}:{
+items?:{
+label:string;
+href?:string;
+}[]
+}){
 
-    organisation: "Organisation",
-    employees: "Employees",
-    users: "Staff Management",
-    audit: "Audit Logs",
 
-    create: "Create News",
-    edit: "Edit Release",
-};
+return (
 
-function formatSegment(segment: string) {
-    return (
-        names[segment] ??
-        segment
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, (c) => c.toUpperCase())
-    );
+<nav
+
+className="
+max-w-7xl
+mx-auto
+px-6
+mb-6
+"
+
+>
+
+<div
+
+className="
+flex
+items-center
+gap-2
+text-sm
+text-gray-500
+"
+
+>
+
+
+{
+items.map((item,index)=>(
+
+
+<div
+key={index}
+className="flex items-center gap-2"
+>
+
+
+{
+item.href ? (
+
+<Link
+
+href={item.href}
+
+className="
+hover:text-[#003B6F]
+font-medium
+transition
+"
+
+>
+
+{item.label}
+
+</Link>
+
+
+)
+
+:
+
+(
+
+<span
+
+className="
+font-bold
+text-[#003B6F]
+"
+
+>
+
+{item.label}
+
+</span>
+
+)
+
 }
 
-export default function Breadcrumb() {
 
-    const pathname = usePathname();
 
-    const segments = pathname
-        .split("/")
-        .filter(Boolean);
 
-    const crumbs = [
-        {
-            label: "Home",
-            href: "/",
-        },
-        ...segments.map((segment, index) => ({
-            label: formatSegment(segment),
-            href: "/" + segments.slice(0, index + 1).join("/"),
-        })),
-    ];
+{
+index !== items.length-1 && (
 
-    return (
+<span className="text-gray-400">
 
-        <nav className="mb-8">
+/
 
-            <div className="text-sm text-gray-500 flex flex-wrap items-center gap-2">
+</span>
 
-                {crumbs.map((crumb, index) => {
+)
 
-                    const last = index === crumbs.length - 1;
+}
 
-                    return (
 
-                        <div
-                            key={crumb.href}
-                            className="flex items-center gap-2"
-                        >
 
-                            {last ? (
+</div>
 
-                                <span className="font-semibold text-[#003B6F]">
 
-                                    {crumb.label}
+))
 
-                                </span>
+}
 
-                            ) : (
 
-                                <Link
-                                    href={crumb.href}
-                                    className="hover:text-[#003B6F] transition"
-                                >
+</div>
 
-                                    {crumb.label}
+</nav>
 
-                                </Link>
 
-                            )}
+);
 
-                            {!last && (
-                                <span>/</span>
-                            )}
-
-                        </div>
-
-                    );
-
-                })}
-
-            </div>
-
-        </nav>
-
-    );
 
 }
