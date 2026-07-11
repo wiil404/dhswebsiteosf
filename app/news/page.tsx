@@ -119,7 +119,6 @@ export default async function NewsPage(){
     return (
 
         <main
-<Breadcrumb />
             className="
             max-w-7xl
             mx-auto
@@ -146,7 +145,7 @@ export default async function NewsPage(){
 
 
 
-
+                <Breadcrumb />
 
 
                 <div
