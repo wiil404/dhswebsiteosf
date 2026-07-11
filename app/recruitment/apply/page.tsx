@@ -16,11 +16,14 @@ const router = useRouter();
 
 const [loading,setLoading] = useState(false);
 
+const [questionLoading,setQuestionLoading] = useState(false);
+
 const [divisions,setDivisions] = useState<any[]>([]);
 
 const [questions,setQuestions] = useState<any[]>([]);
 
 const [answers,setAnswers] = useState<any>({});
+
 
 
 
@@ -50,15 +53,38 @@ useEffect(()=>{
 async function loadDivisions(){
 
 
+try{
+
+
 const response = await fetch(
+
 "/api/recruitment/divisions"
+
 );
+
 
 
 const data = await response.json();
 
 
-setDivisions(data);
+
+setDivisions(
+data || []
+);
+
+
+
+}
+
+catch(error){
+
+console.error(
+"Failed loading divisions",
+error
+);
+
+}
+
 
 
 }
@@ -66,6 +92,7 @@ setDivisions(data);
 
 
 loadDivisions();
+
 
 
 },[]);
@@ -83,6 +110,25 @@ divisionId:string
 ){
 
 
+if(!divisionId){
+
+setQuestions([]);
+
+setAnswers({});
+
+return;
+
+}
+
+
+
+setQuestionLoading(true);
+
+
+
+try{
+
+
 const response = await fetch(
 
 `/api/recruitment/questions?division=${divisionId}`
@@ -95,14 +141,51 @@ const data = await response.json();
 
 
 
-setQuestions(data);
+if(response.ok){
 
+setQuestions(
+data || []
+);
 
 setAnswers({});
+
+}
+
+else{
+
+
+console.error(data.error);
+
+
+setQuestions([]);
 
 
 }
 
+
+
+}
+
+catch(error){
+
+
+console.error(
+"Question loading failed",
+error
+);
+
+
+setQuestions([]);
+
+
+}
+
+
+
+setQuestionLoading(false);
+
+
+}
 
 
 
@@ -172,7 +255,7 @@ if(!form.agreement){
 
 
 alert(
-"Please confirm your information is accurate before submitting."
+"Please confirm your information is accurate."
 );
 
 
@@ -194,6 +277,34 @@ alert(
 
 
 return;
+
+
+}
+
+
+
+
+
+
+
+for(const question of questions){
+
+
+if(
+!answers[question.id] ||
+answers[question.id].trim() === ""
+){
+
+
+alert(
+"Please answer all division assessment questions."
+);
+
+
+return;
+
+
+}
 
 
 }
@@ -227,12 +338,9 @@ headers:{
 
 body:JSON.stringify({
 
-
 ...form,
 
-
 answers
-
 
 })
 
@@ -412,7 +520,7 @@ max-w-4xl
 
 >
 
-Apply to serve within the Department of Homeland Security. Questions will be tailored specifically to your selected division.
+Apply to serve within the Department of Homeland Security. Assessment questions will change depending on your selected division.
 
 </p>
 
@@ -599,27 +707,14 @@ value={form.division}
 onChange={e=>{
 
 
-const selected =
-e.target.value;
-
-
-
-const division =
-divisions.find(
-d=>d.id===selected
-);
-
-
-
 update(
 "division",
-selected
+e.target.value
 );
-
 
 
 loadQuestions(
-selected
+e.target.value
 );
 
 
@@ -672,11 +767,6 @@ value={division.id}
 
 
 
-{
-
-questions.length > 0 && (
-
-
 <section className="mt-12">
 
 
@@ -689,6 +779,47 @@ text-[#003B6F]
 Division Assessment
 
 </h2>
+
+
+
+
+{
+
+questionLoading && (
+
+<p className="mt-5 text-gray-600">
+
+Loading assessment questions...
+
+</p>
+
+)
+
+}
+
+
+
+
+
+
+
+{
+
+!questionLoading &&
+questions.length === 0 && form.division && (
+
+<p className="mt-5 text-gray-500">
+
+No assessment questions configured for this division.
+
+</p>
+
+)
+
+}
+
+
+
 
 
 
@@ -761,11 +892,6 @@ e.target.value
 
 
 </section>
-
-
-)
-
-}
 
 
 
