@@ -26,15 +26,10 @@ export async function POST(
 
             division,
 
-            experience,
-
-            motivation,
-
-            suitability,
-
-            availability
+            answers
 
         } = body;
+
 
 
 
@@ -51,7 +46,7 @@ export async function POST(
 
                 {
                     error:
-                    "Please complete all required fields."
+                    "Please complete all required information."
                 },
 
                 {
@@ -70,7 +65,7 @@ export async function POST(
 
 
         /*
-            Find division
+            Verify Division
         */
 
 
@@ -84,10 +79,12 @@ export async function POST(
 
             .from("divisions")
 
-            .select("id,name")
+            .select(
+                "id,name"
+            )
 
             .eq(
-                "name",
+                "id",
                 division
             )
 
@@ -99,8 +96,10 @@ export async function POST(
 
 
 
-        if(divisionError || !divisionData){
-
+        if(
+            divisionError ||
+            !divisionData
+        ){
 
             return NextResponse.json(
 
@@ -115,8 +114,8 @@ export async function POST(
 
             );
 
-
         }
+
 
 
 
@@ -135,7 +134,7 @@ export async function POST(
 
             data:application,
 
-            error
+            error:applicationError
 
         } = await supabaseAdmin
 
@@ -155,24 +154,12 @@ export async function POST(
 
                 discord_username,
 
+
                 email,
 
 
                 division_id:
                 divisionData.id,
-
-
-                division_name:
-                divisionData.name,
-
-
-                experience,
-
-                motivation,
-
-                suitability,
-
-                availability,
 
 
                 status:
@@ -192,12 +179,11 @@ export async function POST(
 
 
 
-        if(error){
+        if(applicationError){
 
 
             console.error(
-                "APPLICATION ERROR:",
-                error
+                applicationError
             );
 
 
@@ -205,7 +191,7 @@ export async function POST(
 
                 {
                     error:
-                    error.message
+                    applicationError.message
                 },
 
                 {
@@ -225,11 +211,108 @@ export async function POST(
 
 
 
+        /*
+            Save Answers
+        */
+
+
+
+        if(
+            answers &&
+            Object.keys(answers).length > 0
+        ){
+
+
+            const answerRows = Object.entries(
+                answers
+            )
+
+            .map(
+                ([question_id,answer])=>(
+
+                {
+
+                    application_id:
+                    application.id,
+
+
+                    question_id,
+
+
+                    answer:
+                    String(answer)
+
+                }
+
+            ));
+
+
+
+
+
+
+
+            const {
+
+                error:answerError
+
+            } = await supabaseAdmin
+
+                .from("application_answers")
+
+                .insert(
+                    answerRows
+                );
+
+
+
+
+
+
+
+            if(answerError){
+
+
+                console.error(
+                    answerError
+                );
+
+
+
+                return NextResponse.json(
+
+                    {
+                        error:
+                        "Application created but answers failed saving."
+                    },
+
+                    {
+                        status:500
+                    }
+
+                );
+
+
+            }
+
+
+        }
+
+
+
+
+
+
+
+
+
+
         return NextResponse.json(
 
             {
 
                 success:true,
+
 
                 application_number:
                 application.application_number
@@ -242,19 +325,23 @@ export async function POST(
 
 
 
+
+
     }
 
     catch(error){
 
 
-        console.error(error);
+        console.error(
+            error
+        );
 
 
         return NextResponse.json(
 
             {
                 error:
-                "Server error submitting application."
+                "Internal server error."
             },
 
             {
