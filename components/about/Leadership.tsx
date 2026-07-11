@@ -38,12 +38,21 @@ description:
 focus:
 "Leadership Coordination"
 
+},
+
+
+{
+title:"General Counsel",
+
+description:
+"Serves as the Department's principal legal advisor, providing legal guidance, reviewing policy decisions, and ensuring DHS operations remain compliant with applicable standards.",
+
+focus:
+"Department Legal Affairs"
+
 }
 
 ];
-
-
-
 
 
 
@@ -730,7 +739,7 @@ Commanders responsible for leading DHS operational divisions and maintaining exc
 
 className="
 grid
-md:grid-cols-3
+grid-cols-3
 gap-8
 mt-10
 "
@@ -741,21 +750,26 @@ mt-10
 
 {
 
-commanders.map((person:any)=>(
+commanders.map((person:any,index:number)=>(
 
 
 <div
 
 key={person.position}
 
-className="
+className={`
 bg-white
 shadow-lg
 border
 border-gray-200
 p-6
 text-center
-"
+
+${index === 3 ? "col-start-1" : ""}
+
+${index === 4 ? "col-start-2" : ""}
+
+`}
 
 >
 
@@ -797,7 +811,6 @@ object-cover
 
 
 
-
 <h3
 
 className="
@@ -816,6 +829,7 @@ text-[#003B6F]
 
 
 
+
 <p
 
 className="
@@ -828,6 +842,7 @@ mt-2
 {person.position}
 
 </p>
+
 
 
 
@@ -857,7 +872,6 @@ mt-3
 
 
 }
-
 
 </div>
 
