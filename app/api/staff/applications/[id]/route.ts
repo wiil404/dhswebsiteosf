@@ -103,10 +103,9 @@ function hasAccess(
 
 
 
-    // Supabase returns relationships as arrays
-
     const position =
         employee.positions?.[0]?.title || "";
+
 
 
 
@@ -204,18 +203,24 @@ export async function GET(
     request:Request,
 
     context:{
-        params:{
+        params:Promise<{
             id:string
-        }
+        }>
     }
 
 ){
 
 
 
+    const {id} =
+        await context.params;
+
+
+
+
+
     const employee =
         await getEmployee();
-
 
 
 
@@ -238,6 +243,7 @@ export async function GET(
 
 
     }
+
 
 
 
@@ -292,7 +298,7 @@ export async function GET(
 
             "id",
 
-            context.params.id
+            id
 
         )
 
@@ -355,17 +361,26 @@ export async function GET(
 
 
 
+
+
 export async function PATCH(
 
     request:Request,
 
     context:{
-        params:{
+        params:Promise<{
             id:string
-        }
+        }>
     }
 
 ){
+
+
+
+    const {id} =
+        await context.params;
+
+
 
 
 
@@ -447,7 +462,7 @@ export async function PATCH(
 
             "id",
 
-            context.params.id
+            id
 
         );
 
@@ -494,7 +509,7 @@ export async function PATCH(
 
             application_id:
 
-            context.params.id,
+            id,
 
 
 
