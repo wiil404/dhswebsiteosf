@@ -5,7 +5,6 @@ import { supabaseAdmin } from "../../../../lib/supabase-admin";
 
 
 
-
 async function getEmployee(){
 
 
@@ -34,10 +33,8 @@ async function getEmployee(){
 
 
 
-
     const {
-        data:employee,
-        error
+        data:employee
 
     } = await supabaseAdmin
 
@@ -65,17 +62,6 @@ async function getEmployee(){
 
 
 
-
-
-    if(error){
-
-        return null;
-
-    }
-
-
-
-
     return employee;
 
 
@@ -94,17 +80,17 @@ function hasAccess(
 ){
 
 
-    if(!employee){
-
+    if(!employee)
         return false;
-
-    }
-
 
 
 
     const position =
-        employee.positions?.[0]?.title || "";
+        Array.isArray(employee.positions)
+
+        ? employee.positions[0]?.title || ""
+
+        : employee.positions?.title || "";
 
 
 
@@ -114,43 +100,30 @@ function hasAccess(
     const allowedRoles = [
 
 
-
-        // Office of the Secretary
+        // Office of Secretary
 
         "Secretary of Homeland Security",
-
         "Deputy Secretary of Homeland Security",
-
         "Chief of Staff",
-
         "Under Secretary",
-
 
 
 
         // Secret Service
 
         "Deputy Special Agent in Charge (SS)",
-
         "Special Agent in Charge (SS)",
-
         "Assistant Director",
-
         "Deputy Director",
-
         "Secret Service Director",
-
 
 
 
         // LEHT
 
         "Flight Officer",
-
         "Senior Flight Officer",
-
         "Under Secretary for Aviation Operations",
-
 
 
 
@@ -160,19 +133,14 @@ function hasAccess(
 
 
 
-
         // CBP
 
         "Supervisory Customs Agent",
-
         "CBP Deputy Commissioner",
-
         "CBP Commissioner"
 
 
     ];
-
-
 
 
 
@@ -194,6 +162,18 @@ function hasAccess(
 
 
 
+type RouteContext = {
+
+    params: Promise<{
+        id:string
+    }>
+
+};
+
+
+
+
+
 
 
 
@@ -202,18 +182,15 @@ export async function GET(
 
     request:Request,
 
-    context:{
-        params:Promise<{
-            id:string
-        }>
-    }
+    context:RouteContext
 
 ){
 
 
+    const {
+        id
 
-    const {id} =
-        await context.params;
+    } = await context.params;
 
 
 
@@ -225,7 +202,12 @@ export async function GET(
 
 
 
-    if(!hasAccess(employee)){
+
+    if(
+        !employee ||
+        !hasAccess(employee)
+
+    ){
 
 
         return NextResponse.json(
@@ -243,6 +225,7 @@ export async function GET(
 
 
     }
+
 
 
 
@@ -277,18 +260,14 @@ export async function GET(
                 answer,
 
                 questions(
-
                     question
-
                 )
 
             ),
 
 
             application_reviews(
-
                 *
-
             )
 
 
@@ -303,7 +282,6 @@ export async function GET(
         )
 
         .single();
-
 
 
 
@@ -334,22 +312,17 @@ export async function GET(
 
 
 
-
-
     return NextResponse.json({
 
         ...application,
 
         answers:
-        application.application_answers || []
+        application.application_answers
 
     });
 
 
-
 }
-
-
 
 
 
@@ -367,18 +340,16 @@ export async function PATCH(
 
     request:Request,
 
-    context:{
-        params:Promise<{
-            id:string
-        }>
-    }
+    context:RouteContext
 
 ){
 
 
+    const {
+        id
 
-    const {id} =
-        await context.params;
+    } = await context.params;
+
 
 
 
@@ -391,8 +362,11 @@ export async function PATCH(
 
 
 
+    if(
+        !employee ||
+        !hasAccess(employee)
 
-    if(!hasAccess(employee)){
+    ){
 
 
         return NextResponse.json(
@@ -410,7 +384,6 @@ export async function PATCH(
 
 
     }
-
 
 
 
@@ -440,7 +413,6 @@ export async function PATCH(
 
 
 
-
     const {
 
         error:updateError
@@ -455,7 +427,6 @@ export async function PATCH(
 
             internal_notes
 
-
         })
 
         .eq(
@@ -465,7 +436,6 @@ export async function PATCH(
             id
 
         );
-
 
 
 
@@ -506,27 +476,18 @@ export async function PATCH(
 
         .insert({
 
-
-            application_id:
-
-            id,
-
+            application_id:id,
 
 
             employee_id:
-
             employee.id,
 
 
-
             action:
-
             status,
 
 
-
             notes:
-
             internal_notes || null
 
 
