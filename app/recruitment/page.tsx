@@ -45,7 +45,7 @@ const careers = [
     title:"United States Customs and Border Protection",
     short:"USCBP",
     icon:"🌎",
-    image:"/careers/cbp.jpg",
+    image:"//cbp.jpg",
     description:
     "Securing borders, protecting communities, and supporting national security through dedicated enforcement.",
     href:"/divisions/cbp"
@@ -243,7 +243,7 @@ mt-10
 
 <Link
 
-href="/careers/apply"
+href="/recruitment/apply"
 
 className="
 inline-flex
@@ -271,7 +271,7 @@ Start Application →
 
 <Link
 
-href="/careers/applications"
+href="/recruitment/applications"
 
 className="
 inline-flex
@@ -766,7 +766,7 @@ Your next mission starts here.
 
 <Link
 
-href="/careers/apply"
+href="/recruitment/apply"
 
 className="
 inline-flex
