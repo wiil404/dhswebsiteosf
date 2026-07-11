@@ -274,11 +274,7 @@ const position =
 
     if(
 
-        secretaryAccess.some(role=>
-
-            position.includes(role)
-
-        )
+        secretaryAccess.includes(position)
 
     ){
 
@@ -300,36 +296,14 @@ const position =
 
 
     else if(
-
-        secretServiceAccess.some(role=>
-
-            position.includes(role)
-
-        )
-
-        ||
-
-        lehtAccess.some(role=>
-
-            position.includes(role)
-
-        )
-
-        ||
-
-        paoAccess.some(role=>
-
-            position.includes(role)
-
-        )
-
-        ||
-
-        cbpAccess.some(role=>
-
-            position.includes(role)
-
-        )
+    secretServiceAccess.includes(position)
+    ||
+    lehtAccess.includes(position)
+    ||
+    paoAccess.includes(position)
+    ||
+    cbpAccess.includes(position)
+)
 
     ){
 
