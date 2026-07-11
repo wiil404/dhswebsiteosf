@@ -470,27 +470,44 @@ async function getAvatar(id:number){
 try{
 
 
-const res =
-await fetch(
+const res = await fetch(
 
-`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=true`
+`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=false`
+
+,
+{
+cache:"no-store"
+}
 
 );
 
 
-const data =
-await res.json();
+const data = await res.json();
 
 
 
-return data.data?.[0]?.imageUrl
-||
-"/leadership/default.png";
+if(
+data.data &&
+data.data.length > 0 &&
+data.data[0].state === "Completed"
+){
+
+return data.data[0].imageUrl;
+
+}
+
+
+return "/leadership/default.png";
 
 
 }
 
-catch{
+catch(error){
+
+console.error(
+"Roblox avatar error:",
+error
+);
 
 return "/leadership/default.png";
 
