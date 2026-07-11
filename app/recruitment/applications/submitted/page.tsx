@@ -7,6 +7,10 @@ import Breadcrumb from "@/components/Breadcrumb";
 
 
 
+export const dynamic = "force-dynamic";
+
+
+
 export default function ApplicationSubmittedPage(){
 
 
@@ -39,6 +43,7 @@ export default function ApplicationSubmittedPage(){
 
 
             <Breadcrumb />
+
 
 
 
@@ -115,6 +120,7 @@ export default function ApplicationSubmittedPage(){
                         className="
                         mt-5
                         text-5xl
+                        md:text-6xl
                         font-black
                         "
 
@@ -229,7 +235,7 @@ export default function ApplicationSubmittedPage(){
 
                         >
 
-                            Please save this application number. You will need it to check your application status in the future.
+                            Save this application number. You will need it to check your application status in the future.
 
                         </p>
 
@@ -263,14 +269,24 @@ export default function ApplicationSubmittedPage(){
 
                         <Link
 
-                            href={`/recruitment/applications?number=${number}`}
+                            href={
+                                number
+                                ?
+                                `/recruitment/applications?number=${number}`
+                                :
+                                "/recruitment/applications"
+                            }
 
                             className="
+                            inline-flex
+                            items-center
+                            justify-center
                             bg-[#003B6F]
                             text-white
                             px-8
                             py-4
                             font-bold
+                            shadow-lg
                             hover:bg-[#002B52]
                             transition
                             "
@@ -291,7 +307,10 @@ export default function ApplicationSubmittedPage(){
                             href="/"
 
                             className="
-                            border
+                            inline-flex
+                            items-center
+                            justify-center
+                            border-2
                             border-[#003B6F]
                             text-[#003B6F]
                             px-8
