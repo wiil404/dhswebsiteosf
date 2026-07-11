@@ -132,8 +132,8 @@ console.log(
     // FIX:
     // Supabase returns positions as an array
 
-    const position =
-        employee.positions?.[0]?.title || "";
+const position =
+    positionTitle;
 
 
 
