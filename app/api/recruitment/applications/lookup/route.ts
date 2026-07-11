@@ -4,104 +4,65 @@ import {supabaseAdmin} from "../../../../lib/supabase-admin";
 
 
 export async function POST(
-request:Request
+    request:Request
 ){
 
-
-const body =
-await request.json();
+    try {
 
 
-
-const {
-    application_number,
-    roblox_username
-} = body;
+        const body =
+            await request.json();
 
 
 
+        let {
 
-if(
-!application_number ||
-!roblox_username
-){
+            application_number,
 
-return NextResponse.json(
-{
-error:"Application number and Roblox username required."
-},
-{
-status:400
-}
-);
+            roblox_username
 
-}
+        } = body;
 
 
 
 
+        if(
+            !application_number ||
+            !roblox_username
+        ){
 
+            return NextResponse.json(
 
+                {
+                    error:
+                    "Application number and Roblox username are required."
+                },
 
-const {
-data:application,
-error
-}=await supabaseAdmin
+                {
+                    status:400
+                }
 
-.from("applications")
+            );
 
-.select(`
-
-*,
-
-divisions(
-name
-),
-
-application_answers(
-
-answer,
-
-questions(
-question
-)
-
-)
-
-`)
-
-.eq(
-"application_number",
-application_number
-)
-
-.ilike(
-"roblox_username",
-roblox_username
-)
-
-.single();
+        }
 
 
 
 
 
 
-if(error || !application){
+        // Clean user input
+
+        application_number =
+            application_number
+            .trim()
+            .toUpperCase();
 
 
-return NextResponse.json(
-{
-error:
-"No application found with those details."
-},
-{
-status:404
-}
-);
 
-
-}
+        roblox_username =
+            roblox_username
+            .trim();
 
 
 
@@ -109,11 +70,125 @@ status:404
 
 
 
-return NextResponse.json({
+        const {
 
-application
+            data:application,
 
-});
+            error
+
+        } = await supabaseAdmin
+
+            .from("applications")
+
+            .select(`
+
+                *,
+
+                divisions(
+                    name
+                )
+
+            `)
+
+            .eq(
+
+                "application_number",
+
+                application_number
+
+            )
+
+            .ilike(
+
+                "roblox_username",
+
+                roblox_username
+
+            )
+
+            .maybeSingle();
+
+
+
+
+
+
+
+
+        console.log(
+            "LOOKUP RESULT",
+            application,
+            error
+        );
+
+
+
+
+
+
+
+
+        if(error || !application){
+
+
+            return NextResponse.json(
+
+                {
+                    error:
+                    "No application found with those details."
+                },
+
+                {
+                    status:404
+                }
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+        return NextResponse.json({
+
+            application
+
+        });
+
+
+
+
+
+
+
+    }
+
+    catch(error){
+
+
+        console.error(error);
+
+
+
+        return NextResponse.json(
+
+            {
+                error:
+                "Internal server error."
+            },
+
+            {
+                status:500
+            }
+
+        );
+
+
+    }
 
 
 }
