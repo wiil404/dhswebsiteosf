@@ -11,16 +11,17 @@ export const dynamic = "force-dynamic";
 
 
 
-export default function ApplicationSubmittedPage(){
+export default async function ApplicationSubmittedPage({
+    searchParams
+}:{
+    searchParams:Promise<{
+        number?:string
+    }>
+}){
 
+const {number}=await searchParams;
 
-    const searchParams =
-        useSearchParams();
-
-
-
-    const number =
-        searchParams.get("number");
+}
 
 
 
