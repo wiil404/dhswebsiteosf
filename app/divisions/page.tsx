@@ -1,54 +1,91 @@
+import Image from "next/image";
 import Link from "next/link";
 
 
-export default function CareersPage(){
+const pillars = [
+
+{
+title:"Prevent",
+icon:"🛡️",
+text:
+"Identifying threats before they impact communities through intelligence, preparation, and coordinated action."
+},
+
+
+{
+title:"Protect",
+icon:"🇺🇸",
+text:
+"Safeguarding national leadership, critical infrastructure, borders, and the people we serve."
+},
+
+
+{
+title:"Respond",
+icon:"🚨",
+text:
+"Deploying specialised personnel and resources when emergencies and threats require immediate action."
+},
+
+
+{
+title:"Recover",
+icon:"🤝",
+text:
+"Supporting communities through resilience, restoration, and continued partnership."
+}
+
+];
+
+
 
 
 const divisions = [
 
-    {
-        title:"Special Response Team",
-        description:
-        "A highly trained tactical response division responsible for handling high-risk incidents, emergency deployments, and specialized security operations.",
-        link:"/divisions/special-response-team",
-        image:"🚨"
-    },
+{
+name:"Special Response Team",
+short:"SRT",
+description:
+"Elite tactical personnel trained for high-risk response and specialised operations.",
+image:"/careers/srt.jpg"
+},
 
 
-    {
-        title:"Law Enforcement Helicopter Taskforce",
-        description:
-        "Providing aerial support, rapid response capabilities, and operational assistance through advanced aviation assets.",
-        link:"/divisions/helicopter-taskforce",
-        image:"🚁"
-    },
+{
+name:"United States Secret Service",
+short:"USSS",
+description:
+"Protective professionals dedicated to safeguarding national leadership and critical assets.",
+image:"/careers/usss.jpg"
+},
 
 
-    {
-        title:"United States Secret Service",
-        description:
-        "Protecting national leadership and supporting critical security operations through elite protective and investigative services.",
-        link:"/divisions/secret-service",
-        image:"🛡️"
-    },
+{
+name:"Law Enforcement Helicopter Taskforce",
+short:"LEHT",
+description:
+"Dedicated aviation specialists providing aerial support and rapid response capability.",
+image:"/careers/leht.jpg"
+},
 
 
-    {
-        title:"United States Customs and Border Protection",
-        description:
-        "Safeguarding national borders, supporting immigration enforcement, and protecting communities through dedicated personnel.",
-        link:"/divisions/cbp",
-        image:"🌎"
-    },
+{
+name:"Customs and Border Protection",
+short:"CBP",
+description:
+"Frontline security personnel protecting borders and supporting homeland security.",
+image:"/careers/cbp.jpg"
+},
 
 
-    {
-        title:"Public Affairs",
-        description:
-        "Communicating DHS operations, managing public information, and ensuring transparency between the Department and the public.",
-        link:"/divisions/public-affairs",
-        image:"📢"
-    }
+{
+name:"Public Affairs",
+short:"PAO",
+description:
+"The communications division connecting DHS operations with the public.",
+image:"/careers/pao.jpg"
+}
+
 
 ];
 
@@ -56,128 +93,363 @@ const divisions = [
 
 
 
+export default function MissionPage(){
+
+
 return (
 
-<main className="
-max-w-7xl
-mx-auto
-px-6
-py-20
-">
+
+<main className="bg-[#003B6F] py-12">
+
+
+
+<section className="max-w-7xl mx-auto px-6">
+
+
+<div className="bg-white shadow-2xl overflow-hidden">
+
+
+
+{/* HERO */}
 
 
 <div className="
-bg-white
-shadow-xl
-border
-border-gray-200
-overflow-hidden
+relative
+h-[600px]
 ">
 
 
-{/* GOLD BAR */}
+<Image
+
+src="/mission/hero.jpg"
+
+fill
+
+alt="DHS Mission"
+
+className="object-cover"
+
+/>
+
 
 <div className="
-h-2
-bg-[#F2C94C]
+absolute
+inset-0
+bg-gradient-to-t
+from-[#003B6F]
+via-black/50
+to-transparent
 "/>
 
 
 
 
-
-
 <div className="
-p-10
-md:p-14
+absolute
+bottom-12
+left-12
+text-white
+max-w-4xl
 ">
-
-
-
 
 
 <p className="
-uppercase
-tracking-[0.25em]
+text-[#F2C94C]
+tracking-[0.3em]
 font-bold
-text-sm
-text-[#003B6F]
 ">
 
-Department of Homeland Security
+DEPARTMENT OF HOMELAND SECURITY
 
 </p>
 
 
 
-
-
-
 <h1 className="
-mt-5
-text-5xl
-font-bold
-text-[#003B6F]
+text-6xl
+font-black
+mt-4
 ">
 
-Join Our Mission
+OUR MISSION
 
 </h1>
 
 
 
 
-
-
 <p className="
-mt-6
-text-xl
-text-gray-700
-max-w-4xl
-leading-relaxed
-">
-
-The Department of Homeland Security is built by dedicated individuals committed to protecting communities, supporting national security, and serving with excellence.
-
-</p>
-
-
-
-
-
-
-
-<div className="
-mt-10
-border-l-4
-border-[#003B6F]
-bg-gray-50
-p-6
-">
-
-
-<h2 className="
-text-2xl
+text-3xl
 font-bold
-text-[#003B6F]
+mt-4
 ">
 
-Serve With Purpose
-
-</h2>
-
-
-<p className="
-mt-3
-text-gray-700
-">
-
-Whether operating on the front lines, supporting critical missions, or communicating with the public, every DHS member plays an essential role in protecting those we serve.
+Protecting The Nation.
+Serving The People.
 
 </p>
 
 
 </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="p-10 md:p-16">
+
+
+
+
+
+
+
+{/* MISSION STATEMENT */}
+
+
+<section>
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+The DHS Mission
+
+</h2>
+
+
+
+<p className="
+mt-6
+text-xl
+leading-relaxed
+text-gray-700
+">
+
+The Department of Homeland Security exists to protect the United States from threats while strengthening national resilience, supporting communities, and ensuring a safer future.
+
+Through specialised divisions, highly trained personnel, and coordinated operations, DHS delivers security capabilities across land, air, emergency response, and public communication.
+
+</p>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+{/* INFOGRAPHIC */}
+
+
+<section className="mt-16">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Homeland Security At A Glance
+
+</h2>
+
+
+
+
+<div className="
+grid
+md:grid-cols-3
+gap-6
+mt-8
+">
+
+
+{
+
+[
+
+["🇺🇸","National Security","Protecting the nation against emerging threats."],
+
+["🚨","Emergency Response","Rapid deployment during critical incidents."],
+
+["🌎","Border Protection","Securing borders and supporting communities."],
+
+["🚁","Aviation Operations","Providing aerial support capabilities."],
+
+["🛡️","Protective Services","Safeguarding national leadership."],
+
+["📢","Public Information","Maintaining transparency and trust."]
+
+].map((item)=>(
+
+
+<div
+
+key={item[1]}
+
+className="
+bg-gray-50
+border
+p-8
+"
+
+>
+
+
+<div className="text-5xl">
+
+{item[0]}
+
+</div>
+
+
+<h3 className="
+mt-5
+text-xl
+font-black
+text-[#003B6F]
+">
+
+{item[1]}
+
+</h3>
+
+
+
+<p className="
+mt-3
+text-gray-600
+">
+
+{item[2]}
+
+</p>
+
+
+</div>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+{/* PILLARS */}
+
+
+<section className="mt-16">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Our Operational Pillars
+
+</h2>
+
+
+
+<div className="
+grid
+md:grid-cols-4
+gap-6
+mt-8
+">
+
+
+{
+
+pillars.map((pillar)=>(
+
+
+<div
+
+key={pillar.title}
+
+className="
+bg-[#003B6F]
+text-white
+p-8
+"
+
+>
+
+
+<div className="text-5xl">
+
+{pillar.icon}
+
+</div>
+
+
+<h3 className="
+mt-5
+text-xl
+font-black
+text-[#F2C94C]
+">
+
+{pillar.title}
+
+</h3>
+
+
+<p className="
+mt-4
+text-gray-200
+">
+
+{pillar.text}
+
+</p>
+
+
+</div>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+</section>
 
 
 
@@ -190,14 +462,16 @@ Whether operating on the front lines, supporting critical missions, or communica
 {/* DIVISIONS */}
 
 
+<section className="mt-16">
+
+
 <h2 className="
-mt-14
 text-4xl
-font-bold
+font-black
 text-[#003B6F]
 ">
 
-Explore Career Opportunities
+Our Divisions
 
 </h2>
 
@@ -205,94 +479,88 @@ Explore Career Opportunities
 
 
 <div className="
-mt-8
 grid
 md:grid-cols-2
 gap-8
+mt-8
 ">
 
 
 {
+
 divisions.map((division)=>(
 
 
-<Link
+<div
 
-key={division.title}
-
-href={division.link}
+key={division.short}
 
 className="
-group
-border
-border-gray-200
-p-8
-bg-white
-shadow-sm
-hover:shadow-xl
-transition
 relative
+h-72
 overflow-hidden
 "
-
 
 >
 
 
+<Image
+
+src={division.image}
+
+fill
+
+alt={division.name}
+
+className="object-cover"
+
+/>
+
+
+
 <div className="
 absolute
-top-0
-left-0
-h-1
-w-full
-bg-[#003B6F]
-group-hover:bg-[#F2C94C]
-transition
+inset-0
+bg-gradient-to-t
+from-[#003B6F]
+to-transparent
 "/>
 
 
 
-
-
 <div className="
-flex
-items-start
-gap-5
+absolute
+bottom-6
+left-6
+text-white
 ">
 
 
-<div className="
-text-5xl
+<p className="
+text-[#F2C94C]
+font-black
+tracking-widest
 ">
 
-{division.image}
+{division.short}
 
-</div>
+</p>
 
-
-
-
-<div>
 
 
 <h3 className="
 text-2xl
-font-bold
-text-[#003B6F]
-group-hover:text-[#00284d]
+font-black
 ">
 
-{division.title}
+{division.name}
 
 </h3>
 
 
-
-
 <p className="
-mt-3
-text-gray-600
-leading-relaxed
+mt-2
+text-gray-200
 ">
 
 {division.description}
@@ -300,30 +568,14 @@ leading-relaxed
 </p>
 
 
-
-
-<p className="
-mt-5
-font-bold
-text-[#003B6F]
-">
-
-Learn More →
-
-</p>
-
-
 </div>
 
 
 </div>
-
-
-
-</Link>
 
 
 ))
+
 
 }
 
@@ -331,6 +583,7 @@ Learn More →
 </div>
 
 
+</section>
 
 
 
@@ -338,24 +591,26 @@ Learn More →
 
 
 
-{/* APPLY SECTION */}
 
 
-<div className="
+{/* CTA */}
+
+
+<section className="
 mt-16
 bg-[#003B6F]
 text-white
-p-10
-md:p-12
+p-12
+text-center
 ">
 
 
 <h2 className="
-text-3xl
-font-bold
+text-4xl
+font-black
 ">
 
-Ready to Serve?
+Become Part Of The Mission
 
 </h2>
 
@@ -364,44 +619,36 @@ Ready to Serve?
 mt-4
 text-lg
 text-gray-200
-max-w-3xl
 ">
 
-Join the Department of Homeland Security and become part of a team dedicated to security, service, and protecting communities.
+Join the Department of Homeland Security and contribute to protecting communities, supporting operations, and serving a greater purpose.
 
 </p>
 
 
 
-
 <Link
 
-href="/careers/apply"
+href="/recruitment"
 
 className="
-inline-flex
-mt-7
+inline-block
+mt-8
 bg-[#F2C94C]
 text-black
-px-7
-py-3
-font-bold
-hover:bg-yellow-300
-transition
+px-10
+py-4
+font-black
 "
 
 >
 
-Begin Your Application →
+Explore Careers →
 
 </Link>
 
 
-</div>
-
-
-
-
+</section>
 
 
 
@@ -410,6 +657,9 @@ Begin Your Application →
 
 
 </div>
+
+
+</section>
 
 
 </main>
