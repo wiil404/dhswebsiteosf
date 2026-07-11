@@ -1,28 +1,25 @@
-"use client";
-
-
-import {useSearchParams} from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 
 
 
-export const dynamic = "force-dynamic";
-
-
-
 export default async function ApplicationSubmittedPage({
+
     searchParams
+
 }:{
-    searchParams:Promise<{
-        number?:string
+
+    searchParams: Promise<{
+        number?: string
     }>
+
 }){
 
-const {number}=await searchParams;
 
-}
+    const {
+        number
 
+    } = await searchParams;
 
 
 
@@ -44,7 +41,6 @@ const {number}=await searchParams;
 
 
             <Breadcrumb />
-
 
 
 
@@ -74,7 +70,6 @@ const {number}=await searchParams;
                     "
 
                 />
-
 
 
 
@@ -139,9 +134,10 @@ const {number}=await searchParams;
                     <p
 
                         className="
-                        mt-5
+                        mt-6
                         text-xl
                         text-gray-200
+                        max-w-3xl
                         "
 
                     >
@@ -149,7 +145,6 @@ const {number}=await searchParams;
                         Your application has been successfully received by the Department of Homeland Security.
 
                     </p>
-
 
 
 
@@ -175,6 +170,8 @@ const {number}=await searchParams;
 
 
 
+
+
                     <div
 
                         className="
@@ -188,10 +185,11 @@ const {number}=await searchParams;
 
 
 
+
                         <h2
 
                             className="
-                            text-2xl
+                            text-3xl
                             font-bold
                             text-[#003B6F]
                             "
@@ -207,21 +205,40 @@ const {number}=await searchParams;
 
 
 
-                        <p
+                        <div
 
                             className="
-                            mt-5
-                            text-4xl
-                            font-black
-                            tracking-widest
-                            text-gray-900
+                            mt-6
+                            bg-white
+                            border
+                            border-gray-300
+                            p-6
                             "
 
                         >
 
-                            {number || "Unavailable"}
 
-                        </p>
+
+                            <p
+
+                                className="
+                                text-4xl
+                                md:text-5xl
+                                font-black
+                                tracking-widest
+                                text-gray-900
+                                "
+
+                            >
+
+                                {number || "Unavailable"}
+
+                            </p>
+
+
+
+                        </div>
+
 
 
 
@@ -230,13 +247,14 @@ const {number}=await searchParams;
                         <p
 
                             className="
-                            mt-5
+                            mt-6
                             text-gray-600
+                            text-lg
                             "
 
                         >
 
-                            Save this application number. You will need it to check your application status in the future.
+                            Please save this application number. You will need it to view your application status in the future.
 
                         </p>
 
@@ -258,12 +276,11 @@ const {number}=await searchParams;
                         className="
                         mt-10
                         flex
-                        gap-5
                         flex-wrap
+                        gap-5
                         "
 
                     >
-
 
 
 
@@ -287,6 +304,7 @@ const {number}=await searchParams;
                             px-8
                             py-4
                             font-bold
+                            text-lg
                             shadow-lg
                             hover:bg-[#002B52]
                             transition
@@ -303,6 +321,7 @@ const {number}=await searchParams;
 
 
 
+
                         <Link
 
                             href="/"
@@ -310,13 +329,14 @@ const {number}=await searchParams;
                             className="
                             inline-flex
                             items-center
-                            justify-center
+                            justify-content-center
                             border-2
                             border-[#003B6F]
                             text-[#003B6F]
                             px-8
                             py-4
                             font-bold
+                            text-lg
                             hover:bg-gray-100
                             transition
                             "
@@ -327,6 +347,62 @@ const {number}=await searchParams;
 
                         </Link>
 
+
+
+
+                    </div>
+
+
+
+
+
+
+
+
+                    <div
+
+                        className="
+                        mt-12
+                        border-l-4
+                        border-[#F2C94C]
+                        bg-gray-50
+                        p-6
+                        "
+
+                    >
+
+
+
+                        <h3
+
+                            className="
+                            font-bold
+                            text-[#003B6F]
+                            text-xl
+                            "
+
+                        >
+
+                            What happens next?
+
+                        </h3>
+
+
+
+
+
+                        <p
+
+                            className="
+                            mt-3
+                            text-gray-700
+                            "
+
+                        >
+
+                            Your application will now be reviewed by authorised Department personnel. If your application progresses, a member of the relevant division may contact you through the details provided.
+
+                        </p>
 
 
 
@@ -346,7 +422,6 @@ const {number}=await searchParams;
 
 
             </div>
-
 
 
 
