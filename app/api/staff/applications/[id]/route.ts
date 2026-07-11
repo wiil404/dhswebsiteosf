@@ -198,6 +198,10 @@ export async function GET(
 
     const employee =
         await getEmployee();
+    console.log(
+    "CURRENT EMPLOYEE:",
+    JSON.stringify(employee, null, 2)
+);
 
 
 
