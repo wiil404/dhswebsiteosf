@@ -33,66 +33,82 @@ async function getEmployee(){
 
 
 
-const {
-    data:employee
-
-} = await supabaseAdmin
-
-.from("employees")
-
-.select(`
-    id,
-    division_id,
-    position_id
-`)
-
-.eq(
-    "user_id",
-    user.id
-)
-
-.single();
-
-
-let positionTitle = "";
-
-
-
-if(employee?.position_id){
-
-
     const {
-        data:position
+        data:employee
 
     } = await supabaseAdmin
 
-    .from("positions")
+    .from("employees")
 
-    .select("title")
+    .select(`
+        id,
+        division_id,
+        position_id
+    `)
 
     .eq(
-        "id",
-        employee.position_id
+        "user_id",
+        user.id
     )
 
     .single();
 
 
 
-    positionTitle =
-        position?.title || "";
 
 
-}
+    if(!employee){
+
+        return null;
+
+    }
 
 
 
-console.log(
-    "STAFF POSITION:",
-    positionTitle
-);
 
-    return employee;
+
+
+    let positionTitle = "";
+
+
+
+    if(employee.position_id){
+
+
+        const {
+            data:position
+
+        } = await supabaseAdmin
+
+        .from("positions")
+
+        .select("title")
+
+        .eq(
+            "id",
+            employee.position_id
+        )
+
+        .single();
+
+
+
+        positionTitle =
+            position?.title || "";
+
+    }
+
+
+
+
+
+    return {
+
+        ...employee,
+
+        positionTitle
+
+    };
 
 
 }
@@ -109,76 +125,65 @@ function hasAccess(employee:any){
 
 
     if(!employee){
+
         return false;
+
     }
 
 
-
-const position =
-    positionTitle;
-
-
-
-    console.log(
-        "CHECKING POSITION:",
-        position
-    );
 
 
 
     const allowedRoles = [
 
-        // OSDHS
 
         "Secretary of Homeland Security",
-
         "Deputy Secretary of Homeland Security",
-
         "Chief of Staff",
-
         "Under Secretary",
 
-        // SS
 
         "Deputy Special Agent in Charge (SS)",
-
         "Special Agent in Charge (SS)",
-
         "Assistant Director",
-
         "Deputy Director",
-
         "Secret Service Director",
 
-        // LEHT
 
         "Flight Officer",
-
         "Senior Flight Officer",
-
         "Under Secretary for Aviation Operations",
 
-        // PAO
 
         "Under Secretary for Public Affairs",
 
-        // CBP
 
         "Supervisory Customs Agent",
-
         "CBP Deputy Commissioner",
-
         "CBP Commissioner"
+
 
     ];
 
 
 
-    return allowedRoles.includes(position);
+
+
+    console.log(
+        "CHECKING POSITION:",
+        employee.positionTitle
+    );
+
+
+
+
+
+    return allowedRoles.includes(
+        employee.positionTitle
+    );
 
 
 }
-
 
 
 
