@@ -129,7 +129,7 @@ return;
 
 
 router.push(
-"/recruitment/applications"
+`/recruitment/applications?submitted=${result.application_number}`
 );
 
 
