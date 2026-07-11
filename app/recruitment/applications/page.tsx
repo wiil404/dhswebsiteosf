@@ -9,452 +9,406 @@ import Breadcrumb from "@/components/Breadcrumb";
 export default function ApplicationsPage(){
 
 
-    const [applicationNumber,setApplicationNumber] = useState("");
+const [applicationNumber,setApplicationNumber]=useState("");
 
-    const [application,setApplication] = useState<any>(null);
+const [username,setUsername]=useState("");
 
-    const [loading,setLoading] = useState(false);
+const [application,setApplication]=useState<any>(null);
 
-    const [error,setError] = useState("");
+const [error,setError]=useState("");
 
+const [loading,setLoading]=useState(false);
 
 
 
 
-    async function searchApplication(){
 
 
-        if(!applicationNumber){
 
-            setError(
-                "Please enter your application number."
-            );
+async function lookup(){
 
-            return;
 
-        }
+setLoading(true);
 
+setError("");
 
 
-        setLoading(true);
 
-        setError("");
+const response = await fetch(
 
+`/api/recruitment/applications?number=${applicationNumber}&username=${username}`
 
+);
 
 
 
-        const response = await fetch(
+const data = await response.json();
 
-            `/api/recruitment/applications?number=${applicationNumber}`
 
-        );
 
 
+if(!response.ok){
 
-        const data = await response.json();
+setApplication(null);
 
+setError(
+data.error || "Application not found"
+);
 
+setLoading(false);
 
+return;
 
+}
 
-        if(!response.ok){
 
 
-            setError(
-                data.error ||
-                "Application not found."
-            );
 
+setApplication(data);
 
-            setApplication(null);
+setLoading(false);
 
-            setLoading(false);
 
-            return;
+}
 
-        }
 
 
 
 
-        setApplication(data);
 
-        setLoading(false);
 
 
-    }
 
+return (
 
+<main
 
+className="
+max-w-5xl
+mx-auto
+px-6
+py-16
+"
 
+>
 
 
+<Breadcrumb />
 
 
 
-    return (
+<div
 
-        <main
+className="
+bg-white
+shadow-2xl
+border
+border-gray-200
+overflow-hidden
+"
 
-            className="
-            max-w-5xl
-            mx-auto
-            px-6
-            py-16
-            "
+>
 
-        >
 
+<div className="
+h-3
+bg-[#F2C94C]
+"/>
 
-            <Breadcrumb />
 
 
 
 
 
-            <div
+<section
 
-                className="
-                bg-white
-                shadow-2xl
-                border
-                border-gray-200
-                overflow-hidden
-                "
+className="
+bg-[#003B6F]
+text-white
+p-10
+"
 
-            >
+>
 
+<h1
 
-                <div className="
-                h-3
-                bg-[#F2C94C]
-                "/>
+className="
+text-5xl
+font-black
+"
 
+>
 
+Application Status
 
+</h1>
 
 
+<p className="
+mt-4
+text-gray-200
+text-lg
+">
 
-                <section
+Enter your application details to view your recruitment progress.
 
-                    className="
-                    bg-[#003B6F]
-                    text-white
-                    p-10
-                    md:p-14
-                    "
+</p>
 
-                >
 
+</section>
 
-                    <p
 
-                        className="
-                        uppercase
-                        tracking-[0.3em]
-                        text-sm
-                        font-bold
-                        text-[#F2C94C]
-                        "
 
-                    >
 
-                        Department of Homeland Security
 
-                    </p>
 
 
 
 
-                    <h1
+<section
 
-                        className="
-                        mt-4
-                        text-5xl
-                        font-black
-                        "
+className="
+p-10
+"
 
-                    >
+>
 
-                        Application Status
 
-                    </h1>
 
+<input
 
+className="
+border
+p-4
+w-full
+"
 
+placeholder="Application Number"
 
-                    <p
+value={applicationNumber}
 
-                        className="
-                        mt-5
-                        text-lg
-                        text-gray-200
-                        "
+onChange={
+e=>setApplicationNumber(e.target.value)
+}
 
-                    >
+/>
 
-                        Check the current progress of your DHS recruitment application.
 
-                    </p>
 
 
 
-                </section>
+<input
 
+className="
+border
+p-4
+w-full
+mt-5
+"
 
+placeholder="Roblox Username"
 
+value={username}
 
+onChange={
+e=>setUsername(e.target.value)
+}
 
+/>
 
 
 
 
-                <section
 
-                    className="
-                    p-10
-                    md:p-14
-                    "
 
-                >
 
+<button
 
+onClick={lookup}
 
+disabled={loading}
 
+className="
+mt-6
+bg-[#003B6F]
+text-white
+px-8
+py-4
+font-bold
+"
 
-                    <h2
+>
 
-                        className="
-                        text-3xl
-                        font-bold
-                        text-[#003B6F]
-                        "
+{
+loading
+?
+"Searching..."
+:
+"Check Application Status →"
+}
 
-                    >
+</button>
 
-                        Lookup Application
 
-                    </h2>
 
 
 
 
+{
+error && (
 
+<p className="
+mt-6
+text-red-600
+font-bold
+">
 
-                    <input
+{error}
 
-                        className="
-                        border
-                        p-4
-                        w-full
-                        mt-6
-                        "
+</p>
 
-                        placeholder="Application Number"
+)
 
-                        value={applicationNumber}
+}
 
-                        onChange={
-                            e=>
-                            setApplicationNumber(
-                                e.target.value
-                            )
-                        }
 
-                    />
 
 
 
 
 
 
-                    <button
 
-                        onClick={searchApplication}
+{
+application && (
 
-                        disabled={loading}
+<div
 
-                        className="
-                        mt-5
-                        bg-[#003B6F]
-                        text-white
-                        px-8
-                        py-4
-                        font-bold
-                        hover:bg-[#002B52]
-                        transition
-                        "
+className="
+mt-10
+border
+p-8
+bg-gray-50
+"
 
-                    >
+>
 
-                    {
-                        loading
-                        ?
-                        "Searching..."
-                        :
-                        "View Application Status →"
-                    }
 
+<h2
 
-                    </button>
+className="
+text-3xl
+font-bold
+text-[#003B6F]
+"
 
+>
 
+Application Found
 
+</h2>
 
 
 
 
+<p className="mt-5">
 
-                    {
-                        error && (
+<strong>
+Applicant:
+</strong>
 
-                            <p
+{" "}
 
-                                className="
-                                mt-6
-                                text-red-600
-                                font-bold
-                                "
+{application.roblox_username}
 
-                            >
+</p>
 
-                                {error}
 
-                            </p>
 
-                        )
-                    }
 
 
+<p className="mt-3">
 
+<strong>
+Division:
+</strong>
 
+{" "}
 
+{application.divisions?.name}
 
+</p>
 
 
 
-                    {
-                        application && (
 
 
-                            <div
+<p className="mt-3">
 
-                                className="
-                                mt-10
-                                border
-                                border-gray-200
-                                bg-gray-50
-                                p-8
-                                "
+<strong>
+Status:
+</strong>
 
-                            >
+{" "}
 
+<span className="font-bold">
 
-                                <h3
+{application.status}
 
-                                    className="
-                                    text-2xl
-                                    font-bold
-                                    text-[#003B6F]
-                                    "
+</span>
 
-                                >
+</p>
 
-                                    Application Details
 
-                                </h3>
 
 
 
+<p className="mt-3">
 
-                                <p className="mt-5">
+<strong>
+Submitted:
+</strong>
 
-                                    <strong>
-                                        Division:
-                                    </strong>
+{" "}
 
-                                    {" "}
+{
+new Date(
+application.created_at
+)
+.toLocaleDateString()
+}
 
-                                    {
-                                        application.divisions?.name ||
-                                        "Pending"
-                                    }
+</p>
 
-                                </p>
 
 
 
+</div>
 
+)
 
+}
 
-                                <p className="mt-3">
 
-                                    <strong>
-                                        Status:
-                                    </strong>
 
-                                    {" "}
 
-                                    {
-                                        application.status
-                                    }
+</section>
 
-                                </p>
 
 
 
 
 
+</div>
 
-                                <p className="mt-3">
 
-                                    <strong>
-                                        Submitted:
-                                    </strong>
 
-                                    {" "}
 
-                                    {
-                                        new Date(
-                                            application.created_at
-                                        )
-                                        .toLocaleDateString()
-                                    }
 
-                                </p>
 
+</main>
 
-
-
-                            </div>
-
-
-                        )
-                    }
-
-
-
-
-
-
-
-                </section>
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-        </main>
-
-    );
+);
 
 
 }
