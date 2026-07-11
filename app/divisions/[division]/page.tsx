@@ -151,6 +151,14 @@ roles:[
 
 "Assistant Director",
 
+"Special Agent in Charge",
+
+"Deputy Special Agent in Charge",
+
+"Supervisory Special Agent",
+
+"Senior Special Agent",
+
 "Special Agent",
 
 "Probationary Agent"
@@ -300,7 +308,9 @@ roles:[
 
 "Supervisory Customs Agent",
 
-"Customs Agent"
+"Customs Agent",
+
+"Probationary Customs Agent"
 
 ]
 
