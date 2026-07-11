@@ -263,7 +263,7 @@ short:
 "CBP",
 
 commander:
-"Customs and Border Protection Commissioner",
+"CBP Commissioner",
 
 
 heroTitle:
