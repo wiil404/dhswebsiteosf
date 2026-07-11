@@ -44,34 +44,25 @@ export async function GET(){
 
 
 
-    const {
+const {
+    data:employee
 
-        data:employee,
+} = await supabaseAdmin
 
-        error:employeeError
+.from("employees")
 
-    } = await supabaseAdmin
+.select(`
+    id,
+    division_id,
+    position_id
+`)
 
-        .from("employees")
+.eq(
+    "user_id",
+    user.id
+)
 
-        .select(`
-
-            id,
-
-            division_id,
-
-            positions(
-                title
-            )
-
-        `)
-
-        .eq(
-            "user_id",
-            user.id
-        )
-
-        .single();
+.single();
 
 
 
