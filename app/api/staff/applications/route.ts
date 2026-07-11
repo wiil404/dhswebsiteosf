@@ -26,19 +26,14 @@ export async function GET(){
 
     if(!user){
 
-
         return NextResponse.json(
-
             {
                 error:"Not authenticated"
             },
-
             {
                 status:401
             }
-
         );
-
 
     }
 
@@ -47,12 +42,6 @@ export async function GET(){
 
 
 
-
-
-
-    /*
-        Find logged in employee
-    */
 
 
     const {
@@ -71,10 +60,6 @@ export async function GET(){
 
             division_id,
 
-            divisions(
-                name
-            ),
-
             positions(
                 title
             )
@@ -82,15 +67,11 @@ export async function GET(){
         `)
 
         .eq(
-
             "user_id",
-
             user.id
-
         )
 
         .single();
-
 
 
 
@@ -121,10 +102,12 @@ export async function GET(){
 
 
 
-
+    // FIX:
+    // Supabase returns positions as an array
 
     const position =
-        employee.positions?.title || "";
+        employee.positions?.[0]?.title || "";
+
 
 
 
@@ -139,20 +122,8 @@ export async function GET(){
 
 
 
-    /*
-        Permission Groups
-    */
-
-
-
-
-
-
-
-    // Office of the Secretary
 
     const secretaryAccess = [
-
 
         "Secretary of Homeland Security",
 
@@ -162,7 +133,6 @@ export async function GET(){
 
         "Under Secretary"
 
-
     ];
 
 
@@ -171,12 +141,7 @@ export async function GET(){
 
 
 
-
-
-    // United States Secret Service
-
     const secretServiceAccess = [
-
 
         "Deputy Special Agent in Charge (SS)",
 
@@ -188,7 +153,6 @@ export async function GET(){
 
         "Secret Service Director"
 
-
     ];
 
 
@@ -197,12 +161,7 @@ export async function GET(){
 
 
 
-
-
-    // Law Enforcement Helicopter Taskforce
-
     const lehtAccess = [
-
 
         "Flight Officer",
 
@@ -210,7 +169,6 @@ export async function GET(){
 
         "Under Secretary for Aviation Operations"
 
-
     ];
 
 
@@ -218,16 +176,10 @@ export async function GET(){
 
 
 
-
-
-
-    // Public Affairs
 
     const paoAccess = [
 
-
         "Under Secretary for Public Affairs"
-
 
     ];
 
@@ -237,12 +189,7 @@ export async function GET(){
 
 
 
-
-
-    // Customs and Border Protection
-
     const cbpAccess = [
-
 
         "Supervisory Customs Agent",
 
@@ -250,12 +197,7 @@ export async function GET(){
 
         "CBP Commissioner"
 
-
     ];
-
-
-
-
 
 
 
@@ -275,12 +217,6 @@ export async function GET(){
 
             divisions(
                 name
-            ),
-
-            application_reviews(
-
-                *
-
             )
 
         `)
@@ -290,15 +226,10 @@ export async function GET(){
             "created_at",
 
             {
-
                 ascending:false
-
             }
 
         );
-
-
-
 
 
 
@@ -316,16 +247,15 @@ export async function GET(){
 
     if(
 
-        secretaryAccess.some(rank =>
+        secretaryAccess.some(role=>
 
-            position.includes(rank)
+            position.includes(role)
 
         )
 
     ){
 
-
-        // No filter
+        // unrestricted
 
 
     }
@@ -337,23 +267,44 @@ export async function GET(){
 
 
 
-
     /*
-        Secret Service leadership
-
+        Division leadership
     */
 
 
     else if(
 
-        secretServiceAccess.some(rank =>
+        secretServiceAccess.some(role=>
 
-            position.includes(rank)
+            position.includes(role)
+
+        )
+
+        ||
+
+        lehtAccess.some(role=>
+
+            position.includes(role)
+
+        )
+
+        ||
+
+        paoAccess.some(role=>
+
+            position.includes(role)
+
+        )
+
+        ||
+
+        cbpAccess.some(role=>
+
+            position.includes(role)
 
         )
 
     ){
-
 
 
         query = query.eq(
@@ -366,119 +317,6 @@ export async function GET(){
 
 
     }
-
-
-
-
-
-
-
-
-
-    /*
-        LEHT leadership
-
-    */
-
-
-    else if(
-
-        lehtAccess.some(rank =>
-
-            position.includes(rank)
-
-        )
-
-    ){
-
-
-
-        query = query.eq(
-
-            "division_id",
-
-            division
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-
-
-    /*
-        Public Affairs
-
-    */
-
-
-    else if(
-
-        paoAccess.some(rank =>
-
-            position.includes(rank)
-
-        )
-
-    ){
-
-
-
-        query = query.eq(
-
-            "division_id",
-
-            division
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-
-
-    /*
-        CBP
-
-    */
-
-
-    else if(
-
-        cbpAccess.some(rank =>
-
-            position.includes(rank)
-
-        )
-
-    ){
-
-
-
-        query = query.eq(
-
-            "division_id",
-
-            division
-
-        );
-
-
-    }
-
-
 
 
 
@@ -492,16 +330,12 @@ export async function GET(){
         return NextResponse.json(
 
             {
-
                 error:
                 "You do not have permission to view applications"
-
             },
 
             {
-
                 status:403
-
             }
 
         );
@@ -530,33 +364,23 @@ export async function GET(){
 
 
 
-
-
-
     if(error){
 
 
         return NextResponse.json(
 
             {
-
                 error:error.message
-
             },
 
             {
-
                 status:500
-
             }
 
         );
 
 
     }
-
-
-
 
 
 
