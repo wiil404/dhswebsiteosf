@@ -43,7 +43,7 @@ const careers = [
 
 {
     title:"United States Customs and Border Protection",
-    short:"CBP",
+    short:"USCBP",
     icon:"🌎",
     image:"/careers/cbp.jpg",
     description:
