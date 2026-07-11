@@ -642,17 +642,27 @@ Commander
 <div className="mt-6 flex gap-8 items-center bg-gray-50 p-8">
 
 
-<Image
+<img
 
-src={avatar}
+src={
+    commander?.roblox_user_id
 
-width={180}
+    ?
 
-height={180}
+    `https://www.roblox.com/headshot-thumbnail/image?userId=${commander.roblox_user_id}&width=420&height=420&format=png`
+
+    :
+
+    "/leadership/default.png"
+}
 
 alt="Commander"
 
-className="rounded-full border-4 border-[#003B6F]"
+className="
+w-full
+h-full
+object-cover
+"
 
 />
 
