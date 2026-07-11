@@ -9,18 +9,13 @@ import Breadcrumb from "@/components/Breadcrumb";
 export default function ApplicationsPage(){
 
 
-const [applicationNumber,setApplicationNumber]=useState("");
+const [number,setNumber]=useState("");
 
 const [username,setUsername]=useState("");
 
-const [application,setApplication]=useState<any>(null);
+const [result,setResult]=useState<any>(null);
 
 const [error,setError]=useState("");
-
-const [loading,setLoading]=useState(false);
-
-
-
 
 
 
@@ -28,34 +23,53 @@ const [loading,setLoading]=useState(false);
 async function lookup(){
 
 
-setLoading(true);
-
 setError("");
 
+setResult(null);
 
 
-const response = await fetch(
 
-`/api/recruitment/applications?number=${applicationNumber}&username=${username}`
+const response =
+await fetch(
+
+"/api/recruitment/applications/lookup",
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+application_number:number,
+
+roblox_username:username
+
+})
+
+}
 
 );
 
 
 
-const data = await response.json();
+
+
+const data =
+await response.json();
+
 
 
 
 
 if(!response.ok){
 
-setApplication(null);
-
 setError(
-data.error || "Application not found"
+data.error
 );
-
-setLoading(false);
 
 return;
 
@@ -64,9 +78,10 @@ return;
 
 
 
-setApplication(data);
 
-setLoading(false);
+setResult(
+data.application
+);
 
 
 }
@@ -81,114 +96,62 @@ setLoading(false);
 
 return (
 
-<main
-
-className="
-max-w-5xl
+<main className="
+max-w-7xl
 mx-auto
 px-6
 py-16
-"
-
->
+">
 
 
 <Breadcrumb />
 
 
 
-<div
-
-className="
-bg-white
-shadow-2xl
-border
-border-gray-200
-overflow-hidden
-"
-
->
-
-
 <div className="
-h-3
-bg-[#F2C94C]
-"/>
-
-
-
-
-
-
-<section
-
-className="
-bg-[#003B6F]
-text-white
+bg-white
+shadow-xl
+border
 p-10
-"
+">
 
->
 
-<h1
-
-className="
-text-5xl
-font-black
-"
-
->
+<h1 className="
+text-4xl
+font-bold
+text-[#003B6F]
+">
 
 Application Status
 
 </h1>
 
 
+
+
 <p className="
 mt-4
-text-gray-200
-text-lg
+text-gray-600
 ">
 
-Enter your application details to view your recruitment progress.
+Enter your application reference number and Roblox username to view your application.
 
 </p>
 
 
-</section>
-
-
-
-
-
-
-
-
-
-<section
-
-className="
-p-10
-"
-
->
 
 
 
 <input
 
-className="
-border
-p-4
-w-full
-"
+className="border p-4 w-full mt-8"
 
-placeholder="Application Number"
+placeholder="Application Reference Number"
 
-value={applicationNumber}
+value={number}
 
 onChange={
-e=>setApplicationNumber(e.target.value)
+e=>setNumber(e.target.value)
 }
 
 />
@@ -199,12 +162,7 @@ e=>setApplicationNumber(e.target.value)
 
 <input
 
-className="
-border
-p-4
-w-full
-mt-5
-"
+className="border p-4 w-full mt-4"
 
 placeholder="Roblox Username"
 
@@ -221,31 +179,22 @@ e=>setUsername(e.target.value)
 
 
 
-
 <button
 
 onClick={lookup}
-
-disabled={loading}
 
 className="
 mt-6
 bg-[#003B6F]
 text-white
 px-8
-py-4
+py-3
 font-bold
 "
 
 >
 
-{
-loading
-?
-"Searching..."
-:
-"Check Application Status →"
-}
+View Application
 
 </button>
 
@@ -258,7 +207,7 @@ loading
 error && (
 
 <p className="
-mt-6
+mt-5
 text-red-600
 font-bold
 ">
@@ -278,31 +227,21 @@ font-bold
 
 
 
-
 {
-application && (
+result && (
 
-<div
-
-className="
+<div className="
 mt-10
 border
-p-8
+p-6
 bg-gray-50
-"
-
->
+">
 
 
-<h2
-
-className="
-text-3xl
+<h2 className="
+text-2xl
 font-bold
-text-[#003B6F]
-"
-
->
+">
 
 Application Found
 
@@ -311,15 +250,11 @@ Application Found
 
 
 
-<p className="mt-5">
+<p className="mt-4">
 
-<strong>
-Applicant:
-</strong>
+<strong>Status:</strong>{" "}
 
-{" "}
-
-{application.roblox_username}
+{result.status}
 
 </p>
 
@@ -327,15 +262,11 @@ Applicant:
 
 
 
-<p className="mt-3">
+<p>
 
-<strong>
-Division:
-</strong>
+<strong>Division:</strong>{" "}
 
-{" "}
-
-{application.divisions?.name}
+{result.divisions?.name}
 
 </p>
 
@@ -343,43 +274,13 @@ Division:
 
 
 
-<p className="mt-3">
+<p>
 
-<strong>
-Status:
-</strong>
+<strong>Reference:</strong>{" "}
 
-{" "}
-
-<span className="font-bold">
-
-{application.status}
-
-</span>
+{result.application_number}
 
 </p>
-
-
-
-
-
-<p className="mt-3">
-
-<strong>
-Submitted:
-</strong>
-
-{" "}
-
-{
-new Date(
-application.created_at
-)
-.toLocaleDateString()
-}
-
-</p>
-
 
 
 
@@ -391,22 +292,11 @@ application.created_at
 
 
 
-
-</section>
-
-
-
-
-
-
 </div>
-
-
-
-
 
 
 </main>
+
 
 );
 
