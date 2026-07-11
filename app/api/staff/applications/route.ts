@@ -7,20 +7,14 @@ import { supabaseAdmin } from "../../../lib/supabase-admin";
 export async function GET(){
 
 
-
     const supabase = await createClient();
-
-
 
 
     const {
         data:{
             user
         }
-
     } = await supabase.auth.getUser();
-
-
 
 
 
@@ -41,67 +35,29 @@ export async function GET(){
 
 
 
-
-
-
-const {
-    data:employee
-
-} = await supabaseAdmin
-
-.from("employees")
-
-.select(`
-    id,
-    division_id,
-    position_id
-`)
-
-.eq(
-    "user_id",
-    user.id
-)
-
-.single();
-
-
-let positionTitle = "";
-
-
-
-if(employee?.position_id){
-
-
     const {
-        data:position
+        data:employee,
+        error:employeeError
 
     } = await supabaseAdmin
 
-    .from("positions")
+    .from("employees")
 
-    .select("title")
+    .select(`
+        id,
+        division_id,
+        position_id
+    `)
 
     .eq(
-        "id",
-        employee.position_id
+        "user_id",
+        user.id
     )
 
     .single();
 
 
 
-    positionTitle =
-        position?.title || "";
-
-
-}
-
-
-
-console.log(
-    "STAFF POSITION:",
-    positionTitle
-);
 
 
 
@@ -109,17 +65,13 @@ console.log(
 
 
         return NextResponse.json(
-
             {
                 error:"Employee profile not found"
             },
-
             {
                 status:403
             }
-
         );
-
 
     }
 
@@ -128,21 +80,43 @@ console.log(
 
 
 
-
-    // FIX:
-    // Supabase returns positions as an array
-
-const position =
-    positionTitle;
+    let positionTitle = "";
 
 
 
-
-    const division =
-        employee.division_id;
+    if(employee.position_id){
 
 
+        const {
+            data:position
 
+        } = await supabaseAdmin
+
+        .from("positions")
+
+        .select("title")
+
+        .eq(
+            "id",
+            employee.position_id
+        )
+
+        .single();
+
+
+
+        positionTitle =
+            position?.title || "";
+
+    }
+
+
+
+
+    console.log(
+        "STAFF POSITION:",
+        positionTitle
+    );
 
 
 
@@ -153,75 +127,30 @@ const position =
     const secretaryAccess = [
 
         "Secretary of Homeland Security",
-
         "Deputy Secretary of Homeland Security",
-
         "Chief of Staff",
-
         "Under Secretary"
 
     ];
 
 
 
-
-
-
-
-    const secretServiceAccess = [
+    const divisionAccess = [
 
         "Deputy Special Agent in Charge (SS)",
-
         "Special Agent in Charge (SS)",
-
         "Assistant Director",
-
         "Deputy Director",
-
-        "Secret Service Director"
-
-    ];
-
-
-
-
-
-
-
-    const lehtAccess = [
+        "Secret Service Director",
 
         "Flight Officer",
-
         "Senior Flight Officer",
+        "Under Secretary for Aviation Operations",
 
-        "Under Secretary for Aviation Operations"
-
-    ];
-
-
-
-
-
-
-
-    const paoAccess = [
-
-        "Under Secretary for Public Affairs"
-
-    ];
-
-
-
-
-
-
-
-    const cbpAccess = [
+        "Under Secretary for Public Affairs",
 
         "Supervisory Customs Agent",
-
         "CBP Deputy Commissioner",
-
         "CBP Commissioner"
 
     ];
@@ -232,97 +161,55 @@ const position =
 
 
 
-
-
     let query = supabaseAdmin
 
-        .from("applications")
+    .from("applications")
 
-        .select(`
+    .select(`
+        *,
+        divisions(
+            name
+        )
+    `)
 
-            *,
-
-            divisions(
-                name
-            )
-
-        `)
-
-        .order(
-
-            "created_at",
-
-            {
-                ascending:false
-            }
-
-        );
+    .order(
+        "created_at",
+        {
+            ascending:false
+        }
+    );
 
 
 
 
 
 
-
-
-
-    /*
-        Office of Secretary
-        Full access
-    */
 
 
     if(
-
-        secretaryAccess.includes(position)
-
+        secretaryAccess.includes(positionTitle)
     ){
 
-        // unrestricted
+        // Full access
 
 
     }
 
 
-
-
-
-
-
-
-    /*
-        Division leadership
-    */
-
-
     else if(
-    secretServiceAccess.includes(position)
-    ||
-    lehtAccess.includes(position)
-    ||
-    paoAccess.includes(position)
-    ||
-    cbpAccess.includes(position)
-)
+
+        divisionAccess.includes(positionTitle)
 
     ){
 
 
         query = query.eq(
-
             "division_id",
-
-            division
-
+            employee.division_id
         );
 
 
     }
-
-
-
-
-
 
 
     else{
@@ -341,7 +228,6 @@ const position =
 
         );
 
-
     }
 
 
@@ -350,12 +236,8 @@ const position =
 
 
 
-
-
     const {
-
         data:applications,
-
         error
 
     } = await query;
@@ -367,19 +249,14 @@ const position =
 
     if(error){
 
-
         return NextResponse.json(
-
             {
                 error:error.message
             },
-
             {
                 status:500
             }
-
         );
-
 
     }
 
@@ -388,12 +265,10 @@ const position =
 
 
 
+
     return NextResponse.json(
-
         applications || []
-
     );
-
 
 
 }
