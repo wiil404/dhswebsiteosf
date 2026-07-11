@@ -65,7 +65,43 @@ const {
 .single();
 
 
+let positionTitle = "";
 
+
+
+if(employee?.position_id){
+
+
+    const {
+        data:position
+
+    } = await supabaseAdmin
+
+    .from("positions")
+
+    .select("title")
+
+    .eq(
+        "id",
+        employee.position_id
+    )
+
+    .single();
+
+
+
+    positionTitle =
+        position?.title || "";
+
+
+}
+
+
+
+console.log(
+    "STAFF POSITION:",
+    positionTitle
+);
 
 
 
