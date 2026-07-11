@@ -390,9 +390,7 @@ return;
 
 
 router.push(
-
-`/recruitment/applications?submitted=${result.application_number}`
-
+`/recruitment/applications/submitted?number=${result.application_number}`
 );
 
 
