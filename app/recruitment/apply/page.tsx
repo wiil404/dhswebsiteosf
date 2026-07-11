@@ -1,7 +1,7 @@
 "use client";
 
 
-import {useState} from "react";
+import {useState,useEffect} from "react";
 import Breadcrumb from "@/components/Breadcrumb";
 import {useRouter} from "next/navigation";
 
@@ -13,7 +13,16 @@ export default function ApplyPage(){
 const router = useRouter();
 
 
+
 const [loading,setLoading] = useState(false);
+
+const [divisions,setDivisions] = useState<any[]>([]);
+
+const [questions,setQuestions] = useState<any[]>([]);
+
+const [answers,setAnswers] = useState<any>({});
+
+
 
 
 const [form,setForm] = useState({
@@ -23,10 +32,6 @@ const [form,setForm] = useState({
     discord_username:"",
     email:"",
     division:"",
-    experience:"",
-    motivation:"",
-    suitability:"",
-    availability:"",
     agreement:false
 
 });
@@ -35,20 +40,122 @@ const [form,setForm] = useState({
 
 
 
-function update(
-    field:string,
-    value:any
+
+
+
+
+useEffect(()=>{
+
+
+async function loadDivisions(){
+
+
+const response = await fetch(
+"/api/recruitment/divisions"
+);
+
+
+const data = await response.json();
+
+
+setDivisions(data);
+
+
+}
+
+
+
+loadDivisions();
+
+
+},[]);
+
+
+
+
+
+
+
+
+
+async function loadQuestions(
+divisionId:string
 ){
+
+
+const response = await fetch(
+
+`/api/recruitment/questions?division=${divisionId}`
+
+);
+
+
+
+const data = await response.json();
+
+
+
+setQuestions(data);
+
+
+setAnswers({});
+
+
+}
+
+
+
+
+
+
+
+
+
+
+function update(
+field:string,
+value:any
+){
+
 
 setForm({
 
-    ...form,
+...form,
 
-    [field]:value
+[field]:value
 
 });
 
+
 }
+
+
+
+
+
+
+
+
+function updateAnswer(
+
+id:string,
+
+value:string
+
+){
+
+
+setAnswers({
+
+...answers,
+
+[id]:value
+
+});
+
+
+}
+
 
 
 
@@ -63,18 +170,44 @@ async function submitApplication(){
 
 if(!form.agreement){
 
-    alert(
-        "Please confirm your information is accurate before submitting."
-    );
 
-    return;
+alert(
+"Please confirm your information is accurate before submitting."
+);
+
+
+return;
+
 
 }
 
 
 
 
+
+if(!form.division){
+
+
+alert(
+"Please select a division."
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
 setLoading(true);
+
+
+
+
 
 
 
@@ -92,11 +225,24 @@ headers:{
 
 },
 
-body:JSON.stringify(form)
+body:JSON.stringify({
+
+
+...form,
+
+
+answers
+
+
+})
 
 }
 
+
 );
+
+
+
 
 
 
@@ -107,7 +253,10 @@ const result = await response.json();
 
 
 
+
+
 if(!response.ok){
+
 
 alert(
 
@@ -120,7 +269,9 @@ result.error ||
 
 setLoading(false);
 
+
 return;
+
 
 }
 
@@ -128,8 +279,12 @@ return;
 
 
 
+
+
 router.push(
+
 `/recruitment/applications?submitted=${result.application_number}`
+
 );
 
 
@@ -182,14 +337,11 @@ overflow-hidden
 
 
 
-<div
-
-className="
+<div className="
 h-3
 bg-[#F2C94C]
-"
+"/>
 
-/>
 
 
 
@@ -210,7 +362,6 @@ md:p-16
 >
 
 
-
 <p
 
 className="
@@ -226,6 +377,7 @@ text-[#F2C94C]
 Department of Homeland Security
 
 </p>
+
 
 
 
@@ -248,6 +400,7 @@ Employment Application
 
 
 
+
 <p
 
 className="
@@ -259,10 +412,9 @@ max-w-4xl
 
 >
 
-Begin your application to serve within one of the Department of Homeland Security's operational divisions.
+Apply to serve within the Department of Homeland Security. Questions will be tailored specifically to your selected division.
 
 </p>
-
 
 
 
@@ -290,15 +442,12 @@ md:p-14
 
 
 
-<h2
 
-className="
+<h2 className="
 text-3xl
 font-bold
 text-[#003B6F]
-"
-
->
+">
 
 Applicant Information
 
@@ -308,25 +457,22 @@ Applicant Information
 
 
 
-<div
 
-className="
+
+
+<div className="
 grid
 md:grid-cols-2
 gap-6
 mt-8
-"
+">
 
->
 
 
 
 <input
 
-className="
-border
-p-4
-"
+className="border p-4"
 
 placeholder="Roblox Username"
 
@@ -346,13 +492,9 @@ e.target.value
 
 
 
-
 <input
 
-className="
-border
-p-4
-"
+className="border p-4"
 
 placeholder="Roblox User ID"
 
@@ -375,10 +517,7 @@ e.target.value
 
 <input
 
-className="
-border
-p-4
-"
+className="border p-4"
 
 placeholder="Discord Username"
 
@@ -401,10 +540,7 @@ e.target.value
 
 <input
 
-className="
-border
-p-4
-"
+className="border p-4"
 
 placeholder="Email Address"
 
@@ -421,6 +557,8 @@ e.target.value
 
 
 
+
+
 </div>
 
 
@@ -431,18 +569,14 @@ e.target.value
 
 
 
-<h2
-
-className="
+<h2 className="
 mt-12
 text-3xl
 font-bold
 text-[#003B6F]
-"
+">
 
->
-
-Division Selection
+Select Division
 
 </h2>
 
@@ -462,12 +596,35 @@ mt-6
 
 value={form.division}
 
-onChange={
-e=>update(
+onChange={e=>{
+
+
+const selected =
+e.target.value;
+
+
+
+const division =
+divisions.find(
+d=>d.id===selected
+);
+
+
+
+update(
 "division",
-e.target.value
-)
-}
+selected
+);
+
+
+
+loadQuestions(
+selected
+);
+
+
+
+}}
 
 >
 
@@ -479,29 +636,29 @@ Select Division
 </option>
 
 
-<option>
-Special Response Team
+
+
+{
+divisions.map(
+division=>(
+
+<option
+
+key={division.id}
+
+value={division.id}
+
+>
+
+{division.name}
+
 </option>
 
+)
 
-<option>
-Law Enforcement Helicopter Taskforce
-</option>
+)
 
-
-<option>
-United States Secret Service
-</option>
-
-
-<option>
-United States Customs and Border Protection
-</option>
-
-
-<option>
-Public Affairs
-</option>
+}
 
 
 
@@ -515,26 +672,51 @@ Public Affairs
 
 
 
-<h2
+{
 
-className="
-mt-12
+questions.length > 0 && (
+
+
+<section className="mt-12">
+
+
+<h2 className="
 text-3xl
 font-bold
 text-[#003B6F]
-"
+">
 
->
-
-Application Questions
+Division Assessment
 
 </h2>
 
 
 
 
+<div className="
+space-y-8
+mt-8
+">
 
 
+{
+questions.map(
+(question)=>(
+
+
+<div key={question.id}>
+
+
+<label className="
+block
+font-bold
+text-gray-800
+mb-3
+">
+
+{question.question}
+
+</label>
 
 
 
@@ -544,18 +726,18 @@ className="
 border
 p-4
 w-full
-mt-6
 "
 
 rows={5}
 
-placeholder="Previous experience"
-
-value={form.experience}
+value={
+answers[question.id] || ""
+}
 
 onChange={
-e=>update(
-"experience",
+e=>
+updateAnswer(
+question.id,
 e.target.value
 )
 }
@@ -564,98 +746,27 @@ e.target.value
 
 
 
+</div>
 
 
-
-
-
-
-<textarea
-
-className="
-border
-p-4
-w-full
-mt-6
-"
-
-rows={5}
-
-placeholder="Why do you want to join DHS?"
-
-value={form.motivation}
-
-onChange={
-e=>update(
-"motivation",
-e.target.value
 )
+
+)
+
 }
 
-/>
 
 
+</div>
 
 
+</section>
 
 
-
-
-
-<textarea
-
-className="
-border
-p-4
-w-full
-mt-6
-"
-
-rows={5}
-
-placeholder="Why are you suitable for this division?"
-
-value={form.suitability}
-
-onChange={
-e=>update(
-"suitability",
-e.target.value
 )
+
 }
 
-/>
-
-
-
-
-
-
-
-
-<textarea
-
-className="
-border
-p-4
-w-full
-mt-6
-"
-
-rows={3}
-
-placeholder="Your availability"
-
-value={form.availability}
-
-onChange={
-e=>update(
-"availability",
-e.target.value
-)
-}
-
-/>
 
 
 
@@ -670,7 +781,7 @@ className="
 flex
 items-center
 gap-3
-mt-8
+mt-10
 "
 
 >
@@ -683,14 +794,14 @@ type="checkbox"
 checked={form.agreement}
 
 onChange={
-e=>update(
+e=>
+update(
 "agreement",
 e.target.checked
 )
 }
 
 />
-
 
 
 <span>
@@ -759,7 +870,6 @@ loading
 
 
 
-
 </div>
 
 
@@ -769,6 +879,7 @@ loading
 
 
 </main>
+
 
 );
 
