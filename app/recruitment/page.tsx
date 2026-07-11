@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumb";
 
 
@@ -7,55 +8,59 @@ export default function RecruitmentPage(){
 
 const careers = [
 
-
-    {
-        title:"Special Response Team",
-        short:"SRT",
-        image:"/careers/srt.jpg",
-        description:
-        "Elite operational personnel trained for high-risk response, tactical deployments, and specialised security missions.",
-        href:"/divisions/special-response-team"
-    },
-
-
-    {
-        title:"Law Enforcement Helicopter Taskforce",
-        short:"LEHT",
-        image:"/careers/leht.jpg",
-        description:
-        "Aviation specialists providing rapid response, aerial support, and operational assistance to DHS missions.",
-        href:"/divisions/helicopter-taskforce"
-    },
+{
+    title:"Special Response Team",
+    short:"SRT",
+    icon:"🚨",
+    image:"/careers/srt.jpg",
+    description:
+    "Elite operational personnel trained for high-risk response, tactical deployments, and specialised security missions.",
+    href:"/divisions/special-response-team"
+},
 
 
-    {
-        title:"United States Secret Service",
-        short:"USSS",
-        image:"/careers/usss.jpg",
-        description:
-        "Protecting national leadership and supporting critical security operations through elite protective services.",
-        href:"/divisions/secret-service"
-    },
+{
+    title:"Law Enforcement Helicopter Taskforce",
+    short:"LEHT",
+    icon:"🚁",
+    image:"/careers/leht.jpg",
+    description:
+    "Aviation specialists providing rapid response, aerial support, and operational assistance to DHS missions.",
+    href:"/divisions/helicopter-taskforce"
+},
 
 
-    {
-        title:"United States Customs and Border Protection",
-        short:"USCBP",
-        image:"/careers/cbp.jpg",
-        description:
-        "Securing borders, protecting communities, and supporting national security through dedicated enforcement.",
-        href:"/divisions/cbp"
-    },
+{
+    title:"United States Secret Service",
+    short:"USSS",
+    icon:"🛡️",
+    image:"/careers/usss.jpg",
+    description:
+    "Protecting national leadership and supporting critical security operations through elite protective services.",
+    href:"/divisions/secret-service"
+},
 
 
-    {
-        title:"Public Affairs",
-        short:"PAO",
-        image:"/careers/pao.jpg",
-        description:
-        "Managing communications, public information, and transparency between DHS and the communities we serve.",
-        href:"/divisions/public-affairs"
-    }
+{
+    title:"United States Customs and Border Protection",
+    short:"CBP",
+    icon:"🌎",
+    image:"/careers/cbp.jpg",
+    description:
+    "Securing borders, protecting communities, and supporting national security through dedicated enforcement.",
+    href:"/divisions/cbp"
+},
+
+
+{
+    title:"Public Affairs",
+    short:"PAO",
+    icon:"📢",
+    image:"/careers/pao.jpg",
+    description:
+    "Managing communications, public information, and transparency between DHS and the communities we serve.",
+    href:"/divisions/public-affairs"
+}
 
 
 ];
@@ -73,14 +78,13 @@ className="
 max-w-7xl
 mx-auto
 px-6
-py-20
+py-16
 "
 
 >
 
 
 <Breadcrumb />
-
 
 
 
@@ -102,7 +106,7 @@ overflow-hidden
 
 
 
-{/* GOLD HEADER */}
+{/* GOLD STRIPE */}
 
 <div
 
@@ -153,7 +157,6 @@ bg-[length:120px_120px]
 
 
 
-
 <div
 
 className="
@@ -184,7 +187,6 @@ Department of Homeland Security
 
 
 
-
 <h1
 
 className="
@@ -204,15 +206,13 @@ Careers
 
 
 
-
-
 <p
 
 className="
 mt-6
 text-xl
 text-gray-200
-max-w-4xl
+max-w-3xl
 leading-relaxed
 "
 
@@ -227,13 +227,26 @@ Join the Department of Homeland Security and become part of a team dedicated to 
 
 
 
+
+<div
+
+className="
+flex
+flex-wrap
+gap-4
+mt-10
+"
+
+>
+
+
+
 <Link
 
 href="/careers/apply"
 
 className="
 inline-flex
-mt-8
 items-center
 gap-3
 bg-[#F2C94C]
@@ -241,7 +254,6 @@ text-black
 px-8
 py-4
 font-black
-text-lg
 shadow-lg
 hover:bg-white
 transition
@@ -249,14 +261,44 @@ transition
 
 >
 
-Start Your Application
-
-<span>
-→
-</span>
-
+Start Application →
 
 </Link>
+
+
+
+
+
+<Link
+
+href="/careers/applications"
+
+className="
+inline-flex
+items-center
+gap-3
+border-2
+border-white
+text-white
+px-8
+py-4
+font-black
+hover:bg-white
+hover:text-[#003B6F]
+transition
+"
+
+>
+
+View Application Status →
+
+</Link>
+
+
+
+</div>
+
+
 
 
 
@@ -277,7 +319,6 @@ Start Your Application
 {/* INTRO */}
 
 
-
 <section
 
 className="
@@ -291,47 +332,27 @@ md:p-14
 <div
 
 className="
-max-w-3xl
+text-center
+max-w-4xl
+mx-auto
 "
 
 >
 
 
-<p
+<h2
 
 className="
-uppercase
-tracking-widest
-text-sm
+text-4xl
 font-bold
 text-[#003B6F]
 "
 
 >
 
-Choose Your Path
-
-</p>
-
-
-
-
-
-<h2
-
-className="
-mt-3
-text-4xl
-font-black
-text-[#003B6F]
-"
-
->
-
-Find Your Place Within DHS
+Serve Something Greater
 
 </h2>
-
 
 
 
@@ -348,7 +369,7 @@ leading-relaxed
 
 >
 
-Every DHS employee contributes to a larger mission. Explore our operational divisions and discover where your skills, dedication, and commitment to service can make a difference.
+Every DHS employee contributes to a larger mission. Whether protecting national leadership, responding to threats, securing borders, supporting aviation operations, or communicating with the public, your role matters.
 
 </p>
 
@@ -358,13 +379,28 @@ Every DHS employee contributes to a larger mission. Explore our operational divi
 
 
 
+</section>
 
 
 
 
 
 
-{/* CAREER CARDS */}
+
+
+
+{/* DIVISION CARDS */}
+
+
+<section
+
+className="
+px-10
+md:px-14
+pb-14
+"
+
+>
 
 
 <div
@@ -373,16 +409,14 @@ className="
 grid
 md:grid-cols-2
 gap-8
-mt-12
 "
 
 >
 
 
+
 {
-
 careers.map((career)=>(
-
 
 
 <Link
@@ -394,7 +428,7 @@ href={career.href}
 className="
 group
 relative
-h-[430px]
+h-[420px]
 overflow-hidden
 shadow-xl
 border
@@ -404,18 +438,15 @@ border-gray-200
 >
 
 
-
-<img
+<Image
 
 src={career.image}
 
 alt={career.title}
 
+fill
+
 className="
-absolute
-inset-0
-w-full
-h-full
 object-cover
 transition
 duration-700
@@ -423,8 +454,6 @@ group-hover:scale-110
 "
 
 />
-
-
 
 
 
@@ -451,52 +480,6 @@ to-transparent
 
 
 
-{/* BADGE */}
-
-
-<div
-
-className="
-absolute
-top-6
-left-6
-"
-
->
-
-
-<div
-
-className="
-bg-[#F2C94C]
-text-black
-px-5
-py-2
-font-black
-tracking-widest
-shadow-lg
-"
-
->
-
-{career.short}
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-{/* CONTENT */}
-
-
 <div
 
 className="
@@ -507,6 +490,49 @@ text-white
 "
 
 >
+
+
+<div
+
+className="
+flex
+items-center
+gap-4
+"
+
+>
+
+
+<div
+
+className="
+text-5xl
+"
+
+>
+
+{career.icon}
+
+</div>
+
+
+
+<div>
+
+<p
+
+className="
+text-[#F2C94C]
+font-black
+tracking-widest
+text-sm
+"
+
+>
+
+{career.short}
+
+</p>
 
 
 <h3
@@ -523,6 +549,14 @@ font-black
 </h3>
 
 
+</div>
+
+
+
+</div>
+
+
+
 
 
 
@@ -530,7 +564,7 @@ font-black
 <p
 
 className="
-mt-4
+mt-5
 text-gray-200
 leading-relaxed
 "
@@ -546,41 +580,29 @@ leading-relaxed
 
 
 
-
 <div
 
 className="
 mt-6
 inline-flex
-items-center
-gap-3
-bg-white
-text-[#003B6F]
-px-6
-py-3
-font-black
-group-hover:bg-[#F2C94C]
+bg-[#F2C94C]
+text-black
+px-5
+py-2
+font-bold
+group-hover:bg-white
 transition
 "
 
 >
 
-Explore Division
-
-<span>
-→
-</span>
-
+Explore Division →
 
 </div>
 
 
 
-
-
 </div>
-
-
 
 
 
@@ -589,14 +611,20 @@ Explore Division
 </Link>
 
 
-))
 
+))
 
 }
 
 
 
 </div>
+
+
+
+</section>
+
+
 
 
 
@@ -611,7 +639,9 @@ Explore Division
 <section
 
 className="
-mt-16
+mx-10
+md:mx-14
+mb-14
 relative
 bg-gray-50
 border
@@ -638,14 +668,11 @@ bg-[#F2C94C]
 
 
 
-
-
-
 <h2
 
 className="
 text-3xl
-font-black
+font-bold
 text-[#003B6F]
 "
 
@@ -659,7 +686,6 @@ A Career Built Around Service
 
 
 
-
 <p
 
 className="
@@ -667,15 +693,13 @@ mt-4
 text-lg
 text-gray-700
 max-w-4xl
-leading-relaxed
 "
 
 >
 
-Whether responding to emergencies, protecting national leadership, securing borders, supporting aviation operations, or informing the public, every DHS employee contributes to a mission greater than themselves.
+From emergency response to public communication, every position within DHS plays a vital role in protecting the nation and supporting our communities.
 
 </p>
-
 
 
 
@@ -692,14 +716,14 @@ Whether responding to emergencies, protecting national leadership, securing bord
 {/* FINAL CTA */}
 
 
+
 <section
 
 className="
-mt-12
 bg-[#003B6F]
 text-white
-p-10
-md:p-14
+p-12
+md:p-16
 text-center
 "
 
@@ -722,8 +746,6 @@ Ready To Make A Difference?
 
 
 
-
-
 <p
 
 className="
@@ -742,8 +764,6 @@ Your next mission starts here.
 
 
 
-
-
 <Link
 
 href="/careers/apply"
@@ -751,41 +771,26 @@ href="/careers/apply"
 className="
 inline-flex
 mt-8
-items-center
-gap-3
 bg-[#F2C94C]
 text-black
-px-8
+px-10
 py-4
 font-black
-shadow-lg
+text-lg
 hover:bg-white
 transition
 "
 
 >
 
-Apply To Join DHS
-
-<span>
-→
-</span>
-
+Apply To Join DHS →
 
 </Link>
 
 
 
-
-
 </section>
 
-
-
-
-
-
-</section>
 
 
 
