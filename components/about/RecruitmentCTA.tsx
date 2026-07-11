@@ -9,7 +9,7 @@ name:"Special Response Team",
 short:"SRT",
 description:
 "Join DHS's premier tactical division. Recruitment is handled directly through the SRT recruitment process.",
-link:"https://discord.gg/YOURDISCORD",
+link:"https://discord.gg/YNmyjdqUp",
 external:true
 },
 
