@@ -40,7 +40,7 @@ const careers = [
 
     {
         title:"United States Customs and Border Protection",
-        short:"CBP",
+        short:"USCBP",
         image:"/careers/cbp.jpg",
         description:
         "Securing borders, protecting communities, and supporting national security through dedicated enforcement.",
