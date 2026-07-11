@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 
+
 export default function RecruitmentPage(){
 
 
@@ -63,16 +64,38 @@ const careers = [
 
 
 
+
 return (
 
 <main className="
 max-w-7xl
 mx-auto
 px-6
-py-20
+py-16
+">
+
+
+{/* BREADCRUMB AREA */}
+
+<div className="
+mb-8
+bg-white
+border
+border-gray-200
+shadow-sm
+px-6
+py-4
 ">
 
 <Breadcrumb />
+
+</div>
+
+
+
+
+
+
 
 <div className="
 bg-white
@@ -84,7 +107,7 @@ overflow-hidden
 
 
 
-{/* GOLD HEADER STRIPE */}
+
 
 <div className="
 h-3
@@ -95,6 +118,9 @@ bg-[#F2C94C]
 
 
 
+
+
+{/* HERO */}
 
 <section className="
 relative
@@ -126,7 +152,7 @@ z-10
 
 <p className="
 uppercase
-tracking-[0.3em]
+tracking-[0.35em]
 text-sm
 font-bold
 text-[#F2C94C]
@@ -142,7 +168,7 @@ Department of Homeland Security
 <h1 className="
 mt-5
 text-5xl
-md:text-6xl
+md:text-7xl
 font-black
 ">
 
@@ -156,14 +182,15 @@ Careers
 <p className="
 mt-6
 text-xl
-text-gray-200
-max-w-3xl
 leading-relaxed
+text-gray-200
+max-w-4xl
 ">
 
 Join the Department of Homeland Security and become part of a team dedicated to protecting communities, supporting national security, and serving with integrity.
 
 </p>
+
 
 
 
@@ -174,27 +201,31 @@ href="/careers/apply"
 
 className="
 inline-flex
-mt-8
-bg-[#F2C94C]
-text-black
+items-center
+mt-10
+border-2
+border-[#F2C94C]
+text-[#F2C94C]
 px-8
 py-4
 font-bold
-text-lg
-hover:bg-yellow-300
+uppercase
+tracking-wide
+hover:bg-[#F2C94C]
+hover:text-[#003B6F]
 transition
+duration-300
 "
 
 >
 
-Start Your Application →
+Begin Application →
 
 </Link>
 
 
 
 </div>
-
 
 
 </section>
@@ -207,23 +238,40 @@ Start Your Application →
 
 
 
+{/* CAREERS */}
+
 <section className="
 p-10
 md:p-14
 ">
 
 
-
 <div className="
 text-center
-max-w-3xl
+max-w-4xl
 mx-auto
 ">
 
 
-<h2 className="
-text-4xl
+<p className="
+uppercase
+tracking-[0.25em]
+text-sm
 font-bold
+text-[#003B6F]
+">
+
+Operational Divisions
+
+</p>
+
+
+
+<h2 className="
+mt-4
+text-4xl
+md:text-5xl
+font-black
 text-[#003B6F]
 ">
 
@@ -234,12 +282,12 @@ Find Your Place Within DHS
 
 
 <p className="
-mt-4
+mt-5
 text-lg
 text-gray-600
 ">
 
-Our personnel serve across multiple operational areas, each contributing to the Department's mission of security, service, and protection.
+Every division plays a vital role in protecting the nation. Explore available career paths and discover where your service can make the greatest impact.
 
 </p>
 
@@ -253,9 +301,8 @@ Our personnel serve across multiple operational areas, each contributing to the 
 
 
 
-
 <div className="
-mt-12
+mt-14
 grid
 md:grid-cols-2
 gap-8
@@ -268,17 +315,16 @@ careers.map((career)=>(
 
 <Link
 
-href={career.href}
-
 key={career.title}
+
+href={career.href}
 
 className="
 group
 relative
+bg-white
 border
 border-gray-200
-bg-white
-p-8
 shadow-md
 hover:shadow-2xl
 transition-all
@@ -289,14 +335,10 @@ overflow-hidden
 >
 
 
-{/* Hover Accent */}
+
 
 <div className="
-absolute
-left-0
-top-0
-bottom-0
-w-1
+h-2
 bg-[#003B6F]
 group-hover:bg-[#F2C94C]
 transition
@@ -307,17 +349,24 @@ transition
 
 
 
+
 <div className="
-flex
-items-start
-gap-6
+p-8
 ">
 
 
 <div className="
-text-6xl
+flex
+gap-6
+items-start
+">
+
+
+<div className="
+text-5xl
 group-hover:scale-110
 transition
+duration-300
 ">
 
 {career.icon}
@@ -327,13 +376,15 @@ transition
 
 
 
-<div>
+
+
+<div className="flex-1">
 
 
 <p className="
-text-sm
-font-bold
-tracking-widest
+text-xs
+font-black
+tracking-[0.25em]
 text-[#003B6F]
 ">
 
@@ -344,10 +395,11 @@ text-[#003B6F]
 
 
 
+
 <h3 className="
-mt-2
+mt-3
 text-2xl
-font-bold
+font-black
 text-gray-900
 ">
 
@@ -371,13 +423,26 @@ leading-relaxed
 
 
 
+
 <div className="
-mt-6
+mt-8
+inline-flex
+items-center
+border
+border-[#003B6F]
+px-5
+py-3
+text-sm
 font-bold
+uppercase
+tracking-wide
 text-[#003B6F]
+group-hover:bg-[#003B6F]
+group-hover:text-white
+transition
 ">
 
-Explore Career →
+View Division →
 
 </div>
 
@@ -388,6 +453,12 @@ Explore Career →
 
 
 </div>
+
+
+
+</div>
+
+
 
 
 
@@ -399,23 +470,34 @@ Explore Career →
 }
 
 
+
 </div>
 
 
 
 
+</section>
 
 
 
+
+
+
+
+
+
+{/* MISSION SECTION */}
 
 <section className="
-mt-16
+mx-10
+mb-10
 relative
 bg-gray-50
 border
 border-gray-200
 p-10
 md:p-12
+overflow-hidden
 ">
 
 
@@ -432,7 +514,7 @@ bg-[#F2C94C]
 
 <h2 className="
 text-3xl
-font-bold
+font-black
 text-[#003B6F]
 ">
 
@@ -442,14 +524,16 @@ A Career Built Around Service
 
 
 
+
 <p className="
-mt-4
-text-gray-700
+mt-5
 text-lg
-max-w-4xl
+text-gray-700
+max-w-5xl
+leading-relaxed
 ">
 
-Whether responding to emergencies, protecting national leaders, securing borders, supporting aviation operations, or informing the public, every DHS employee contributes to a larger mission.
+Whether responding to emergencies, protecting national leaders, securing borders, supporting aviation operations, or informing the public, every DHS employee contributes to a mission larger than themselves.
 
 </p>
 
@@ -462,19 +546,21 @@ Whether responding to emergencies, protecting national leaders, securing borders
 
 
 
+
+{/* FINAL CTA */}
+
 <section className="
-mt-12
 bg-[#003B6F]
 text-white
-p-10
-md:p-14
+p-12
+md:p-16
 text-center
 ">
 
 
 <h2 className="
 text-4xl
-font-bold
+font-black
 ">
 
 Ready To Make A Difference?
@@ -482,15 +568,17 @@ Ready To Make A Difference?
 </h2>
 
 
+
 <p className="
 mt-4
-text-lg
+text-xl
 text-gray-200
 ">
 
 Your next mission starts here.
 
 </p>
+
 
 
 
@@ -502,12 +590,16 @@ href="/careers/apply"
 className="
 inline-flex
 mt-8
-bg-[#F2C94C]
-text-black
-px-8
+border-2
+border-[#F2C94C]
+text-[#F2C94C]
+px-10
 py-4
 font-bold
-hover:bg-yellow-300
+uppercase
+tracking-wide
+hover:bg-[#F2C94C]
+hover:text-[#003B6F]
 transition
 "
 
@@ -526,10 +618,6 @@ Apply To Join DHS →
 
 
 
-</section>
-
-
-
 
 
 </div>
@@ -539,6 +627,5 @@ Apply To Join DHS →
 
 
 );
-
 
 }
