@@ -33,31 +33,25 @@ async function getEmployee(){
 
 
 
-    const {
-        data:employee
+const {
+    data:employee
 
-    } = await supabaseAdmin
+} = await supabaseAdmin
 
-        .from("employees")
+.from("employees")
 
-        .select(`
+.select(`
+    id,
+    division_id,
+    position_id
+`)
 
-            id,
+.eq(
+    "user_id",
+    user.id
+)
 
-            division_id,
-
-            positions(
-                title
-            )
-
-        `)
-
-        .eq(
-            "user_id",
-            user.id
-        )
-
-        .single();
+.single();
 
 
 
