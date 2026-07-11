@@ -3,6 +3,25 @@ import { supabaseAdmin } from "../../../lib/supabase-admin";
 
 
 
+function generateApplicationNumber(){
+
+    const prefix = "DHS";
+
+    const random =
+        Math.floor(
+            100000 +
+            Math.random() * 900000
+        );
+
+    return `${prefix}-${random}`;
+
+}
+
+
+
+
+
+
 export async function POST(
     request: Request
 ){
@@ -10,7 +29,9 @@ export async function POST(
     try {
 
 
-        const body = await request.json();
+        const body =
+            await request.json();
+
 
 
 
@@ -64,8 +85,9 @@ export async function POST(
 
 
 
+
         /*
-            Verify Division
+            Verify Division Exists
         */
 
 
@@ -80,7 +102,10 @@ export async function POST(
             .from("divisions")
 
             .select(
-                "id,name"
+                `
+                id,
+                name
+                `
             )
 
             .eq(
@@ -124,6 +149,60 @@ export async function POST(
 
 
 
+        /*
+            Generate Secure Application Number
+
+            Prevent duplicates by checking existing records
+        */
+
+
+        let applicationNumber = "";
+
+        let exists = true;
+
+
+
+        while(exists){
+
+
+            applicationNumber =
+                generateApplicationNumber();
+
+
+
+            const {
+
+                data:existing
+
+            } = await supabaseAdmin
+
+                .from("applications")
+
+                .select("id")
+
+                .eq(
+                    "application_number",
+                    applicationNumber
+                )
+
+                .maybeSingle();
+
+
+
+
+            exists =
+                !!existing;
+
+
+        }
+
+
+
+
+
+
+
+
 
         /*
             Create Application
@@ -142,7 +221,12 @@ export async function POST(
 
             .insert({
 
+                application_number:
+                applicationNumber,
+
+
                 roblox_username,
+
 
                 roblox_user_id:
                 roblox_user_id
@@ -152,14 +236,19 @@ export async function POST(
                 null,
 
 
-                discord_username,
+
+                discord_username:
+                discord_username || null,
+
 
 
                 email,
 
 
+
                 division_id:
                 divisionData.id,
+
 
 
                 status:
@@ -212,9 +301,8 @@ export async function POST(
 
 
         /*
-            Save Answers
+            Store Division Questions
         */
-
 
 
         if(
@@ -228,9 +316,7 @@ export async function POST(
             )
 
             .map(
-                ([question_id,answer])=>(
-
-                {
+                ([question_id,answer])=>({
 
                     application_id:
                     application.id,
@@ -242,10 +328,9 @@ export async function POST(
                     answer:
                     String(answer)
 
-                }
+                })
 
-            ));
-
+            );
 
 
 
@@ -306,7 +391,6 @@ export async function POST(
 
 
 
-
         return NextResponse.json(
 
             {
@@ -315,7 +399,12 @@ export async function POST(
 
 
                 application_number:
-                application.application_number
+                application.application_number,
+
+
+                roblox_username:
+                application.roblox_username
+
 
             }
 
@@ -328,6 +417,7 @@ export async function POST(
 
 
     }
+
 
     catch(error){
 
