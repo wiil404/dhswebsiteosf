@@ -8,10 +8,13 @@ import { supabaseAdmin } from "../../lib/supabase-admin";
 const divisions:any = {
 
 
-"special-response-team": {
+
+"special-response-team":{
 
 divisionId:
 "4161d355-cdf6-4351-8c55-2f9fbc29cbca",
+
+folder:"srt",
 
 name:
 "Special Response Team",
@@ -22,26 +25,55 @@ short:
 commander:
 "Special Response Team Commander",
 
+
+heroTitle:
+"THE NATION'S PREMIER TACTICAL RESPONSE FORCE",
+
+
 description:
-"The Special Response Team is the Department of Homeland Security's premier tactical response division. Personnel are trained to respond to high-risk incidents, critical threats, and specialised operational missions requiring advanced capabilities.",
+
+"The Special Response Team represents the highest level of tactical capability within the Department of Homeland Security. Built from highly trained operators, SRT personnel respond to critical incidents, specialised missions, and high-risk situations requiring precision, discipline, and teamwork.",
 
 
-mission:[
+
+history:
+
+"Established as DHS's elite operational response division, the Special Response Team exists to provide rapid deployment capability when conventional resources are insufficient.",
+
+
+
+capabilities:[
 
 {
 title:"Rapid Response",
-text:"Deploying highly trained operators to incidents requiring immediate tactical intervention."
+text:"Deploying specialised operators to incidents requiring immediate tactical intervention."
 },
 
 {
-title:"Specialised Operations",
-text:"Conducting advanced security operations and supporting DHS missions nationwide."
+title:"Special Operations",
+text:"Conducting advanced missions requiring exceptional skill, coordination, and preparation."
 },
 
 {
-title:"Operational Excellence",
-text:"Maintaining the highest standards of discipline, teamwork, and readiness."
+title:"Operational Readiness",
+text:"Maintaining constant readiness through training, discipline, and teamwork."
 }
+
+],
+
+
+
+roles:[
+
+"Special Response Team Commander",
+
+"Special Agent in Charge (SRT)",
+
+"Assistant Special Agent in Charge (SRT)",
+
+"Operator",
+
+"Probationary Operator"
 
 ],
 
@@ -59,45 +91,69 @@ discordLink:
 
 
 
-"secret-service": {
-
+"secret-service":{
 
 divisionId:
 "039748c5-271e-4b15-8192-938daaa28272",
 
+folder:"usss",
 
 name:
 "United States Secret Service",
 
-
 short:
 "USSS",
-
 
 commander:
 "Secret Service Director",
 
 
+heroTitle:
+"PROTECTING NATIONAL LEADERSHIP",
+
+
 description:
-"The United States Secret Service protects national leadership, supports DHS protective operations, and provides highly trained personnel dedicated to safeguarding critical individuals and locations.",
+
+"The United States Secret Service provides elite protective operations, threat prevention, and specialised security support. Personnel safeguard critical individuals while supporting the Department's broader national security mission.",
 
 
-mission:[
+history:
+
+"Operating as one of DHS's most recognised protective organisations, the Secret Service combines professionalism, intelligence, and operational excellence.",
+
+
+capabilities:[
 
 {
 title:"Protective Operations",
-text:"Providing security services for protected individuals and national leadership."
+text:"Providing security for protected individuals and national leadership."
 },
 
 {
-title:"Threat Prevention",
-text:"Identifying and mitigating threats through planning and intelligence."
+title:"Threat Assessment",
+text:"Identifying and preventing potential threats through intelligence."
 },
 
 {
-title:"Operational Support",
-text:"Supporting DHS operations through elite protective capabilities."
+title:"Security Operations",
+text:"Supporting DHS missions through specialised protective expertise."
 }
+
+],
+
+
+
+roles:[
+
+"Secret Service Director",
+
+"Deputy Director",
+
+"Assistant Director",
+
+"Special Agent",
+
+"Probationary Agent"
 
 ]
 
@@ -108,47 +164,73 @@ text:"Supporting DHS operations through elite protective capabilities."
 
 
 
-"helicopter-taskforce": {
 
+"helicopter-taskforce":{
 
 divisionId:
 "49cf99c6-3dec-4105-b678-2795718cad79",
 
+folder:"leht",
 
 name:
 "Law Enforcement Helicopter Taskforce",
 
-
 short:
 "LEHT",
-
 
 commander:
 "Under Secretary for Aviation Operations",
 
 
+heroTitle:
+"FROM ABOVE, WE PROTECT",
+
+
 description:
-"The Law Enforcement Helicopter Taskforce provides aviation support to DHS operations through highly skilled pilots, flight officers, and aerial response personnel.",
+
+"The Law Enforcement Helicopter Taskforce provides DHS with advanced aviation capability. Flight personnel deliver rapid response, aerial support, and operational assistance across Department missions.",
 
 
-mission:[
+history:
+
+"LEHT was created to provide DHS with a dedicated aviation element capable of supporting ground operations and emergency response.",
+
+
+capabilities:[
 
 {
-title:"Aerial Response",
-text:"Providing rapid aviation support during critical incidents."
+title:"Aviation Support",
+text:"Providing aerial assistance to DHS operations."
 },
 
 {
-title:"Operational Aviation",
-text:"Supporting law enforcement missions through helicopter operations."
+title:"Rapid Deployment",
+text:"Delivering personnel and resources quickly through aviation assets."
 },
 
 {
 title:"Flight Excellence",
-text:"Maintaining professional aviation standards across DHS."
+text:"Maintaining professional aviation standards."
 }
 
+],
+
+
+
+roles:[
+
+"Under Secretary for Aviation Operations",
+
+"Senior Flight Officer",
+
+"Flight Officer",
+
+"Pilot",
+
+"Trainee"
+
 ]
+
 
 },
 
@@ -157,47 +239,71 @@ text:"Maintaining professional aviation standards across DHS."
 
 
 
-"cbp": {
+
+"cbp":{
 
 
 divisionId:
 "a5540d05-f9cc-4082-8228-2289b02e241f",
 
+folder:"cbp",
 
 name:
 "United States Customs and Border Protection",
 
-
 short:
 "CBP",
-
 
 commander:
 "CBP Commissioner",
 
 
+heroTitle:
+"SECURING OUR BORDERS",
+
+
 description:
-"United States Customs and Border Protection secures national borders, protects communities, and supports homeland security through dedicated enforcement personnel.",
+
+"Customs and Border Protection protects communities, secures national borders, and supports homeland security through dedicated enforcement professionals.",
 
 
-mission:[
+history:
+
+"CBP serves as DHS's frontline security organisation, protecting the nation through enforcement, awareness, and operational excellence.",
+
+
+capabilities:[
 
 {
 title:"Border Security",
-text:"Protecting national borders through enforcement and operational readiness."
+text:"Protecting national borders through professional enforcement."
 },
 
 {
-title:"Customs Enforcement",
-text:"Preventing illegal activity while supporting lawful travel and trade."
+title:"Customs Operations",
+text:"Supporting safe and lawful movement across borders."
 },
 
 {
 title:"Community Protection",
-text:"Working to keep communities safe through professional service."
+text:"Keeping communities safe through dedicated service."
 }
 
+],
+
+
+roles:[
+
+"CBP Commissioner",
+
+"CBP Deputy Commissioner",
+
+"Supervisory Customs Agent",
+
+"Customs Agent"
+
 ]
+
 
 },
 
@@ -206,49 +312,71 @@ text:"Working to keep communities safe through professional service."
 
 
 
-"public-affairs": {
+
+
+"public-affairs":{
 
 
 divisionId:
 "3c17bd3b-1992-4571-85bc-5cbb45939eed",
 
+folder:"pao",
 
 name:
 "Public Affairs",
 
-
 short:
 "PAO",
-
 
 commander:
 "Under Secretary for Public Affairs",
 
 
+heroTitle:
+"THE VOICE OF DHS",
+
+
 description:
-"Public Affairs manages DHS communications, public information, and transparency initiatives while ensuring communities remain informed about Department operations.",
+
+"Public Affairs manages Department communications, public information, and transparency efforts while connecting DHS operations with the communities it serves.",
 
 
-mission:[
+history:
+
+"Public Affairs ensures accurate communication between DHS personnel, leadership, media, and the public.",
+
+
+capabilities:[
 
 {
-title:"Public Communication",
-text:"Delivering accurate information regarding DHS activities."
+title:"Communications",
+text:"Delivering clear and accurate Department information."
 },
 
 {
 title:"Media Relations",
-text:"Managing communication between DHS and external organisations."
+text:"Managing relationships with external organisations."
 },
 
 {
-title:"Transparency",
-text:"Supporting openness and public confidence."
+title:"Public Trust",
+text:"Supporting transparency and confidence."
 }
+
+],
+
+
+roles:[
+
+"Under Secretary for Public Affairs",
+
+"Public Affairs Staff"
 
 ]
 
+
 }
+
 
 
 };
@@ -261,9 +389,7 @@ text:"Supporting openness and public confidence."
 
 
 
-
 async function getCommander(config:any){
-
 
 
 const {
@@ -284,11 +410,8 @@ config.commander
 
 
 
-
 if(!position)
 return null;
-
-
 
 
 
@@ -301,15 +424,8 @@ data:employee
 .from("employees")
 
 .select(`
-
 roblox_username,
-
-roblox_user_id,
-
-positions(
-title
-)
-
+roblox_user_id
 `)
 
 .eq(
@@ -326,13 +442,52 @@ position.id
 
 
 
-
 return employee;
 
 
 }
 
 
+
+
+
+
+
+
+async function getAvatar(id:number){
+
+
+try{
+
+
+const res =
+await fetch(
+
+`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=true`
+
+);
+
+
+const data =
+await res.json();
+
+
+
+return data.data?.[0]?.imageUrl
+||
+"/leadership/default.png";
+
+
+}
+
+catch{
+
+return "/leadership/default.png";
+
+}
+
+
+}
 
 
 
@@ -355,12 +510,10 @@ division:string
 }){
 
 
-
 const {
 division
 
 }=await params;
-
 
 
 
@@ -369,14 +522,8 @@ divisions[division];
 
 
 
-
-if(!config){
-
+if(!config)
 notFound();
-
-}
-
-
 
 
 
@@ -386,246 +533,76 @@ await getCommander(config);
 
 
 
+const avatar =
+commander?.roblox_user_id
+?
+await getAvatar(
+commander.roblox_user_id
+)
+:
+"/leadership/default.png";
+
+
 
 
 
 
 return (
 
-<main
+<main className="bg-[#003B6F] py-10">
 
-className="
-relative
-py-16
-"
 
->
+<section className="max-w-7xl mx-auto px-6">
 
 
-<div
+<div className="bg-white shadow-2xl overflow-hidden">
 
-className="
-absolute
-inset-0
--z-10
-bg-[#003B6F]
-"
 
-/>
 
-
-
-
-
-
-<section
-
-className="
-max-w-6xl
-mx-auto
-px-6
-"
-
->
-
-
-<div
-
-className="
-bg-white
-shadow-2xl
-border
-border-gray-200
-overflow-hidden
-"
-
->
-
-
-<div
-
-className="
-h-3
-bg-[#F2C94C]
-"
-
-/>
-
-
-
-
-
-
-
-<div
-
-className="
-p-8
-md:p-14
-"
-
->
-
-
-
-
-
-
-
-
-<p
-
-className="
-uppercase
-tracking-[0.3em]
-font-bold
-text-sm
-text-[#003B6F]
-"
-
->
-
-Department of Homeland Security
-
-</p>
-
-
-
-
-
-
-
-<h1
-
-className="
-mt-4
-text-5xl
-font-black
-text-[#003B6F]
-"
-
->
-
-{config.name}
-
-</h1>
-
-
-
-
-
-<p
-
-className="
-mt-4
-text-xl
-text-gray-600
-"
-
->
-
-{config.description}
-
-</p>
-
-
-
-
-
-
-
-
-
-{/* COMMANDER */}
-
-
-
-<section
-
-className="
-mt-12
-border-t
-pt-10
-"
-
->
-
-
-<h2
-
-className="
-text-3xl
-font-bold
-text-[#003B6F]
-"
-
->
-
-Division Leadership
-
-</h2>
-
-
-
-
-
-
-
-<div
-
-className="
-mt-6
-flex
-items-center
-gap-8
-bg-gray-50
-p-8
-border
-"
-
->
-
-
-<div
-
-className="
-relative
-w-36
-h-36
-rounded-full
-overflow-hidden
-border-4
-border-[#003B6F]
-"
-
->
+<div className="relative h-[550px]">
 
 
 <Image
 
-src={
-
-commander?.roblox_user_id
-
-?
-
-`https://www.roblox.com/headshot-thumbnail/image?userId=${commander.roblox_user_id}&width=420&height=420&format=png`
-
-:
-
-"/leadership/default.png"
-
-}
-
-alt="Commander"
+src={`/divisions/${config.folder}/hero.jpg`}
 
 fill
 
-className="
-object-cover
-"
+alt={config.name}
+
+className="object-cover"
 
 />
+
+
+<div className="absolute inset-0 bg-gradient-to-t from-[#003B6F] via-black/40 to-transparent"/>
+
+
+<div className="absolute bottom-10 left-10 text-white">
+
+
+<p className="text-[#F2C94C] font-bold tracking-widest">
+
+DEPARTMENT OF HOMELAND SECURITY
+
+</p>
+
+
+<h1 className="text-6xl font-black mt-3">
+
+{config.short}
+
+</h1>
+
+
+<p className="text-3xl font-bold">
+
+{config.heroTitle}
+
+</p>
+
+
+</div>
 
 
 </div>
@@ -634,62 +611,56 @@ object-cover
 
 
 
+
+<div className="p-10 md:p-16">
+
+
+
+
+
+<section>
+
+
+<h2 className="text-4xl font-black text-[#003B6F]">
+
+Commander
+
+</h2>
+
+
+
+<div className="mt-6 flex gap-8 items-center bg-gray-50 p-8">
+
+
+<Image
+
+src={avatar}
+
+width={180}
+
+height={180}
+
+alt="Commander"
+
+className="rounded-full border-4 border-[#003B6F]"
+
+/>
 
 
 
 <div>
 
 
-<h3
+<h3 className="text-4xl font-black text-[#003B6F]">
 
-className="
-text-4xl
-font-black
-text-[#003B6F]
-"
-
->
-
-{
-commander?.roblox_username
-||
-"Vacant"
-}
+{commander?.roblox_username || "Vacant"}
 
 </h3>
 
 
+<p className="text-xl font-bold">
 
-
-
-<p
-
-className="
-mt-2
-text-xl
-font-bold
-"
-
->
-
-{
-config.commander
-}
-
-</p>
-
-
-
-<p
-
-className="
-mt-3
-text-gray-600
-"
-
->
-
-Division Commander
+{config.commander}
 
 </p>
 
@@ -708,92 +679,74 @@ Division Commander
 
 
 
+<section className="mt-16">
 
 
-{/* MISSION */}
+<h2 className="text-4xl font-black text-[#003B6F]">
+
+About The Division
+
+</h2>
 
 
-<section
+<p className="mt-5 text-lg text-gray-700 leading-relaxed">
 
-className="
-mt-14
-"
+{config.description}
 
->
+</p>
 
 
-<h2
+<p className="mt-5 text-lg text-gray-700 leading-relaxed">
 
-className="
-text-3xl
-font-bold
-text-[#003B6F]
-"
+{config.history}
 
->
+</p>
 
-Our Mission
+
+</section>
+
+
+
+
+
+
+
+
+<section className="mt-16">
+
+
+<h2 className="text-4xl font-black text-[#003B6F]">
+
+Capabilities
 
 </h2>
 
 
 
+<div className="grid md:grid-cols-3 gap-6 mt-8">
 
-<div
 
-className="
-grid
-md:grid-cols-3
-gap-6
-mt-6
-"
-
->
-
-{
-
-config.mission.map(
-(item:any)=>(
+{config.capabilities.map((x:any)=>(
 
 
 <div
 
-key={item.title}
+key={x.title}
 
-className="
-border
-p-6
-bg-gray-50
-"
+className="border p-6 bg-gray-50"
 
 >
 
+<h3 className="text-xl font-bold text-[#003B6F]">
 
-<h3
-
-className="
-font-bold
-text-xl
-text-[#003B6F]
-"
-
->
-
-{item.title}
+{x.title}
 
 </h3>
 
 
-<p
+<p className="mt-3 text-gray-600">
 
-className="
-mt-3
-text-gray-600
-"
-
->
-
-{item.text}
+{x.text}
 
 </p>
 
@@ -801,12 +754,7 @@ text-gray-600
 </div>
 
 
-)
-
-)
-
-
-}
+))}
 
 
 </div>
@@ -821,30 +769,55 @@ text-gray-600
 
 
 
+<section className="mt-16">
 
-{/* RECRUITMENT */}
+
+<h2 className="text-4xl font-black text-[#003B6F]">
+
+Career Opportunities
+
+</h2>
 
 
-<section
 
-className="
-mt-14
-bg-[#003B6F]
-text-white
-p-10
-"
+<div className="flex flex-wrap gap-3 mt-6">
+
+
+{config.roles.map((r:string)=>(
+
+
+<span
+
+key={r}
+
+className="bg-[#003B6F] text-white px-5 py-3 font-bold"
 
 >
 
+{r}
 
-<h2
+</span>
 
-className="
-text-3xl
-font-black
-"
 
->
+))}
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section className="mt-16 bg-[#003B6F] text-white p-10">
+
+
+<h2 className="text-4xl font-black">
 
 Join {config.name}
 
@@ -852,21 +825,11 @@ Join {config.name}
 
 
 
+<p className="mt-4 text-gray-200">
 
-<p
-
-className="
-mt-4
-text-gray-200
-"
-
->
-
-Become part of DHS and serve alongside dedicated personnel committed to protecting the nation.
+Begin your career with the Department of Homeland Security.
 
 </p>
-
-
 
 
 
@@ -875,20 +838,11 @@ Become part of DHS and serve alongside dedicated personnel committed to protecti
 
 config.discord ?
 
-
 <Link
 
 href={config.discordLink}
 
-className="
-inline-flex
-mt-8
-bg-[#F2C94C]
-text-black
-px-8
-py-4
-font-black
-"
+className="inline-block mt-8 bg-[#F2C94C] text-black px-8 py-4 font-black"
 
 >
 
@@ -899,24 +853,15 @@ Join Recruitment Discord →
 
 :
 
-
 <Link
 
 href={`/recruitment/apply?division=${config.divisionId}`}
 
-className="
-inline-flex
-mt-8
-bg-[#F2C94C]
-text-black
-px-8
-py-4
-font-black
-"
+className="inline-block mt-8 bg-[#F2C94C] text-black px-8 py-4 font-black"
 
 >
 
-Begin Application →
+Start Application →
 
 </Link>
 
@@ -929,13 +874,9 @@ Begin Application →
 
 
 
-
-
-
-
-
-
 </div>
+
+
 
 </div>
 
@@ -944,7 +885,6 @@ Begin Application →
 
 
 </main>
-
 
 );
 
