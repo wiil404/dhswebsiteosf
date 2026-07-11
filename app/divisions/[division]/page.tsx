@@ -628,61 +628,153 @@ DEPARTMENT OF HOMELAND SECURITY
 
 
 
+{/* COMMANDER PROFILE */}
+
 <section>
 
-
 <h2 className="text-4xl font-black text-[#003B6F]">
-
-Commander
-
+    Division Leadership
 </h2>
 
 
+<div className="
+mt-8
+flex
+flex-col
+md:flex-row
+items-center
+gap-10
+bg-gray-50
+border
+p-10
+">
 
-<div className="mt-6 flex gap-8 items-center bg-gray-50 p-8">
+
+{/* ROBLOX AVATAR */}
+
+<div
+className="
+relative
+w-56
+h-56
+rounded-full
+overflow-hidden
+border-4
+border-[#003B6F]
+shadow-xl
+flex-shrink-0
+"
+>
 
 
-<img
+<Image
 
-src={
-    commander?.roblox_user_id
+src={avatar}
 
-    ?
-
-    `https://www.roblox.com/headshot-thumbnail/image?userId=${commander.roblox_user_id}&width=420&height=420&format=png`
-
-    :
-
-    "/leadership/default.png"
+alt={
+`${commander?.roblox_username || "Vacant"} Roblox Avatar`
 }
 
-alt="Commander"
+fill
+
+sizes="224px"
 
 className="
-w-full
-h-full
 object-cover
 "
 
 />
 
 
+</div>
+
+
+
+
+
+
+{/* COMMANDER INFORMATION */}
 
 <div>
 
 
-<h3 className="text-4xl font-black text-[#003B6F]">
+<p
 
-{commander?.roblox_username || "Vacant"}
+className="
+uppercase
+tracking-[0.25em]
+text-sm
+font-bold
+text-[#003B6F]
+"
+
+>
+
+Division Commander
+
+</p>
+
+
+
+<h3
+
+className="
+mt-3
+text-5xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+{
+commander?.roblox_username
+||
+"Vacant"
+}
 
 </h3>
 
 
-<p className="text-xl font-bold">
 
-{config.commander}
+
+
+<h4
+
+className="
+mt-3
+text-2xl
+font-bold
+text-gray-800
+"
+
+>
+
+{
+config.commander
+}
+
+</h4>
+
+
+
+
+
+<p
+
+className="
+mt-5
+text-gray-600
+max-w-xl
+leading-relaxed
+"
+
+>
+
+The Division Commander is responsible for overseeing departmental operations, maintaining organisational standards, and leading personnel in support of the Department of Homeland Security mission.
 
 </p>
+
 
 
 </div>
