@@ -296,6 +296,36 @@ View Application Status →
 
 
 
+
+
+
+<Link
+
+href="/staff/applications"
+
+className="
+inline-flex
+items-center
+gap-3
+bg-white
+text-[#003B6F]
+px-8
+py-4
+font-black
+shadow-lg
+hover:bg-[#F2C94C]
+hover:text-black
+transition
+"
+
+>
+
+🔒 DHS Staff Review Portal →
+
+</Link>
+
+
+
 </div>
 
 
