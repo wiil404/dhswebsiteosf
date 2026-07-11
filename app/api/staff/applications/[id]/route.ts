@@ -114,10 +114,8 @@ function hasAccess(employee:any){
 
 
 
-    const position =
-        employee.positions?.[0]?.title
-        ||
-        "";
+const position =
+    positionTitle;
 
 
 
