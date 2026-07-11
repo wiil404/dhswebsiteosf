@@ -5,6 +5,7 @@ import Timeline from "@/components/about/Timeline";
 import CoreValues from "@/components/about/CoreValues";
 import DivisionShowcase from "@/components/about/DivisionShowcase";
 import RecruitmentCTA from "@/components/about/RecruitmentCTA";
+import Leadership from "@/components/about/Leadership";
 
 
 
@@ -530,7 +531,9 @@ space-y-3
 
 
 
+{/* LEADERSHIP */}
 
+<Leadership />
 
 
 
