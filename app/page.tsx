@@ -10,56 +10,56 @@ export default async function Home() {
 
 
     const {
-    data: featured
-} = await supabaseAdmin
+        data: featured
+    } = await supabaseAdmin
 
-    .from("news")
+        .from("news")
 
-    .select("*")
+        .select("*")
 
-    .eq("featured", true)
+        .eq("featured", true)
 
-    .eq("published", true)
+        .eq("published", true)
 
-    .limit(1)
+        .limit(1)
 
-    .maybeSingle();
-
+        .maybeSingle();
 
 
 
 
     const {
-    data: news,
-    error: newsError
-} = await supabaseAdmin
+        data: news,
+        error: newsError
+    } = await supabaseAdmin
 
-.from("news")
+        .from("news")
 
-.select("*")
+        .select("*")
 
-.eq("published", true)
+        .eq("published", true)
 
-.order(
-    "created_at",
-    {
-        ascending:false
-    }
-)
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        )
 
-.limit(3);
+        .limit(3);
 
 
-console.log(
-    "NEWS DATA:",
-    news
-);
 
-console.log(
-    "NEWS ERROR:",
-    newsError
-);
+    console.log(
+        "NEWS DATA:",
+        news
+    );
 
+
+    console.log(
+        "NEWS ERROR:",
+        newsError
+    );
 
 
 
@@ -68,7 +68,9 @@ return (
 
 <main>
 
-    <Breadcrumb />
+
+<Breadcrumb />
+
 
 <HeroCarousel />
 
@@ -91,6 +93,7 @@ px-6
 
 >
 
+
 <div
 
 className="
@@ -101,22 +104,56 @@ gap-8
 
 >
 
-<RecruitCard
+
+<FeatureCard
+
 image="/hero/recruitment.jpg"
+
 href="/recruitment"
+
+title="Join DHS"
+
+description="Begin your career serving the nation alongside dedicated professionals."
+
+button="Apply Now"
+
 />
 
 
-<RecruitCard
+
+
+<FeatureCard
+
 image="/hero/divisions.jpg"
+
 href="/divisions"
+
+title="Explore Our Agencies"
+
+description="Discover the divisions, teams, and responsibilities that make up DHS."
+
+button="View Divisions"
+
 />
 
 
-<RecruitCard
-image="/hero/service.jpg"
-href="/about"
+
+
+
+<FeatureCard
+
+image="/hero/news.jpg"
+
+href="/news"
+
+title="Latest News"
+
+description="Read official announcements, operations, and updates from the Department."
+
+button="Read News"
+
 />
+
 
 
 </div>
@@ -130,11 +167,15 @@ href="/about"
 
 
 
+
+
 {/* FEATURED STATEMENT */}
+
 
 {
 
 featured && (
+
 
 <section
 
@@ -289,6 +330,7 @@ Read Full Statement →
 
 {/* LATEST NEWS */}
 
+
 <section
 
 className="
@@ -381,7 +423,7 @@ mt-10
 
 {
 
-news?.map(article=>(
+news?.map(article => (
 
 
 <article
@@ -408,6 +450,7 @@ bg-[#003B6F]
 "
 
 />
+
 
 
 
@@ -479,7 +522,6 @@ leading-relaxed
 
 
 
-
 {
 
 article.employees && (
@@ -509,6 +551,7 @@ Author: {article.employees.roblox_username}
 </p>
 
 
+
 <p
 
 className="
@@ -528,10 +571,10 @@ article.employees.positions?.title ||
 
 </div>
 
-
 )
 
 }
+
 
 
 
@@ -568,6 +611,7 @@ new Date(article.created_at)
 
 
 
+
 <Link
 
 href={`/news/${article.slug}`}
@@ -583,7 +627,6 @@ hover:underline
 Read More →
 
 </Link>
-
 
 
 </div>
@@ -607,9 +650,7 @@ Read More →
 </div>
 
 
-
 </div>
-
 
 
 </section>
@@ -634,17 +675,30 @@ Read More →
 
 
 
-function RecruitCard({
+function FeatureCard({
 
 image,
 
-href
+href,
+
+title,
+
+description,
+
+button
+
 
 }:{
 
 image:string;
 
 href:string;
+
+title:string;
+
+description:string;
+
+button:string;
 
 }){
 
@@ -657,7 +711,7 @@ href={href}
 
 className="
 relative
-h-80
+h-96
 overflow-hidden
 shadow-xl
 block
@@ -671,18 +725,19 @@ group
 
 src={image}
 
-alt=""
+alt={title}
 
 fill
 
 className="
 object-cover
 transition
-duration-500
-group-hover:scale-105
+duration-700
+group-hover:scale-110
 "
 
 />
+
 
 
 
@@ -692,12 +747,90 @@ className="
 absolute
 inset-0
 bg-gradient-to-t
-from-[#003B6F]/70
+from-[#001F3F]
+via-[#003B6F]/60
 to-transparent
 "
 
 />
 
+
+
+
+
+<div
+
+className="
+absolute
+bottom-0
+p-8
+text-white
+"
+
+>
+
+
+
+<h3
+
+className="
+text-3xl
+font-bold
+"
+
+>
+
+{title}
+
+</h3>
+
+
+
+
+
+<p
+
+className="
+mt-3
+text-gray-200
+leading-relaxed
+"
+
+>
+
+{description}
+
+</p>
+
+
+
+
+
+
+<div
+
+className="
+mt-6
+inline-flex
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
+py-3
+font-bold
+transition
+group-hover:translate-x-2
+"
+
+>
+
+{button} →
+
+</div>
+
+
+
+
+</div>
 
 
 </Link>
