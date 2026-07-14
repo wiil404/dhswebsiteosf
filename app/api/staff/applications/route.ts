@@ -137,7 +137,7 @@ export async function GET(){
 
     const divisionAccess = [
 
-        "Supervisory Special Agent".
+        "Supervisory Special Agent",
         "Deputy Special Agent in Charge (SS)",
         "Special Agent in Charge (SS)",
         "Assistant Director",
