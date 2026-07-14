@@ -1,9 +1,15 @@
 "use client";
 
+import {
+    useState,
+    useEffect
+} from "react";
 
-import {useState,useEffect} from "react";
+import {
+    useRouter
+} from "next/navigation";
+
 import Breadcrumb from "@/components/Breadcrumb";
-import {useRouter} from "next/navigation";
 
 
 
@@ -14,17 +20,43 @@ const router = useRouter();
 
 
 
-const [loading,setLoading] = useState(false);
 
-const [questionLoading,setQuestionLoading] = useState(false);
+const [loading,setLoading] =
+useState(false);
 
-const [divisions,setDivisions] = useState<any[]>([]);
 
-const [questions,setQuestions] = useState<any[]>([]);
+const [questionLoading,setQuestionLoading] =
+useState(false);
 
-const [answers,setAnswers] = useState<any>({});
 
-const [errors,setErrors] = useState<any>({});
+const [robloxChecking,setRobloxChecking] =
+useState(false);
+
+
+const [robloxVerified,setRobloxVerified] =
+useState(false);
+
+
+const [robloxError,setRobloxError] =
+useState("");
+
+
+
+const [divisions,setDivisions] =
+useState<any[]>([]);
+
+
+const [questions,setQuestions] =
+useState<any[]>([]);
+
+
+const [answers,setAnswers] =
+useState<any>({});
+
+
+const [errors,setErrors] =
+useState<any>({});
+
 
 
 
@@ -33,15 +65,18 @@ const [errors,setErrors] = useState<any>({});
 const [form,setForm] = useState({
 
     roblox_username:"",
+    
     roblox_user_id:"",
+
     discord_username:"",
+
     email:"",
+
     division:"",
+
     agreement:false
 
 });
-
-
 
 
 
@@ -58,13 +93,15 @@ async function loadDivisions(){
 try{
 
 
-const response = await fetch(
+const response =
+await fetch(
 "/api/recruitment/divisions"
 );
 
 
 
-const data = await response.json();
+const data =
+await response.json();
 
 
 
@@ -79,12 +116,11 @@ data || []
 catch(error){
 
 console.error(
-"Failed loading divisions",
+"Division loading error",
 error
 );
 
 }
-
 
 
 }
@@ -105,16 +141,14 @@ loadDivisions();
 
 
 
-async function loadQuestions(
-divisionId:string
+
+async function verifyRoblox(){
+
+
+
+if(
+!form.roblox_username.trim()
 ){
-
-
-if(!divisionId){
-
-setQuestions([]);
-
-setAnswers({});
 
 return;
 
@@ -122,42 +156,104 @@ return;
 
 
 
-setQuestionLoading(true);
+setRobloxChecking(true);
+
+setRobloxError("");
+
+setRobloxVerified(false);
+
 
 
 
 try{
 
 
-const response = await fetch(
+const response =
+await fetch(
 
-`/api/recruitment/questions?division=${divisionId}`
+"/api/roblox/verify",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+body:JSON.stringify({
+
+username:
+form.roblox_username
+
+})
+
+}
 
 );
 
 
 
-const data = await response.json();
+
+
+const result =
+await response.json();
 
 
 
-if(response.ok){
 
-setQuestions(
-data || []
+
+if(
+!result.valid
+){
+
+setRobloxError(
+result.error ||
+"Roblox verification failed."
 );
 
-setAnswers({});
+
+
+setForm({
+
+...form,
+
+roblox_user_id:""
+
+});
+
+
+
+return;
+
 
 }
 
-else{
 
-console.error(data.error);
 
-setQuestions([]);
 
-}
+
+
+setForm({
+
+...form,
+
+roblox_username:
+result.username,
+
+roblox_user_id:
+result.userId
+
+});
+
+
+
+
+
+setRobloxVerified(true);
 
 
 
@@ -165,18 +261,25 @@ setQuestions([]);
 
 catch(error){
 
-console.error(
-"Question loading failed",
-error
+
+console.error(error);
+
+
+setRobloxError(
+"Unable to verify Roblox account."
 );
 
-setQuestions([]);
 
 }
 
+finally{
 
 
-setQuestionLoading(false);
+setRobloxChecking(false);
+
+
+}
+
 
 
 }
@@ -259,7 +362,114 @@ setErrors({
 
 
 
+async function loadQuestions(
+divisionId:string
+){
+
+
+if(!divisionId){
+
+setQuestions([]);
+
+setAnswers({});
+
+return;
+
+}
+
+
+
+setQuestionLoading(true);
+
+
+
+try{
+
+
+const response =
+await fetch(
+
+`/api/recruitment/questions?division=${divisionId}`
+
+);
+
+
+
+const data =
+await response.json();
+
+
+
+
+
+if(response.ok){
+
+
+setQuestions(
+data || []
+);
+
+
+setAnswers({});
+
+
+}
+
+else{
+
+
+setQuestions([]);
+
+
+}
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+error
+);
+
+
+setQuestions([]);
+
+
+}
+
+finally{
+
+
+setQuestionLoading(false);
+
+
+}
+
+
+
+}
+
 async function submitApplication(){
+
+
+if(!robloxVerified){
+
+
+alert(
+"Please verify your Roblox account before submitting."
+);
+
+
+return;
+
+
+}
+
+
+
 
 
 let newErrors:any = {};
@@ -268,15 +478,8 @@ let newErrors:any = {};
 
 
 
-// Applicant details
-
 if(!form.roblox_username.trim())
 newErrors.roblox_username = true;
-
-
-
-if(!form.roblox_user_id.trim())
-newErrors.roblox_user_id = true;
 
 
 
@@ -291,18 +494,17 @@ newErrors.email = true;
 
 
 
-
-// Division
-
 if(!form.division)
 newErrors.division = true;
 
 
 
 
-// Prevent submission with no questions
 
-if(form.division && questions.length === 0){
+if(
+form.division &&
+questions.length === 0
+){
 
 newErrors.questions = true;
 
@@ -312,9 +514,11 @@ newErrors.questions = true;
 
 
 
-// Question validation
 
-for(const question of questions){
+
+for(
+const question of questions
+){
 
 
 if(
@@ -323,7 +527,9 @@ answers[question.id].trim() === ""
 ){
 
 
-newErrors[`question_${question.id}`] = true;
+newErrors[
+`question_${question.id}`
+] = true;
 
 
 }
@@ -335,7 +541,6 @@ newErrors[`question_${question.id}`] = true;
 
 
 
-// Agreement
 
 if(!form.agreement)
 newErrors.agreement = true;
@@ -345,30 +550,43 @@ newErrors.agreement = true;
 
 
 
-setErrors(newErrors);
+
+setErrors(
+newErrors
+);
 
 
 
 
 
-if(Object.keys(newErrors).length > 0){
+
+
+if(
+Object.keys(newErrors).length > 0
+){
+
 
 
 if(newErrors.questions){
 
+
 alert(
-"This division is not accepting applications at this time."
+"This division is not accepting applications currently."
 );
+
 
 }
 
 else{
 
+
 alert(
 "Please complete all required fields."
 );
 
+
 }
+
 
 
 return;
@@ -380,9 +598,22 @@ return;
 
 
 
+
+
+
 setLoading(true);
 
-const response = await fetch(
+
+
+
+
+
+try{
+
+
+
+const response =
+await fetch(
 
 "/api/recruitment/apply",
 
@@ -392,9 +623,11 @@ method:"POST",
 
 headers:{
 
-"Content-Type":"application/json"
+"Content-Type":
+"application/json"
 
 },
+
 
 body:JSON.stringify({
 
@@ -403,6 +636,7 @@ body:JSON.stringify({
 answers
 
 })
+
 
 }
 
@@ -413,7 +647,9 @@ answers
 
 
 
-const result = await response.json();
+
+const result =
+await response.json();
 
 
 
@@ -427,8 +663,7 @@ if(!response.ok){
 alert(
 
 result.error ||
-
-"Unable to submit application"
+"Unable to submit application."
 
 );
 
@@ -452,6 +687,32 @@ router.push(
 `/recruitment/applications/submitted?number=${result.application_number}`
 
 );
+
+
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+"APPLICATION ERROR",
+error
+);
+
+
+alert(
+"Something went wrong."
+);
+
+
+
+setLoading(false);
+
+
+}
 
 
 
@@ -485,8 +746,6 @@ py-16
 
 
 
-
-
 <div
 
 className="
@@ -503,10 +762,14 @@ overflow-hidden
 
 
 
-<div className="
+<div
+
+className="
 h-3
 bg-[#F2C94C]
-"/>
+"
+
+/>
 
 
 
@@ -567,6 +830,7 @@ Employment Application
 
 
 
+
 <p
 
 className="
@@ -609,11 +873,16 @@ md:p-14
 
 
 
-<h2 className="
+
+<h2
+
+className="
 text-3xl
 font-bold
 text-[#003B6F]
-">
+"
+
+>
 
 Applicant Information
 
@@ -625,13 +894,20 @@ Applicant Information
 
 
 
+<div
 
-<div className="
+className="
 grid
 md:grid-cols-2
 gap-6
 mt-8
-">
+"
+
+>
+
+
+
+
 
 
 
@@ -647,17 +923,29 @@ errors.roblox_username
 
 placeholder="Roblox Username"
 
-value={form.roblox_username}
+value={
+form.roblox_username
+}
 
 onChange={
 
-e=>
+e=>{
 
 update(
 "roblox_username",
 e.target.value
-)
+);
 
+
+setRobloxVerified(false);
+
+
+}
+
+}
+
+onBlur={
+verifyRoblox
 }
 
 />
@@ -670,30 +958,22 @@ e.target.value
 
 <input
 
-className={`border p-4 ${
-errors.roblox_user_id
-?
-"border-red-500"
-:
-"border-gray-300"
-}`}
+className="
+border
+p-4
+bg-gray-100
+"
 
 placeholder="Roblox User ID"
 
-value={form.roblox_user_id}
-
-onChange={
-
-e=>
-
-update(
-"roblox_user_id",
-e.target.value
-)
-
+value={
+form.roblox_user_id
 }
 
+readOnly
+
 />
+
 
 
 
@@ -713,7 +993,9 @@ errors.discord_username
 
 placeholder="Discord Username"
 
-value={form.discord_username}
+value={
+form.discord_username
+}
 
 onChange={
 
@@ -734,6 +1016,7 @@ e.target.value
 
 
 
+
 <input
 
 className={`border p-4 ${
@@ -746,7 +1029,9 @@ errors.email
 
 placeholder="Email Address"
 
-value={form.email}
+value={
+form.email
+}
 
 onChange={
 
@@ -774,21 +1059,99 @@ e.target.value
 
 
 
+{
+robloxChecking && (
 
-<h2 className="
+<p
+
+className="
+mt-4
+text-blue-600
+font-bold
+"
+
+>
+
+Checking Roblox membership...
+
+</p>
+
+)
+
+}
+
+
+
+
+
+
+{
+robloxVerified && (
+
+<p
+
+className="
+mt-4
+text-green-600
+font-bold
+"
+
+>
+
+✓ Roblox account verified as OSFUSA member.
+
+</p>
+
+)
+
+}
+
+
+
+
+
+
+{
+robloxError && (
+
+<p
+
+className="
+mt-4
+text-red-600
+font-bold
+"
+
+>
+
+{robloxError}
+
+</p>
+
+)
+
+}
+
+
+
+
+
+
+
+<h2
+
+className="
 mt-12
 text-3xl
 font-bold
 text-[#003B6F]
-">
+"
+
+>
 
 Select Division
 
 </h2>
-
-
-
-
 
 
 <select
@@ -810,6 +1173,7 @@ update(
 "division",
 e.target.value
 );
+
 
 
 loadQuestions(
@@ -868,6 +1232,9 @@ value={division.id}
 
 
 
+
+
+
 {
 
 questions.length > 0 && (
@@ -876,17 +1243,19 @@ questions.length > 0 && (
 <section className="mt-12">
 
 
-<h2 className="
+<h2
+
+className="
 text-3xl
 font-bold
 text-[#003B6F]
-">
+"
+
+>
 
 Division Assessment
 
 </h2>
-
-
 
 
 
@@ -912,10 +1281,14 @@ Loading assessment questions...
 
 
 
-<div className="
+<div
+
+className="
 space-y-8
 mt-8
-">
+"
+
+>
 
 
 {
@@ -946,6 +1319,8 @@ mb-3
 {question.question}
 
 </label>
+
+
 
 
 
@@ -998,6 +1373,10 @@ e.target.value
 </div>
 
 
+
+
+
+
 </section>
 
 
@@ -1043,7 +1422,9 @@ errors.agreement
 
 }
 
-checked={form.agreement}
+checked={
+form.agreement
+}
 
 onChange={
 
@@ -1059,11 +1440,14 @@ e.target.checked
 />
 
 
+
+
 <span>
 
 I confirm that all information provided is accurate.
 
 </span>
+
 
 
 </label>
@@ -1075,11 +1459,17 @@ I confirm that all information provided is accurate.
 
 
 
+
 <button
 
-onClick={submitApplication}
+onClick={
+submitApplication
+}
 
-disabled={loading}
+disabled={
+loading ||
+!robloxVerified
+}
 
 className="
 mt-10
@@ -1096,6 +1486,7 @@ disabled:opacity-50
 
 >
 
+
 {
 
 loading
@@ -1106,12 +1497,24 @@ loading
 
 :
 
+!robloxVerified
+
+?
+
+"Verify Roblox Account First"
+
+:
+
 "Submit Application →"
 
 }
 
 
+
 </button>
+
+
+
 
 
 
@@ -1132,11 +1535,11 @@ loading
 
 
 
-
 </main>
 
 
 );
+
 
 
 }
