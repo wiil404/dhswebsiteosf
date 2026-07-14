@@ -357,7 +357,7 @@ if(Object.keys(newErrors).length > 0){
 if(newErrors.questions){
 
 alert(
-"This division does not have an assessment configured yet."
+"This division is not accepting applications at this time."
 );
 
 }
