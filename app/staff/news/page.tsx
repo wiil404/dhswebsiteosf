@@ -22,12 +22,9 @@ export default async function StaffNewsPage(){
 
 
 const profile =
-    await requirePermission([
-        "news.create",
-        "news.edit",
-        "news.delete",
-        "news.publish"
-    ]);
+await requirePermission(
+    "news.edit"
+);
 
 
 
