@@ -24,6 +24,8 @@ const [questions,setQuestions] = useState<any[]>([]);
 
 const [answers,setAnswers] = useState<any>({});
 
+const [errors,setErrors] = useState<any>({});
+
 
 
 
@@ -210,6 +212,16 @@ setForm({
 });
 
 
+
+setErrors({
+
+...errors,
+
+[field]:false
+
+});
+
+
 }
 
 
@@ -237,6 +249,16 @@ setAnswers({
 });
 
 
+
+setErrors({
+
+...errors,
+
+[`question_${id}`]:false
+
+});
+
+
 }
 
 
@@ -250,38 +272,33 @@ setAnswers({
 async function submitApplication(){
 
 
-
-if(!form.agreement){
-
-
-alert(
-"Please confirm your information is accurate."
-);
-
-
-return;
-
-
-}
+let newErrors:any = {};
 
 
 
 
-
-if(!form.division){
-
-
-alert(
-"Please select a division."
-);
+if(!form.roblox_username.trim())
+newErrors.roblox_username = true;
 
 
-return;
+
+if(!form.roblox_user_id.trim())
+newErrors.roblox_user_id = true;
 
 
-}
+
+if(!form.discord_username.trim())
+newErrors.discord_username = true;
 
 
+
+if(!form.email.trim())
+newErrors.email = true;
+
+
+
+if(!form.division)
+newErrors.division = true;
 
 
 
@@ -296,8 +313,37 @@ answers[question.id].trim() === ""
 ){
 
 
+newErrors[`question_${question.id}`] = true;
+
+
+}
+
+
+}
+
+
+
+
+
+if(!form.agreement)
+newErrors.agreement = true;
+
+
+
+
+
+
+setErrors(newErrors);
+
+
+
+
+
+if(Object.keys(newErrors).length > 0){
+
+
 alert(
-"Please answer all division assessment questions."
+"Please complete all required fields."
 );
 
 
@@ -307,22 +353,13 @@ return;
 }
 
 
-}
-
-
-
 
 
 
 setLoading(true);
 
 
-
-
-
-
-
-const response = await fetch(
+    const response = await fetch(
 
 "/api/recruitment/apply",
 
@@ -346,9 +383,7 @@ answers
 
 }
 
-
 );
-
 
 
 
@@ -390,7 +425,9 @@ return;
 
 
 router.push(
+
 `/recruitment/applications/submitted?number=${result.application_number}`
+
 );
 
 
@@ -575,93 +612,88 @@ mt-8
 
 
 
-
 <input
-
-className="border p-4"
-
+className={`border p-4 ${
+errors.roblox_username
+?
+"border-red-500"
+:
+"border-gray-300"
+}`}
 placeholder="Roblox Username"
-
 value={form.roblox_username}
-
 onChange={
 e=>update(
 "roblox_username",
 e.target.value
 )
 }
-
 />
 
 
 
 
-
-
 <input
-
-className="border p-4"
-
+className={`border p-4 ${
+errors.roblox_user_id
+?
+"border-red-500"
+:
+"border-gray-300"
+}`}
 placeholder="Roblox User ID"
-
 value={form.roblox_user_id}
-
 onChange={
 e=>update(
 "roblox_user_id",
 e.target.value
 )
 }
-
 />
 
 
 
 
 
-
-
 <input
-
-className="border p-4"
-
+className={`border p-4 ${
+errors.discord_username
+?
+"border-red-500"
+:
+"border-gray-300"
+}`}
 placeholder="Discord Username"
-
 value={form.discord_username}
-
 onChange={
 e=>update(
 "discord_username",
 e.target.value
 )
 }
-
 />
-
-
 
 
 
 
 
 <input
-
-className="border p-4"
-
+className={`border p-4 ${
+errors.email
+?
+"border-red-500"
+:
+"border-gray-300"
+}`}
 placeholder="Email Address"
-
 value={form.email}
-
 onChange={
 e=>update(
 "email",
 e.target.value
 )
 }
-
 />
-
-
 
 
 
@@ -693,12 +725,13 @@ Select Division
 
 <select
 
-className="
-border
-p-4
-w-full
-mt-6
-"
+className={`border p-4 w-full mt-6 ${
+errors.division
+?
+"border-red-500"
+:
+"border-gray-300"
+}`}
 
 value={form.division}
 
@@ -732,7 +765,9 @@ Select Division
 
 
 {
+
 divisions.map(
+
 division=>(
 
 <option
@@ -765,6 +800,11 @@ value={division.id}
 
 
 
+{
+
+questions.length > 0 && (
+
+
 <section className="mt-12">
 
 
@@ -777,6 +817,9 @@ text-[#003B6F]
 Division Assessment
 
 </h2>
+
+
+
 
 
 
@@ -801,27 +844,6 @@ Loading assessment questions...
 
 
 
-{
-
-!questionLoading &&
-questions.length === 0 && form.division && (
-
-<p className="mt-5 text-gray-500">
-
-No assessment questions configured for this division.
-
-</p>
-
-)
-
-}
-
-
-
-
-
-
-
 <div className="
 space-y-8
 mt-8
@@ -829,7 +851,9 @@ mt-8
 
 
 {
+
 questions.map(
+
 (question)=>(
 
 
@@ -851,11 +875,13 @@ mb-3
 
 <textarea
 
-className="
-border
-p-4
-w-full
-"
+className={`border p-4 w-full ${
+errors[`question_${question.id}`]
+?
+"border-red-500"
+:
+"border-gray-300"
+}`}
 
 rows={5}
 
@@ -892,6 +918,11 @@ e.target.value
 </section>
 
 
+)
+
+}
+
+
 
 
 
@@ -914,6 +945,14 @@ mt-10
 <input
 
 type="checkbox"
+
+className={
+errors.agreement
+?
+"outline outline-2 outline-red-500"
+:
+""
+}
 
 checked={form.agreement}
 
@@ -1009,3 +1048,4 @@ loading
 
 
 }
+
