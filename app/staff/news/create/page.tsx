@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Editor from "../../../../components/Editor";
 import FileUpload from "../../../../components/FileUpload";
+
 
 
 export default function CreateNews(){
@@ -24,7 +25,6 @@ const [published,setPublished] = useState(true);
 const [featured,setFeatured] = useState(false);
 
 
-
 const [attachments,setAttachments] = useState<
 {
     name:string;
@@ -33,132 +33,15 @@ const [attachments,setAttachments] = useState<
 >([]);
 
 
-
 const [featuredImage,setFeaturedImage] = useState("");
 
 const [loading,setLoading] = useState(false);
-
-const [checkingPermission,setCheckingPermission] = useState(true);
-
-
-
-
-
-
-
-
-
-useEffect(()=>{
-
-
-async function checkPermission(){
-
-
-try{
-
-
-const profileResponse =
-await fetch(
-    "/api/profile"
-);
-
-
-
-if(!profileResponse.ok){
-
-    router.push("/staff/login");
-
-    return;
-
-}
-
-
-
-const profile =
-await profileResponse.json();
-
-
-
-
-
-
-const permissionResponse =
-await fetch(
-    "/api/profile/permissions?permission=news.create"
-);
-
-
-
-const permission =
-await permissionResponse.json();
-
-
-
-
-
-
-if(
-
-permission.allowed ||
-
-profile.role === "Administrator" ||
-
-profile.role === "Editor" ||
-
-profile.role === "Public Affairs Officer"
-
-){
-
-    setCheckingPermission(false);
-
-}
-
-else{
-
-    router.push("/staff/news");
-
-}
-
-
-
-}
-
-catch(error){
-
-
-console.error(
-"PERMISSION ERROR:",
-error
-);
-
-
-router.push("/staff/news");
-
-
-}
-
-
-
-}
-
-
-
-checkPermission();
-
-
-
-},[router]);
-
-
-
-
 
 
 
 
 
 function generateSlug(value:string){
-
 
 return value
 
@@ -175,12 +58,7 @@ return value
 /^-+|-+$/g,
 "");
 
-
 }
-
-
-
-
 
 
 
@@ -193,11 +71,7 @@ setLoading(true);
 
 
 
-try{
-
-
-const response =
-await fetch(
+const response = await fetch(
 
 "/api/news/create",
 
@@ -210,7 +84,6 @@ headers:{
 "Content-Type":"application/json"
 
 },
-
 
 body:JSON.stringify({
 
@@ -242,7 +115,6 @@ featuredImage
 
 
 
-
 const result =
 await response.json();
 
@@ -250,16 +122,15 @@ await response.json();
 
 
 
+if(!response.ok){
 
-if(result.error){
-
-
-alert(result.error);
+alert(
+result.error || "Failed to create release"
+);
 
 setLoading(false);
 
 return;
-
 
 }
 
@@ -272,97 +143,7 @@ router.push(
 );
 
 
-
 }
-
-catch(error){
-
-
-console.error(
-"CREATE ERROR:",
-error
-);
-
-
-alert(
-"Something went wrong creating the article"
-);
-
-
-setLoading(false);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-if(checkingPermission){
-
-
-return (
-
-<main
-
-className="
-max-w-5xl
-mx-auto
-px-6
-py-16
-"
-
->
-
-
-<div
-
-className="
-bg-white
-shadow-xl
-border
-border-gray-200
-p-10
-"
-
->
-
-
-<h1
-
-className="
-text-2xl
-font-bold
-text-[#003B6F]
-"
-
->
-
-Checking permissions...
-
-</h1>
-
-
-</div>
-
-
-</main>
-
-
-);
-
-
-}
-
-
 
 
 
@@ -398,25 +179,11 @@ md:p-12
 >
 
 
-
-
-
-<div
-
-className="
-border-b
-border-gray-200
-pb-8
-"
-
->
-
-
 <h1
 
 className="
 text-4xl
-font-bold
+font-black
 text-[#003B6F]
 "
 
@@ -427,24 +194,18 @@ Create Press Release
 </h1>
 
 
-
 <p
 
 className="
 mt-3
-text-gray-500
+text-gray-600
 "
 
 >
 
-Create and publish official DHS statements, notices and releases.
+Create official DHS communications.
 
 </p>
-
-
-</div>
-
-
 
 
 
@@ -470,7 +231,6 @@ space-y-5
 className="
 w-full
 border
-border-gray-300
 p-4
 "
 
@@ -480,18 +240,13 @@ value={title}
 
 onChange={(e)=>{
 
-
-const value =
-e.target.value;
-
+const value=e.target.value;
 
 setTitle(value);
-
 
 setSlug(
 generateSlug(value)
 );
-
 
 }}
 
@@ -508,7 +263,6 @@ generateSlug(value)
 className="
 w-full
 border
-border-gray-300
 p-4
 "
 
@@ -528,14 +282,11 @@ setSlug(e.target.value)
 
 
 
-
-
 <select
 
 className="
 w-full
 border
-border-gray-300
 p-4
 "
 
@@ -552,11 +303,9 @@ setCategory(e.target.value)
 Press Release
 </option>
 
-
 <option>
 Public Notice
 </option>
-
 
 <option>
 Statement
@@ -571,19 +320,17 @@ Statement
 
 
 
-
 <textarea
 
 className="
 w-full
 border
-border-gray-300
 p-4
 "
 
-placeholder="Summary"
-
 rows={4}
+
+placeholder="Summary"
 
 value={summary}
 
@@ -604,11 +351,11 @@ setSummary(e.target.value)
 
 className="
 border
-border-gray-200
 p-5
 "
 
 >
+
 
 <Editor
 
@@ -618,8 +365,8 @@ onChange={setContent}
 
 />
 
-</div>
 
+</div>
 
 
 
@@ -650,27 +397,17 @@ setFeaturedImage={setFeaturedImage}
 <div
 
 className="
-mt-8
 border
-border-[#D9E4EF]
-bg-[#F5F8FB]
+bg-gray-50
 p-6
-space-y-5
+space-y-4
 "
 
 >
 
 
+<label className="flex gap-3 items-center">
 
-<label
-
-className="
-flex
-items-center
-gap-3
-"
-
->
 
 <input
 
@@ -685,15 +422,7 @@ setPublished(e.target.checked)
 />
 
 
-<span className="
-font-semibold
-"
-
->
-
 Publish immediately
-
-</span>
 
 
 </label>
@@ -703,24 +432,17 @@ Publish immediately
 
 
 
-<label
 
-className="
-flex
-items-center
-gap-3
-"
-
->
+<label className="flex gap-3 items-center">
 
 
 <input
 
 type="checkbox"
 
-disabled={!published}
-
 checked={featured}
+
+disabled={!published}
 
 onChange={(e)=>
 setFeatured(e.target.checked)
@@ -729,20 +451,10 @@ setFeatured(e.target.checked)
 />
 
 
-
-<span className="
-font-semibold
-"
-
->
-
-Feature on homepage statement block
-
-</span>
+Feature on homepage
 
 
 </label>
-
 
 
 </div>
@@ -767,7 +479,6 @@ text-white
 px-8
 py-3
 font-bold
-disabled:opacity-50
 "
 
 >
@@ -802,11 +513,7 @@ published
 
 
 
-
-
-
 </div>
-
 
 
 </div>
