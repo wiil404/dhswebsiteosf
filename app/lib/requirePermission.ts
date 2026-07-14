@@ -3,7 +3,7 @@ import { hasPermission, getProfile } from "./permissions";
 
 
 export async function requirePermission(
-    permission:string
+    permission: string | string[]
 ){
 
     const profile = await getProfile();
