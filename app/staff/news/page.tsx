@@ -21,9 +21,13 @@ import ToggleButton from "./ToggleButton";
 export default async function StaffNewsPage(){
 
 
-const profile = await requirePermission(
-    "news.edit"
-);
+const profile =
+    await requirePermission([
+        "news.create",
+        "news.edit",
+        "news.delete",
+        "news.publish"
+    ]);
 
 
 
