@@ -422,7 +422,7 @@ font-bold
 
 >
 
-Disable Account
+Deactivate Employee
 
 </button>
 
