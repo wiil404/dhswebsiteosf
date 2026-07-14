@@ -8,77 +8,79 @@ import Link from "next/link";
 export default function Employees(){
 
 
-    const [employees,setEmployees] = useState<any[]>([]);
+const [employees,setEmployees] = useState<any[]>([]);
 
-    const [loading,setLoading] = useState(true);
+const [loading,setLoading] = useState(true);
 
 
+const [pages,setPages] = useState<any>({});
 
+const employeesPerPage = 9;
 
 
 
 
-    useEffect(()=>{
 
 
-        async function load(){
 
+useEffect(()=>{
 
-            try{
 
+async function load(){
 
-                const response = await fetch(
 
-                    "/api/staff/employees",
+try{
 
-                    {
 
-                        cache:"no-store"
+const response = await fetch(
 
-                    }
+"/api/staff/employees",
 
-                );
+{
 
+cache:"no-store"
 
+}
 
-                const data = await response.json();
+);
 
 
 
-                setEmployees(data);
+const data = await response.json();
 
 
+setEmployees(data);
 
-            }
-            catch(error){
 
 
-                console.error(
-                    "EMPLOYEE LOAD ERROR:",
-                    error
-                );
+}
 
+catch(error){
 
-            }
-            finally{
+console.error(
+"EMPLOYEE LOAD ERROR:",
+error
+);
 
+}
 
-                setLoading(false);
+finally{
 
+setLoading(false);
 
-            }
+}
 
 
-        }
+}
 
 
 
+load();
 
-        load();
 
+},[]);
 
 
-    },[]);
 
 
 
@@ -86,61 +88,44 @@ export default function Employees(){
 
 
 
+function groupEmployees(){
 
 
-    if(loading){
+return employees.reduce(
 
+(groups,employee)=>{
 
-        return (
 
-            <main
+const division =
+employee.divisions?.name ||
+"No Division";
 
-                className="
-                max-w-7xl
-                mx-auto
-                px-6
-                py-16
-                "
 
-            >
 
+if(!groups[division]){
 
-                <div
+groups[division]=[];
 
-                    className="
-                    bg-white
-                    shadow-xl
-                    border
-                    border-gray-200
-                    p-10
-                    "
+}
 
-                >
 
-                    <h1
 
-                        className="
-                        text-xl
-                        font-bold
-                        text-[#003B6F]
-                        "
+groups[division].push(employee);
 
-                    >
 
-                        Loading employee directory...
 
-                    </h1>
+return groups;
 
 
-                </div>
+},
 
+{} as any
 
-            </main>
 
-        );
+);
 
 
-    }
+}
 
 
 
@@ -150,84 +135,77 @@ export default function Employees(){
 
 
 
-    return (
+function changePage(
+division:string,
+page:number
+){
 
-        <main
 
-            className="
-            max-w-7xl
-            mx-auto
-            px-6
-            py-16
-            "
+setPages({
 
-        >
+...pages,
 
+[division]:page
 
+});
 
-            <div
 
-                className="
-                bg-white
-                shadow-xl
-                border
-                border-gray-200
-                p-10
-                "
+}
 
-            >
 
 
 
 
 
-                {/* HEADER */}
 
 
-                <div
 
-                    className="
-                    flex
-                    justify-between
-                    items-center
-                    border-b
-                    border-gray-200
-                    pb-8
-                    "
+if(loading){
 
-                >
 
+return (
 
+<main className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+">
 
-                    <div>
+<div className="
+bg-white
+shadow-xl
+border
+p-10
+">
 
+<h1 className="
+text-xl
+font-bold
+text-[#003B6F]
+">
 
-                        <h1
+Loading employee directory...
 
-                            className="
-                            text-4xl
-                            font-bold
-                            text-[#003B6F]
-                            "
+</h1>
 
-                        >
+</div>
 
-                            Employee Directory
+</main>
 
-                        </h1>
+);
 
+}
 
 
 
-                        <p className="mt-3 text-gray-600">
 
-                            View and manage DHS personnel records.
 
-                        </p>
 
+const grouped =
+groupEmployees();
 
 
-                    </div>
 
 
 
@@ -235,328 +213,517 @@ export default function Employees(){
 
 
 
+return (
 
-                    <Link
+<main className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+">
 
-                        href="/staff/employees/create"
 
-                        className="
-                        bg-[#003B6F]
-                        text-white
-                        px-6
-                        py-3
-                        font-bold
-                        hover:bg-[#00284d]
-                        transition
-                        "
+<div className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-10
+">
 
-                    >
 
-                        Add Employee
 
-                    </Link>
 
 
 
+<div className="
+flex
+justify-between
+items-center
+border-b
+pb-8
+">
 
-                </div>
 
+<div>
 
 
+<h1 className="
+text-4xl
+font-bold
+text-[#003B6F]
+">
 
+Employee Directory
 
+</h1>
 
 
+<p className="
+mt-3
+text-gray-600
+">
 
+View and manage DHS personnel records.
 
-                {/* EMPLOYEE CARDS */}
+</p>
 
 
+</div>
 
-                <div
 
-                    className="
-                    mt-10
-                    grid
-                    md:grid-cols-3
-                    gap-6
-                    "
 
-                >
 
+<Link
 
+href="/staff/employees/create"
 
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-bold
+hover:bg-[#00284d]
+transition
+"
 
-                    {
-                        employees.map((employee)=>(
+>
 
+Add Employee
 
+</Link>
 
-                            <Link
 
+</div>
 
-                                key={employee.id}
 
 
-                                href={`/staff/employees/${employee.id}`}
 
 
-                                className="
-                                relative
-                                bg-white
-                                border
-                                border-gray-200
-                                p-6
-                                shadow-sm
-                                hover:shadow-xl
-                                transition
-                                "
 
-                            >
 
 
 
+<div className="
+mt-10
+space-y-16
+">
 
 
-                                <div
+{
 
-                                    className="
-                                    absolute
-                                    left-0
-                                    top-0
-                                    bottom-0
-                                    w-1
-                                    bg-[#003B6F]
-                                    "
+Object.entries(grouped).map(
 
-                                />
+([division,members]:any)=>(
 
 
+<section key={division}>
 
 
+<h2 className="
+text-3xl
+font-bold
+text-[#003B6F]
+border-b
+pb-3
+mb-8
+">
 
+{division}
 
+</h2>
 
 
 
-                                <h2
 
-                                    className="
-                                    text-xl
-                                    font-bold
-                                    text-[#003B6F]
-                                    "
 
-                                >
+{
 
-                                    {employee.roblox_username}
 
-                                </h2>
+(()=>{
 
 
+const currentPage =
+pages[division] || 1;
 
 
+const totalPages =
+Math.ceil(
+members.length / employeesPerPage
+);
 
 
 
+const start =
+(currentPage - 1)
+*
+employeesPerPage;
 
 
-                                <div className="mt-4">
 
+const currentEmployees =
+members.slice(
+start,
+start + employeesPerPage
+);
 
-                                    <p className="font-semibold text-gray-900">
 
-                                        {
-                                            employee.positions?.title ||
-                                            "No Position"
-                                        }
 
-                                    </p>
+return (
 
+<>
 
 
 
+<div className="
+grid
+md:grid-cols-3
+gap-6
+">
 
-                                    <p className="text-gray-600">
 
-                                        {
-                                            employee.divisions?.name ||
-                                            "No Division"
-                                        }
+{
 
-                                    </p>
+currentEmployees.map(
+(employee:any)=>(
 
 
 
-                                </div>
+<Link
 
+key={employee.id}
 
+href={`/staff/employees/${employee.id}`}
 
+className="
+relative
+bg-white
+border
+border-gray-200
+p-6
+shadow-sm
+hover:shadow-xl
+transition
+"
 
 
+>
 
 
+<div className="
+absolute
+left-0
+top-0
+bottom-0
+w-1
+bg-[#003B6F]
+"/>
 
 
-                                <div
 
-                                    className="
-                                    mt-5
-                                    "
 
-                                >
 
+<h3 className="
+text-xl
+font-bold
+text-[#003B6F]
+">
 
+{employee.roblox_username}
 
-                                    {
-                                        employee.status === "Active"
+</h3>
 
-                                        ?
 
-                                        <span
 
-                                            className="
-                                            inline-block
-                                            bg-green-100
-                                            text-green-700
-                                            px-3
-                                            py-1
-                                            text-sm
-                                            font-bold
-                                            "
 
-                                        >
 
-                                            Active
+<div className="
+mt-4
+">
 
-                                        </span>
 
+<p className="
+font-semibold
+">
 
-                                        :
+{
+employee.positions?.title ||
+"No Position"
+}
 
-                                        <span
+</p>
 
-                                            className="
-                                            inline-block
-                                            bg-gray-100
-                                            text-gray-700
-                                            px-3
-                                            py-1
-                                            text-sm
-                                            font-bold
-                                            "
 
-                                        >
 
-                                            {employee.status}
+<p className="
+text-gray-600
+">
 
-                                        </span>
+{
+employee.divisions?.name ||
+"No Division"
+}
 
-                                    }
+</p>
 
 
 
-                                </div>
+</div>
 
 
 
 
 
+<div className="mt-5">
 
 
+{
 
+employee.status === "Active"
 
-                                <div
+?
 
-                                    className="
-                                    mt-6
-                                    pt-4
-                                    border-t
-                                    border-gray-100
-                                    "
+<span className="
+bg-green-100
+text-green-700
+px-3
+py-1
+text-sm
+font-bold
+">
 
-                                >
+Active
 
+</span>
 
+:
 
-                                    <p className="text-xs uppercase text-gray-500">
+<span className="
+bg-gray-100
+text-gray-700
+px-3
+py-1
+text-sm
+font-bold
+">
 
-                                        Roblox ID
+{employee.status}
 
-                                    </p>
+</span>
 
 
+}
 
-                                    <p className="text-sm font-semibold text-gray-700">
 
-                                        {employee.roblox_user_id}
 
-                                    </p>
+</div>
 
 
 
-                                </div>
 
 
 
 
+<div className="
+mt-6
+pt-4
+border-t
+">
 
+<p className="
+text-xs
+uppercase
+text-gray-500
+">
 
-                            </Link>
+Roblox ID
 
+</p>
 
 
-                        ))
-                    }
+<p className="
+text-sm
+font-semibold
+">
 
+{employee.roblox_user_id}
 
+</p>
 
 
-                </div>
+</div>
 
 
 
 
+</Link>
 
 
+))
 
-                {
-                    employees.length === 0 && (
 
+}
 
-                        <div
 
-                            className="
-                            mt-10
-                            text-center
-                            text-gray-500
-                            "
+</div>
 
-                        >
 
-                            No employees found.
 
-                        </div>
 
 
-                    )
-                }
 
 
+{
 
+totalPages > 1 && (
 
 
+<div className="
+flex
+justify-center
+items-center
+gap-3
+mt-8
+">
 
 
-            </div>
+<button
 
+disabled={
+currentPage === 1
+}
 
+onClick={()=>changePage(
+division,
+currentPage - 1
+)}
 
+className="
+border
+px-4
+py-2
+disabled:opacity-40
+"
 
-        </main>
+>
 
+Previous
 
-    );
+</button>
+
+
+
+
+
+<span className="
+font-bold
+text-[#003B6F]
+">
+
+{currentPage} / {totalPages}
+
+</span>
+
+
+
+
+
+<button
+
+disabled={
+currentPage === totalPages
+}
+
+onClick={()=>changePage(
+division,
+currentPage + 1
+)}
+
+className="
+border
+px-4
+py-2
+disabled:opacity-40
+"
+
+>
+
+Next
+
+</button>
+
+
+</div>
+
+
+)
+
+}
+
+
+
+</>
+
+);
+
+
+
+})()
+
+
+}
+
+
+
+</section>
+
+
+)
+
+
+)
+
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+{
+
+employees.length === 0 && (
+
+<div className="
+mt-10
+text-center
+text-gray-500
+">
+
+No employees found.
+
+</div>
+
+)
+
+}
+
+
+
+</div>
+
+
+</main>
+
+
+);
 
 
 }
