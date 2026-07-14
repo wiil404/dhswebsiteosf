@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { getProfile } from "../../../lib/permissions";
-import { canCreate } from "../../../lib/roles";
+import { getProfile, hasPermission } from "../../../lib/permissions";
 
 
 export default async function Layout({
@@ -10,7 +9,8 @@ export default async function Layout({
 }) {
 
 
-    const profile = await getProfile();
+    const profile =
+        await getProfile();
 
 
 
@@ -22,7 +22,36 @@ export default async function Layout({
 
 
 
-    if(!canCreate(profile.role)){
+
+
+    const permissionAllowed =
+        await hasPermission(
+            "news.create"
+        );
+
+
+
+
+
+
+    const roleAllowed =
+
+        profile.role === "Administrator" ||
+
+        profile.role === "Editor" ||
+
+        profile.role === "Public Affairs Officer";
+
+
+
+
+
+
+
+    if(
+        !permissionAllowed &&
+        !roleAllowed
+    ){
 
         redirect("/staff/dashboard");
 
@@ -30,10 +59,16 @@ export default async function Layout({
 
 
 
+
+
+
+
     return (
+
         <>
             {children}
         </>
+
     );
 
 }
