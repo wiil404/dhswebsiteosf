@@ -144,11 +144,8 @@ export async function hasPermission(
     permission: string | string[]
 ){
 
-
     const profile =
         await getProfile();
-
-
 
 
 
@@ -162,12 +159,9 @@ export async function hasPermission(
 
 
 
-
-
     /*
         Emergency administrator bypass
     */
-
 
     if(
         profile.role === "Administrator"
@@ -181,28 +175,12 @@ export async function hasPermission(
 
 
 
-
-
     /*
-        User must have a linked
-        DHS employee record
+        User must have employee record
     */
 
-
     if(
-        !profile.employee
-    ){
-
-        return false;
-
-    }
-
-
-
-
-
-
-    if(
+        !profile.employee ||
         !profile.employee.position_id
     ){
 
@@ -214,28 +192,11 @@ export async function hasPermission(
 
 
 
-
-
     const supabase =
         await createClient();
 
 
 
-
-
-
-
-    /*
-        Check position permissions
-
-        employee
-            ↓
-        position_id
-            ↓
-        position_permissions
-            ↓
-        permissions
-    */
 
 
     const {
@@ -258,6 +219,7 @@ export async function hasPermission(
 
     `)
 
+
     .eq(
 
         "position_id",
@@ -265,7 +227,6 @@ export async function hasPermission(
         profile.employee.position_id
 
     );
-
 
 
 
@@ -288,15 +249,45 @@ export async function hasPermission(
 
 
 
+    /*
+        Convert single permission
+        into array
+
+        Allows:
+
+        "news.edit"
+
+        OR
+
+        [
+          "news.create",
+          "news.edit"
+        ]
+
+    */
+
+
+    const requestedPermissions =
+        Array.isArray(permission)
+        ?
+        permission
+        :
+        [permission];
+
+
+
+
+
 
     return data?.some(
 
         (item:any)=>
 
-            item.permissions?.name === permission
+            requestedPermissions.includes(
+                item.permissions?.name
+            )
 
     ) || false;
-
 
 
 }
