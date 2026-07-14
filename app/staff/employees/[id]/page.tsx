@@ -402,6 +402,14 @@ Demote
 
 </Link>
 
+<form
+
+action={`/api/staff/employees/${id}/disable`}
+
+method="POST"
+
+>
+
 <button
 
 className="
@@ -417,6 +425,8 @@ font-bold
 Disable Account
 
 </button>
+
+</form>
 
 
 </div>
