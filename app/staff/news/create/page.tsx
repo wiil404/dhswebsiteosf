@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
 import Editor from "../../../../components/Editor";
 import FileUpload from "../../../../components/FileUpload";
-
 
 
 export default function CreateNews(){
@@ -46,19 +46,25 @@ const [checkingPermission,setCheckingPermission] = useState(true);
 
 
 
+
+
 useEffect(()=>{
 
 
 async function checkPermission(){
 
 
-const response = await fetch(
+try{
+
+
+const profileResponse =
+await fetch(
     "/api/profile"
 );
 
 
 
-if(!response.ok){
+if(!profileResponse.ok){
 
     router.push("/staff/login");
 
@@ -68,7 +74,24 @@ if(!response.ok){
 
 
 
-const profile = await response.json();
+const profile =
+await profileResponse.json();
+
+
+
+
+
+
+const permissionResponse =
+await fetch(
+    "/api/profile/permissions?permission=news.create"
+);
+
+
+
+const permission =
+await permissionResponse.json();
+
 
 
 
@@ -76,8 +99,12 @@ const profile = await response.json();
 
 if(
 
+permission.allowed ||
+
 profile.role === "Administrator" ||
+
 profile.role === "Editor" ||
+
 profile.role === "Public Affairs Officer"
 
 ){
@@ -96,12 +123,31 @@ else{
 
 }
 
+catch(error){
+
+
+console.error(
+"PERMISSION ERROR:",
+error
+);
+
+
+router.push("/staff/news");
+
+
+}
+
+
+
+}
+
 
 
 checkPermission();
 
 
-},[]);
+
+},[router]);
 
 
 
@@ -121,14 +167,13 @@ return value
 .trim()
 
 .replace(
-    /[^a-z0-9]+/g,
-    "-"
+/[^a-z0-9]+/g,
+"-"
 )
 
 .replace(
-    /^-+|-+$/g,
-    ""
-);
+/^-+|-+$/g,
+"");
 
 
 }
@@ -151,7 +196,8 @@ setLoading(true);
 try{
 
 
-const response = await fetch(
+const response =
+await fetch(
 
 "/api/news/create",
 
@@ -164,6 +210,7 @@ headers:{
 "Content-Type":"application/json"
 
 },
+
 
 body:JSON.stringify({
 
@@ -195,6 +242,7 @@ featuredImage
 
 
 
+
 const result =
 await response.json();
 
@@ -202,7 +250,9 @@ await response.json();
 
 
 
+
 if(result.error){
+
 
 alert(result.error);
 
@@ -210,13 +260,16 @@ setLoading(false);
 
 return;
 
+
 }
 
 
 
 
 
-router.push("/staff/news");
+router.push(
+"/staff/news"
+);
 
 
 
@@ -258,27 +311,40 @@ if(checkingPermission){
 
 return (
 
-<main className="
+<main
+
+className="
 max-w-5xl
 mx-auto
 px-6
 py-16
-">
+"
+
+>
 
 
-<div className="
+<div
+
+className="
 bg-white
 shadow-xl
 border
 border-gray-200
 p-10
-">
+"
 
-<h1 className="
+>
+
+
+<h1
+
+className="
 text-2xl
 font-bold
 text-[#003B6F]
-">
+"
+
+>
 
 Checking permissions...
 
@@ -289,6 +355,7 @@ Checking permissions...
 
 
 </main>
+
 
 );
 
@@ -332,9 +399,6 @@ md:p-12
 
 
 
-
-
-{/* HEADER */}
 
 
 <div
@@ -388,10 +452,14 @@ Create and publish official DHS statements, notices and releases.
 
 
 
-{/* FORM */}
+<div
 
+className="
+mt-10
+space-y-5
+"
 
-<div className="mt-10 space-y-5">
+>
 
 
 
@@ -404,8 +472,6 @@ w-full
 border
 border-gray-300
 p-4
-focus:outline-none
-focus:border-[#003B6F]
 "
 
 placeholder="Title"
@@ -415,7 +481,8 @@ value={title}
 onChange={(e)=>{
 
 
-const value=e.target.value;
+const value =
+e.target.value;
 
 
 setTitle(value);
@@ -436,7 +503,6 @@ generateSlug(value)
 
 
 
-
 <input
 
 className="
@@ -444,8 +510,6 @@ w-full
 border
 border-gray-300
 p-4
-focus:outline-none
-focus:border-[#003B6F]
 "
 
 placeholder="Slug"
@@ -473,8 +537,6 @@ w-full
 border
 border-gray-300
 p-4
-focus:outline-none
-focus:border-[#003B6F]
 "
 
 value={category}
@@ -510,7 +572,6 @@ Statement
 
 
 
-
 <textarea
 
 className="
@@ -518,8 +579,6 @@ w-full
 border
 border-gray-300
 p-4
-focus:outline-none
-focus:border-[#003B6F]
 "
 
 placeholder="Summary"
@@ -541,12 +600,15 @@ setSummary(e.target.value)
 
 
 
+<div
 
-<div className="
+className="
 border
 border-gray-200
 p-5
-">
+"
+
+>
 
 <Editor
 
@@ -585,10 +647,6 @@ setFeaturedImage={setFeaturedImage}
 
 
 
-
-{/* OPTIONS */}
-
-
 <div
 
 className="
@@ -604,9 +662,6 @@ space-y-5
 
 
 
-
-
-
 <label
 
 className="
@@ -616,7 +671,6 @@ gap-3
 "
 
 >
-
 
 <input
 
@@ -633,8 +687,9 @@ setPublished(e.target.checked)
 
 <span className="
 font-semibold
-text-gray-800
-">
+"
+
+>
 
 Publish immediately
 
@@ -648,26 +703,13 @@ Publish immediately
 
 
 
-
-
-
-
 <label
 
-className={`
+className="
 flex
 items-center
 gap-3
-
-${
-!published
-?
-"opacity-50"
-:
-""
-}
-
-`}
+"
 
 >
 
@@ -690,8 +732,9 @@ setFeatured(e.target.checked)
 
 <span className="
 font-semibold
-text-gray-800
-">
+"
+
+>
 
 Feature on homepage statement block
 
@@ -702,37 +745,7 @@ Feature on homepage statement block
 
 
 
-
-
-
-
-
-
-{
-featured && published && (
-
-<p
-
-className="
-text-sm
-text-[#003B6F]
-font-medium
-"
-
->
-
-This release will appear as the main featured statement on the DHS homepage.
-
-</p>
-
-)
-
-}
-
-
-
 </div>
-
 
 
 
@@ -754,8 +767,6 @@ text-white
 px-8
 py-3
 font-bold
-hover:bg-[#00284d]
-transition
 disabled:opacity-50
 "
 
@@ -780,7 +791,7 @@ published
 
 :
 
-"Save as Draft"
+"Save Draft"
 
 }
 
@@ -795,9 +806,6 @@ published
 
 
 </div>
-
-
-
 
 
 
