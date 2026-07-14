@@ -583,7 +583,9 @@ text-gray-900
 
 {
 
-answer.questions?.question
+{
+answer.application_questions?.question
+}
 
 }
 
