@@ -59,9 +59,7 @@ try{
 
 
 const response = await fetch(
-
 "/api/recruitment/divisions"
-
 );
 
 
@@ -155,12 +153,9 @@ setAnswers({});
 
 else{
 
-
 console.error(data.error);
 
-
 setQuestions([]);
-
 
 }
 
@@ -170,15 +165,12 @@ setQuestions([]);
 
 catch(error){
 
-
 console.error(
 "Question loading failed",
 error
 );
 
-
 setQuestions([]);
-
 
 }
 
@@ -231,12 +223,10 @@ setErrors({
 
 
 
+
 function updateAnswer(
-
 id:string,
-
 value:string
-
 ){
 
 
@@ -277,6 +267,9 @@ let newErrors:any = {};
 
 
 
+
+// Applicant details
+
 if(!form.roblox_username.trim())
 newErrors.roblox_username = true;
 
@@ -297,12 +290,29 @@ newErrors.email = true;
 
 
 
+
+
+// Division
+
 if(!form.division)
 newErrors.division = true;
 
 
 
 
+// Prevent submission with no questions
+
+if(form.division && questions.length === 0){
+
+newErrors.questions = true;
+
+}
+
+
+
+
+
+// Question validation
 
 for(const question of questions){
 
@@ -325,6 +335,8 @@ newErrors[`question_${question.id}`] = true;
 
 
 
+// Agreement
+
 if(!form.agreement)
 newErrors.agreement = true;
 
@@ -342,9 +354,21 @@ setErrors(newErrors);
 if(Object.keys(newErrors).length > 0){
 
 
+if(newErrors.questions){
+
+alert(
+"This division does not have an assessment configured yet."
+);
+
+}
+
+else{
+
 alert(
 "Please complete all required fields."
 );
+
+}
 
 
 return;
@@ -358,8 +382,7 @@ return;
 
 setLoading(true);
 
-
-    const response = await fetch(
+const response = await fetch(
 
 "/api/recruitment/apply",
 
@@ -613,6 +636,7 @@ mt-8
 
 
 <input
+
 className={`border p-4 ${
 errors.roblox_username
 ?
@@ -620,20 +644,32 @@ errors.roblox_username
 :
 "border-gray-300"
 }`}
+
 placeholder="Roblox Username"
+
 value={form.roblox_username}
+
 onChange={
-e=>update(
+
+e=>
+
+update(
 "roblox_username",
 e.target.value
 )
+
 }
+
 />
 
 
 
 
+
+
+
 <input
+
 className={`border p-4 ${
 errors.roblox_user_id
 ?
@@ -641,21 +677,32 @@ errors.roblox_user_id
 :
 "border-gray-300"
 }`}
+
 placeholder="Roblox User ID"
+
 value={form.roblox_user_id}
+
 onChange={
-e=>update(
+
+e=>
+
+update(
 "roblox_user_id",
 e.target.value
 )
+
 }
+
 />
 
 
 
 
 
+
+
 <input
+
 className={`border p-4 ${
 errors.discord_username
 ?
@@ -663,21 +710,32 @@ errors.discord_username
 :
 "border-gray-300"
 }`}
+
 placeholder="Discord Username"
+
 value={form.discord_username}
+
 onChange={
-e=>update(
+
+e=>
+
+update(
 "discord_username",
 e.target.value
 )
+
 }
+
 />
 
 
 
 
 
+
+
 <input
+
 className={`border p-4 ${
 errors.email
 ?
@@ -685,15 +743,25 @@ errors.email
 :
 "border-gray-300"
 }`}
+
 placeholder="Email Address"
+
 value={form.email}
+
 onChange={
-e=>update(
+
+e=>
+
+update(
 "email",
 e.target.value
 )
+
 }
+
 />
+
+
 
 
 
@@ -764,11 +832,13 @@ Select Division
 
 
 
+
 {
 
 divisions.map(
 
 division=>(
+
 
 <option
 
@@ -782,6 +852,7 @@ value={division.id}
 
 </option>
 
+
 )
 
 )
@@ -791,9 +862,6 @@ value={division.id}
 
 
 </select>
-
-
-
 
 
 
@@ -857,19 +925,29 @@ questions.map(
 (question)=>(
 
 
-<div key={question.id}>
+<div
+
+key={question.id}
+
+>
 
 
-<label className="
+<label
+
+className="
 block
 font-bold
 text-gray-800
 mb-3
-">
+"
+
+>
 
 {question.question}
 
 </label>
+
+
 
 
 
@@ -890,14 +968,19 @@ answers[question.id] || ""
 }
 
 onChange={
+
 e=>
+
 updateAnswer(
 question.id,
 e.target.value
 )
+
 }
 
 />
+
+
 
 
 
@@ -947,21 +1030,30 @@ mt-10
 type="checkbox"
 
 className={
+
 errors.agreement
+
 ?
+
 "outline outline-2 outline-red-500"
+
 :
+
 ""
+
 }
 
 checked={form.agreement}
 
 onChange={
+
 e=>
+
 update(
 "agreement",
 e.target.checked
 )
+
 }
 
 />
@@ -1048,4 +1140,3 @@ loading
 
 
 }
-
