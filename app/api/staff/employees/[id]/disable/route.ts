@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "../../../../../../lib/supabase-admin";
-import { createClient } from "../../../../../../lib/supabase-server";
-import { hasPermission } from "../../../../../../lib/permissions";
+import { supabaseAdmin } from "../../../../../lib/supabase-admin";
+import { createClient } from "../../../../../lib/supabase-server";
+import { hasPermission } from "../../../../../lib/permissions";
 
 
 
