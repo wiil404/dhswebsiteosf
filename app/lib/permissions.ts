@@ -356,4 +356,52 @@ return await hasPermission(
 "news.publish"
 );
 
+export async function canManageUsers(){
+
+    return await hasPermission(
+        "staff.manage"
+    );
+
+}
+
+
+
+export async function canPromoteEmployees(){
+
+    return await hasPermission(
+        "EMPLOYEE_PROMOTE"
+    );
+
+}
+
+
+
+export async function canDemoteEmployees(){
+
+    return await hasPermission(
+        "staff.demote"
+    );
+
+}
+
+
+
+export async function canEditEmployees(){
+
+    return await hasPermission(
+        "EMPLOYEES_EDIT"
+    );
+
+}
+
+
+
+export async function canManagePermissions(){
+
+    return await hasPermission(
+        "staff.permissions"
+    );
+
+}
+    
 }
