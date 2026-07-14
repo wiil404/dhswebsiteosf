@@ -142,15 +142,15 @@ button="View Divisions"
 
 <FeatureCard
 
-image="/hero/news.jpg"
+image="/hero/about.jpg"
 
-href="/news"
+href="/about"
 
-title="Latest News"
+title="About The Department"
 
-description="Read official announcements, operations, and updates from the Department."
+description="Learn about our mission, leadership, history, and commitment to service."
 
-button="Read News"
+button="Learn More"
 
 />
 
