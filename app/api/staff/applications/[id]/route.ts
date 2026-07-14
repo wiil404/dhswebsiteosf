@@ -143,6 +143,7 @@ function hasAccess(employee:any){
         "Under Secretary",
 
 
+        "Supervisory Special Agent",
         "Deputy Special Agent in Charge (SS)",
         "Special Agent in Charge (SS)",
         "Assistant Director",
