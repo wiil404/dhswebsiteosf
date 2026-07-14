@@ -10,6 +10,7 @@ export type Role =
 
 
 
+
 export async function getProfile(){
 
     const supabase =
@@ -124,6 +125,7 @@ export async function hasPermission(
     permission:string | string[]
 ){
 
+
     const profile =
         await getProfile();
 
@@ -142,7 +144,7 @@ export async function hasPermission(
 
 
     /*
-        ADMIN BYPASS
+        Administrator bypass
     */
 
     if(
@@ -158,19 +160,23 @@ export async function hasPermission(
 
 
     /*
-        STAFF ROLE BYPASS
-        FOR DHS MEDIA MANAGEMENT
+        Public Affairs / Editor news access
     */
+
+    const requested =
+        Array.isArray(permission)
+        ?
+        permission
+        :
+        [permission];
+
+
+
 
 
     if(
-        permission.includes
-        &&
-        Array.isArray(permission)
-        &&
-        permission.some(
-            p =>
-            p.startsWith("news.")
+        requested.some(
+            p => p.startsWith("news.")
         )
     ){
 
@@ -189,33 +195,8 @@ export async function hasPermission(
 
 
 
-
-
-    if(
-        typeof permission === "string" &&
-        permission.startsWith("news.")
-    ){
-
-        if(
-            profile.role === "Editor" ||
-            profile.role === "Public Affairs Officer"
-        ){
-
-            return true;
-
-        }
-
-    }
-
-
-
-
-
-
-
-
     /*
-        DATABASE PERMISSION CHECK
+        Database permission check
     */
 
 
@@ -234,6 +215,7 @@ export async function hasPermission(
 
     const supabase =
         await createClient();
+
 
 
 
@@ -270,28 +252,17 @@ export async function hasPermission(
 
 
 
+
     if(error){
 
         console.error(
+            "PERMISSION ERROR:",
             error
         );
 
         return false;
 
     }
-
-
-
-
-
-
-
-    const requested =
-        Array.isArray(permission)
-        ?
-        permission
-        :
-        [permission];
 
 
 
@@ -310,6 +281,7 @@ export async function hasPermission(
     ) || false;
 
 
+
 }
 
 
@@ -317,44 +289,68 @@ export async function hasPermission(
 
 
 
+
+
+
+/*
+    News Permissions
+*/
 
 
 
 export async function canCreateNews(){
 
-return await hasPermission(
-"news.create"
-);
+    return await hasPermission(
+        "news.create"
+    );
 
 }
+
+
 
 
 
 export async function canEditNews(){
 
-return await hasPermission(
-"news.edit"
-);
+    return await hasPermission(
+        "news.edit"
+    );
 
 }
+
+
 
 
 
 export async function canDeleteNews(){
 
-return await hasPermission(
-"news.delete"
-);
+    return await hasPermission(
+        "news.delete"
+    );
 
 }
 
 
 
+
+
 export async function canPublishNews(){
 
-return await hasPermission(
-"news.publish"
-);
+    return await hasPermission(
+        "news.publish"
+    );
+
+}
+
+
+
+
+
+/*
+    Staff Management
+*/
+
+
 
 export async function canManageUsers(){
 
@@ -363,6 +359,8 @@ export async function canManageUsers(){
     );
 
 }
+
+
 
 
 
@@ -376,6 +374,8 @@ export async function canPromoteEmployees(){
 
 
 
+
+
 export async function canDemoteEmployees(){
 
     return await hasPermission(
@@ -383,6 +383,8 @@ export async function canDemoteEmployees(){
     );
 
 }
+
+
 
 
 
@@ -396,12 +398,12 @@ export async function canEditEmployees(){
 
 
 
+
+
 export async function canManagePermissions(){
 
     return await hasPermission(
         "staff.permissions"
     );
 
-}
-    
 }
