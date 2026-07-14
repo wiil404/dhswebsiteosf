@@ -10,9 +10,7 @@ export type Role =
 
 
 
-
 export async function getProfile(){
-
 
     const supabase =
         await createClient();
@@ -27,7 +25,6 @@ export async function getProfile(){
 
 
 
-
     if(!user){
 
         return null;
@@ -37,13 +34,11 @@ export async function getProfile(){
 
 
 
-
     const {
         data:profile,
         error
 
     } = await supabase
-
 
     .from("profiles")
 
@@ -59,8 +54,7 @@ export async function getProfile(){
 
 
 
-
-    if(error){
+    if(error || !profile){
 
         console.error(
             "PROFILE ERROR:",
@@ -75,19 +69,6 @@ export async function getProfile(){
 
 
 
-
-    /*
-        Link profile account
-        to DHS employee record
-
-        profiles.id
-            ↓
-        employees.user_id
-            ↓
-        employees.id
-    */
-
-
     const {
         data:employee
 
@@ -98,7 +79,9 @@ export async function getProfile(){
 
     .select(`
 
-        *,
+        id,
+        position_id,
+        roblox_username,
 
         positions(
             id,
@@ -118,14 +101,11 @@ export async function getProfile(){
 
 
 
-
     return {
-
 
         ...profile,
 
         employee
-
 
     };
 
@@ -141,11 +121,13 @@ export async function getProfile(){
 
 
 export async function hasPermission(
-    permission: string | string[]
+    permission:string | string[]
 ){
 
     const profile =
         await getProfile();
+
+
 
 
 
@@ -160,7 +142,7 @@ export async function hasPermission(
 
 
     /*
-        Emergency administrator bypass
+        ADMIN BYPASS
     */
 
     if(
@@ -176,17 +158,75 @@ export async function hasPermission(
 
 
     /*
-        User must have employee record
+        STAFF ROLE BYPASS
+        FOR DHS MEDIA MANAGEMENT
     */
 
+
     if(
-        !profile.employee ||
-        !profile.employee.position_id
+        permission.includes
+        &&
+        Array.isArray(permission)
+        &&
+        permission.some(
+            p =>
+            p.startsWith("news.")
+        )
+    ){
+
+        if(
+            profile.role === "Editor" ||
+            profile.role === "Public Affairs Officer"
+        ){
+
+            return true;
+
+        }
+
+    }
+
+
+
+
+
+
+
+    if(
+        typeof permission === "string" &&
+        permission.startsWith("news.")
+    ){
+
+        if(
+            profile.role === "Editor" ||
+            profile.role === "Public Affairs Officer"
+        ){
+
+            return true;
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+    /*
+        DATABASE PERMISSION CHECK
+    */
+
+
+    if(
+        !profile.employee?.position_id
     ){
 
         return false;
 
     }
+
 
 
 
@@ -221,11 +261,8 @@ export async function hasPermission(
 
 
     .eq(
-
         "position_id",
-
         profile.employee.position_id
-
     );
 
 
@@ -236,7 +273,6 @@ export async function hasPermission(
     if(error){
 
         console.error(
-            "PERMISSION CHECK ERROR:",
             error
         );
 
@@ -249,25 +285,8 @@ export async function hasPermission(
 
 
 
-    /*
-        Convert single permission
-        into array
 
-        Allows:
-
-        "news.edit"
-
-        OR
-
-        [
-          "news.create",
-          "news.edit"
-        ]
-
-    */
-
-
-    const requestedPermissions =
+    const requested =
         Array.isArray(permission)
         ?
         permission
@@ -279,11 +298,12 @@ export async function hasPermission(
 
 
 
+
     return data?.some(
 
         (item:any)=>
 
-            requestedPermissions.includes(
+            requested.includes(
                 item.permissions?.name
             )
 
@@ -300,130 +320,40 @@ export async function hasPermission(
 
 
 
-/*
-    Permission helpers
-*/
-
-
-
-
-
 export async function canCreateNews(){
 
-    return await hasPermission(
-        "news.create"
-    );
+return await hasPermission(
+"news.create"
+);
 
 }
-
-
-
-
 
 
 
 export async function canEditNews(){
 
-    return await hasPermission(
-        "news.edit"
-    );
+return await hasPermission(
+"news.edit"
+);
 
 }
-
-
-
-
-
-
-
-export async function canPublishNews(){
-
-    return await hasPermission(
-        "news.publish"
-    );
-
-}
-
-
-
-
 
 
 
 export async function canDeleteNews(){
 
-    return await hasPermission(
-        "news.delete"
-    );
+return await hasPermission(
+"news.delete"
+);
 
 }
 
 
 
+export async function canPublishNews(){
 
-
-
-
-export async function canManageUsers(){
-
-    return await hasPermission(
-        "staff.manage"
-    );
-
-}
-
-
-
-
-
-
-
-export async function canPromoteEmployees(){
-
-    return await hasPermission(
-        "EMPLOYEE_PROMOTE"
-    );
-
-}
-
-
-
-
-
-
-
-export async function canDemoteEmployees(){
-
-    return await hasPermission(
-        "staff.demote"
-    );
-
-}
-
-
-
-
-
-
-
-export async function canEditEmployees(){
-
-    return await hasPermission(
-        "EMPLOYEES_EDIT"
-    );
-
-}
-
-
-
-
-
-
-
-export async function canManagePermissions(){
-
-    return await hasPermission(
-        "staff.permissions"
-    );
+return await hasPermission(
+"news.publish"
+);
 
 }
