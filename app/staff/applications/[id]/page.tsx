@@ -520,112 +520,65 @@ application.divisions?.name
 
 {/* Questions */}
 
-
-
 <div>
 
-
 <h2
-
 className="
 text-3xl
 font-bold
 text-[#003B6F]
 "
-
 >
-
 Division Assessment
-
 </h2>
 
 
-
-
-
-
-
 <div
-
 className="
 space-y-6
 mt-6
 "
-
 >
 
-
 {
-
 application.answers?.map((answer:any)=>(
 
-
 <div
-
 key={answer.id}
-
 className="
 border
 p-6
 "
-
 >
 
-
 <p
-
 className="
 font-bold
 text-gray-900
 "
-
 >
-
-{
-
-{
-answer.application_questions?.question
-}
-
-}
-
+{answer.application_questions?.question || "Question unavailable"}
 </p>
 
 
-
 <p
-
 className="
 mt-3
 text-gray-700
 "
-
 >
-
-{
-
-answer.answer
-
-}
-
+{answer.answer || "No answer provided"}
 </p>
 
 
 </div>
 
-
 ))
-
-
 }
 
-
-
 </div>
 
-
 </div>
-
 
 
 
