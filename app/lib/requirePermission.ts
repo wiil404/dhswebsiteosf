@@ -19,12 +19,8 @@ export async function requirePermission(
 
 
 
-
-
     const allowed =
         await hasPermission(permission);
-
-
 
 
 
@@ -33,8 +29,6 @@ export async function requirePermission(
         redirect("/staff/dashboard");
 
     }
-
-
 
 
 
