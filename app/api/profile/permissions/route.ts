@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { hasPermission } from "../../../lib/permissions";
+import { hasPermission, getProfile } from "../../../lib/permissions";
 
 
 export async function GET(request:Request){
@@ -15,25 +15,39 @@ searchParams.get("permission");
 
 
 
-if(!permission){
-
-return NextResponse.json({
-allowed:false
-});
-
-}
+const profile =
+await getProfile();
 
 
 
 const allowed =
-await hasPermission(
 permission
-);
+?
+await hasPermission(permission)
+:
+false;
+
+
+
+console.log("PROFILE:", profile);
+
+console.log("REQUESTED PERMISSION:", permission);
+
+console.log("ALLOWED:", allowed);
+
 
 
 
 return NextResponse.json({
-allowed
+
+allowed,
+
+role: profile?.role,
+
+employee: profile?.employee,
+
+permission
+
 });
 
 
