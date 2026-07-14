@@ -12,11 +12,10 @@ const [employees,setEmployees] = useState<any[]>([]);
 
 const [loading,setLoading] = useState(true);
 
-
 const [pages,setPages] = useState<any>({});
 
-const employeesPerPage = 9;
 
+const employeesPerPage = 9;
 
 
 
@@ -37,16 +36,16 @@ const response = await fetch(
 "/api/staff/employees",
 
 {
-
 cache:"no-store"
-
 }
 
 );
 
 
 
-const data = await response.json();
+const data =
+await response.json();
+
 
 
 setEmployees(data);
@@ -74,7 +73,6 @@ setLoading(false);
 }
 
 
-
 load();
 
 
@@ -88,10 +86,10 @@ load();
 
 
 
-function groupEmployees(){
+function groupEmployees(list:any[]){
 
 
-return employees.reduce(
+return list.reduce(
 
 (groups,employee)=>{
 
@@ -120,7 +118,6 @@ return groups;
 },
 
 {} as any
-
 
 );
 
@@ -160,53 +157,25 @@ setPages({
 
 
 
-if(loading){
+function EmployeeSection({
 
+title,
+employees,
+inactive=false
 
-return (
+}:{
 
-<main className="
-max-w-7xl
-mx-auto
-px-6
-py-16
-">
+title:string;
 
-<div className="
-bg-white
-shadow-xl
-border
-p-10
-">
+employees:any[];
 
-<h1 className="
-text-xl
-font-bold
-text-[#003B6F]
-">
+inactive?:boolean;
 
-Loading employee directory...
-
-</h1>
-
-</div>
-
-</main>
-
-);
-
-}
-
-
-
-
+}){
 
 
 const grouped =
-groupEmployees();
-
-
-
+groupEmployees(employees);
 
 
 
@@ -215,89 +184,29 @@ groupEmployees();
 
 return (
 
-<main className="
-max-w-7xl
-mx-auto
-px-6
-py-16
-">
+<section className="mt-12">
 
 
-<div className="
-bg-white
-shadow-xl
-border
-border-gray-200
-p-10
-">
-
-
-
-
-
-
-<div className="
-flex
-justify-between
-items-center
-border-b
-pb-8
-">
-
-
-<div>
-
-
-<h1 className="
+<h2 className={`
 text-4xl
-font-bold
-text-[#003B6F]
-">
+font-black
+mb-8
+border-b
+pb-4
 
-Employee Directory
+${
+inactive
+?
+"text-gray-500"
+:
+"text-[#003B6F]"
+}
 
-</h1>
+`}>
 
+{title}
 
-<p className="
-mt-3
-text-gray-600
-">
-
-View and manage DHS personnel records.
-
-</p>
-
-
-</div>
-
-
-
-
-<Link
-
-href="/staff/employees/create"
-
-className="
-bg-[#003B6F]
-text-white
-px-6
-py-3
-font-bold
-hover:bg-[#00284d]
-transition
-"
-
->
-
-Add Employee
-
-</Link>
-
-
-</div>
-
-
+</h2>
 
 
 
@@ -306,8 +215,7 @@ Add Employee
 
 
 <div className="
-mt-10
-space-y-16
+space-y-12
 ">
 
 
@@ -321,18 +229,20 @@ Object.entries(grouped).map(
 <section key={division}>
 
 
-<h2 className="
-text-3xl
+<h3 className="
+text-2xl
 font-bold
 text-[#003B6F]
-border-b
-pb-3
-mb-8
+mb-6
 ">
 
 {division}
 
-</h2>
+</h3>
+
+
+
+
 
 
 
@@ -346,6 +256,7 @@ mb-8
 
 const currentPage =
 pages[division] || 1;
+
 
 
 const totalPages =
@@ -370,6 +281,9 @@ start + employeesPerPage
 
 
 
+
+
+
 return (
 
 <>
@@ -385,9 +299,10 @@ gap-6
 
 {
 
-currentEmployees.map(
-(employee:any)=>(
 
+currentEmployees.map(
+
+(employee:any)=>(
 
 
 <Link
@@ -407,24 +322,35 @@ hover:shadow-xl
 transition
 "
 
-
 >
 
 
-<div className="
+<div className={`
 absolute
 left-0
 top-0
 bottom-0
 w-1
-bg-[#003B6F]
-"/>
+
+${
+inactive
+?
+"bg-gray-400"
+:
+"bg-[#003B6F]"
+}
+
+`}
+
+/>
 
 
 
 
 
-<h3 className="
+
+
+<h4 className="
 text-xl
 font-bold
 text-[#003B6F]
@@ -432,18 +358,15 @@ text-[#003B6F]
 
 {employee.roblox_username}
 
-</h3>
+</h4>
 
 
 
 
-
-<div className="
-mt-4
-">
 
 
 <p className="
+mt-3
 font-semibold
 ">
 
@@ -453,6 +376,9 @@ employee.positions?.title ||
 }
 
 </p>
+
+
+
 
 
 
@@ -469,20 +395,36 @@ employee.divisions?.name ||
 
 
 
-</div>
 
 
 
 
-
-<div className="mt-5">
+<div className="
+mt-5
+">
 
 
 {
 
-employee.status === "Active"
+inactive
 
 ?
+
+<span className="
+bg-gray-200
+text-gray-700
+px-3
+py-1
+text-sm
+font-bold
+">
+
+Inactive Personnel
+
+</span>
+
+
+:
 
 <span className="
 bg-green-100
@@ -497,24 +439,7 @@ Active
 
 </span>
 
-:
-
-<span className="
-bg-gray-100
-text-gray-700
-px-3
-py-1
-text-sm
-font-bold
-">
-
-{employee.status}
-
-</span>
-
-
 }
-
 
 
 </div>
@@ -537,22 +462,27 @@ uppercase
 text-gray-500
 ">
 
-Roblox ID
+Employee Number
 
 </p>
 
 
 <p className="
-text-sm
 font-semibold
 ">
 
-{employee.roblox_user_id}
+{
+employee.employee_number ||
+"N/A"
+}
 
 </p>
 
 
 </div>
+
+
+
 
 
 
@@ -560,13 +490,18 @@ font-semibold
 </Link>
 
 
-))
+)
+
+)
 
 
 }
 
 
+
 </div>
+
+
 
 
 
@@ -582,8 +517,8 @@ totalPages > 1 && (
 <div className="
 flex
 justify-center
+gap-4
 items-center
-gap-3
 mt-8
 ">
 
@@ -654,6 +589,7 @@ Next
 </button>
 
 
+
 </div>
 
 
@@ -663,9 +599,10 @@ Next
 
 
 
+
 </>
 
-);
+)
 
 
 
@@ -688,8 +625,217 @@ Next
 }
 
 
+</div>
+
+
+</section>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+if(loading){
+
+
+return (
+
+<main className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+">
+
+
+<div className="
+bg-white
+shadow-xl
+border
+p-10
+">
+
+
+<h1 className="
+text-xl
+font-bold
+text-[#003B6F]
+">
+
+Loading employee directory...
+
+</h1>
+
 
 </div>
+
+
+</main>
+
+);
+
+
+}
+
+
+
+
+
+
+const activeEmployees =
+employees.filter(
+employee =>
+employee.status === "Active"
+);
+
+
+
+const inactiveEmployees =
+employees.filter(
+employee =>
+employee.status !== "Active"
+);
+
+
+
+
+
+
+return (
+
+<main className="
+max-w-7xl
+mx-auto
+px-6
+py-16
+">
+
+
+<div className="
+bg-white
+shadow-xl
+border
+border-gray-200
+p-10
+">
+
+
+
+
+
+
+
+<div className="
+flex
+justify-between
+items-center
+border-b
+pb-8
+">
+
+
+<div>
+
+
+<h1 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Employee Directory
+
+</h1>
+
+
+
+<p className="
+mt-3
+text-gray-600
+">
+
+View and manage DHS personnel records.
+
+</p>
+
+
+</div>
+
+
+
+
+
+<Link
+
+href="/staff/employees/create"
+
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-bold
+"
+
+>
+
+Add Employee
+
+</Link>
+
+
+</div>
+
+
+
+
+
+
+
+
+<EmployeeSection
+
+title="Active Personnel"
+
+employees={activeEmployees}
+
+/>
+
+
+
+
+
+
+
+
+{
+
+inactiveEmployees.length > 0 && (
+
+
+<EmployeeSection
+
+title="Inactive Personnel"
+
+employees={inactiveEmployees}
+
+inactive
+
+/>
+
+)
+
+
+}
 
 
 
@@ -701,7 +847,7 @@ Next
 
 employees.length === 0 && (
 
-<div className="
+<p className="
 mt-10
 text-center
 text-gray-500
@@ -709,7 +855,7 @@ text-gray-500
 
 No employees found.
 
-</div>
+</p>
 
 )
 
