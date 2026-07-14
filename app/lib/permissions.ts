@@ -141,7 +141,7 @@ export async function getProfile(){
 
 
 export async function hasPermission(
-    permission:string
+    permission: string | string[]
 ){
 
 
