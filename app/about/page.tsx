@@ -6,6 +6,7 @@ import CoreValues from "@/components/about/CoreValues";
 import DivisionShowcase from "@/components/about/DivisionShowcase";
 import RecruitmentCTA from "@/components/about/RecruitmentCTA";
 import Leadership from "@/components/about/Leadership";
+import Statistics from "@/components/about/Statistics";
 
 
 
@@ -519,7 +520,10 @@ space-y-3
 
 
 
+{/* STATISTICS */}
 
+
+<Statistics />
 
 
 
