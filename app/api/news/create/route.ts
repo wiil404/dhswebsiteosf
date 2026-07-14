@@ -3,7 +3,7 @@ import { createClient } from "../../../lib/supabase-server";
 import { supabaseAdmin } from "../../../lib/supabase-admin";
 import { createAuditLog } from "../../../lib/audit";
 import { hasPermission } from "@/app/lib/permissions";
-
+import { hasPermission, getProfile } from "../../../lib/permissions";
 
 
 export async function POST(request: Request){
@@ -15,12 +15,44 @@ export async function POST(request: Request){
 
 
 
-    const allowed =
-        await hasPermission(
-            "news.create"
-        );
+const allowed =
+    await hasPermission([
+        "news.create",
+        "news.edit"
+    ]);
+
+const {
+    data:{
+        user
+    }
+} = await supabase.auth.getUser();
 
 
+const profile =
+    await getProfile();
+
+
+if(
+profile?.role === "Administrator" ||
+profile?.role === "Editor" ||
+profile?.role === "Public Affairs Officer"
+){
+
+    // allowed
+
+}
+else if(!allowed){
+
+    return NextResponse.json(
+    {
+        error:"You do not have permission to create news"
+    },
+    {
+        status:403
+    });
+
+}
+    
 
     if(!allowed){
 
