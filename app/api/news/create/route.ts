@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
+
 import { createClient } from "../../../lib/supabase-server";
 import { supabaseAdmin } from "../../../lib/supabase-admin";
 import { createAuditLog } from "../../../lib/audit";
-import { hasPermission } from "@/app/lib/permissions";
-import { hasPermission, getProfile } from "../../../lib/permissions";
+
+import {
+    hasPermission,
+    getProfile
+} from "../../../lib/permissions";
+
+
+
 
 
 export async function POST(request: Request){
@@ -15,61 +22,10 @@ export async function POST(request: Request){
 
 
 
-const allowed =
-    await hasPermission([
-        "news.create",
-        "news.edit"
-    ]);
 
-const {
-    data:{
-        user
-    }
-} = await supabase.auth.getUser();
-
-
-const profile =
-    await getProfile();
-
-
-if(
-profile?.role === "Administrator" ||
-profile?.role === "Editor" ||
-profile?.role === "Public Affairs Officer"
-){
-
-    // allowed
-
-}
-else if(!allowed){
-
-    return NextResponse.json(
-    {
-        error:"You do not have permission to create news"
-    },
-    {
-        status:403
-    });
-
-}
-    
-
-    if(!allowed){
-
-        return NextResponse.json(
-            {
-                error:"You do not have permission to create news"
-            },
-            {
-                status:403
-            }
-        );
-
-    }
-
-
-
-
+    /*
+        Authentication
+    */
 
 
     const {
@@ -78,7 +34,6 @@ else if(!allowed){
         }
 
     } = await supabase.auth.getUser();
-
 
 
 
@@ -103,10 +58,64 @@ else if(!allowed){
 
 
     /*
-        Find logged in staff profile
+        Permission Check
+
+        Allows:
+
+        Administrator
+        Editor
+        Public Affairs Officer
+
+        OR
+
+        Any role with news.create
     */
 
 
+    const profile =
+        await getProfile();
+
+
+
+
+    const permissionAllowed =
+        await hasPermission(
+            "news.create"
+        );
+
+
+
+
+
+    const roleAllowed =
+
+        profile?.role === "Administrator" ||
+
+        profile?.role === "Editor" ||
+
+        profile?.role === "Public Affairs Officer";
+
+
+
+
+
+
+    if(
+        !permissionAllowed &&
+        !roleAllowed
+    ){
+
+        return NextResponse.json(
+            {
+                error:
+                "You do not have permission to create news"
+            },
+            {
+                status:403
+            }
+        );
+
+    }
 
 
 
@@ -116,49 +125,63 @@ else if(!allowed){
 
 
 
+    /*
+        Find employee profile
+    */
 
-/*
-    Find logged in employee profile
-*/
 
-const {
-    data:employee,
-    error:employeeError
-} = await supabaseAdmin
+    const {
+
+        data:employee,
+
+        error:employeeError
+
+    } = await supabaseAdmin
+
 
     .from("employees")
 
+
     .select(`
+
         *,
+
         positions(title),
+
         divisions(name)
+
     `)
+
 
     .eq(
         "user_id",
         user.id
     )
 
+
     .single();
 
 
 
-if(
-    employeeError ||
-    !employee
-){
 
-    return NextResponse.json(
-        {
-            error:
-            "Your account is not linked to an employee profile"
-        },
-        {
-            status:403
-        }
-    );
 
-}
+
+    if(
+        employeeError ||
+        !employee
+    ){
+
+        return NextResponse.json(
+            {
+                error:
+                "Your account is not linked to an employee profile"
+            },
+            {
+                status:403
+            }
+        );
+
+    }
 
 
 
@@ -195,6 +218,7 @@ if(
 
         featuredImage
 
+
     } = body;
 
 
@@ -204,13 +228,18 @@ if(
 
 
 
-const {
-    data:article,
-    error
 
-} = await supabaseAdmin
+    const {
+
+        data:article,
+
+        error
+
+    } = await supabaseAdmin
+
 
     .from("news")
+
 
     .insert({
 
@@ -224,25 +253,34 @@ const {
 
         content,
 
+
         author_id:
         employee.id,
 
+
         published,
+
 
         featured:
         featured ?? false,
 
+
         attachments:
         attachments ?? [],
+
 
         featured_image:
         featuredImage ?? null
 
     })
 
+
     .select()
 
+
     .single();
+
+
 
 
 
@@ -254,14 +292,16 @@ const {
 
 
         return NextResponse.json(
+
             {
                 error:error.message
             },
+
             {
                 status:500
             }
-        );
 
+        );
 
     }
 
@@ -272,8 +312,8 @@ const {
 
 
 
-    await createAuditLog({
 
+    await createAuditLog({
 
         action:
         "NEWS_CREATED",
@@ -294,8 +334,8 @@ const {
         description:
         `Created news article "${article.title}" by ${employee.roblox_username}`
 
-
     });
+
 
 
 
