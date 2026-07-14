@@ -6,7 +6,8 @@ export async function requirePermission(
     permission: string | string[]
 ){
 
-    const profile = await getProfile();
+    const profile =
+        await getProfile();
 
 
 
@@ -18,7 +19,12 @@ export async function requirePermission(
 
 
 
-export async function hasPermission(permission:string)
+
+
+    const allowed =
+        await hasPermission(permission);
+
+
 
 
 
@@ -27,6 +33,8 @@ export async function hasPermission(permission:string)
         redirect("/staff/dashboard");
 
     }
+
+
 
 
 
