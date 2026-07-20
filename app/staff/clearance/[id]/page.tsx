@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "../../../lib/supabase-admin";
+import { getProfile } from "../../../lib/permissions";
 import { canManageClearance } from "../../../lib/clearance";
-import ClearanceForm from "./ClearanceForm";
+import EditClearanceForm from "./EditClearanceForm";
 
 
 
@@ -11,11 +12,34 @@ params
 
 }:{
 
-params:{
+params: Promise<{
     id:string
-}
+}>
 
 }){
+
+
+const {
+    id
+} = await params;
+
+
+
+
+
+const profile =
+await getProfile();
+
+
+
+if(!profile){
+
+redirect("/staff/login");
+
+}
+
+
+
 
 
 const allowed =
@@ -25,39 +49,40 @@ await canManageClearance();
 
 if(!allowed){
 
-    redirect("/staff/dashboard");
+redirect("/staff/dashboard");
 
 }
 
 
 
+
+
+
+
+
 const {
-    data:subject
+
+data:clearance,
+error
 
 } = await supabaseAdmin
 
-
-.from("security_subjects")
-
+.from("security_clearances")
 
 .select(`
 
-*
+*,
 
-,
-
-security_clearances(
+security_subjects(
     *
 )
 
 `)
 
-
 .eq(
 "id",
-params.id
+id
 )
-
 
 .single();
 
@@ -65,23 +90,42 @@ params.id
 
 
 
-if(!subject){
 
-    return (
 
-        <main className="p-12">
+if(error || !clearance){
 
-            <h1 className="text-3xl font-bold">
 
-            Subject not found
+return (
 
-            </h1>
+<main className="p-10">
 
-        </main>
+<h1 className="
+text-3xl
+font-bold
+">
 
-    );
+Clearance Not Found
+
+</h1>
+
+
+<p className="mt-4 text-red-600">
+
+{error?.message}
+
+</p>
+
+
+</main>
+
+);
+
 
 }
+
+
+
+
 
 
 
@@ -99,10 +143,13 @@ py-16
 
 <div className="
 bg-white
-border
 shadow-xl
+border
 p-10
 ">
+
+
+
 
 
 <h1 className="
@@ -111,24 +158,130 @@ font-bold
 text-[#003B6F]
 ">
 
-Manage Clearance
+Edit Security Clearance
 
 </h1>
 
 
-<p className="mt-3 text-gray-600">
 
-{subject.full_name}
+
+
+<div className="
+mt-8
+bg-[#F5F8FB]
+border
+p-6
+">
+
+
+<h2 className="
+text-2xl
+font-bold
+">
+
+Subject
+
+</h2>
+
+
+
+
+<p className="mt-3">
+
+<b>Name:</b>
+
+{" "}
+
+{
+clearance.security_subjects?.full_name ||
+"N/A"
+}
 
 </p>
 
 
 
-<ClearanceForm
 
-subject={subject}
+<p className="mt-2">
+
+<b>Organisation:</b>
+
+{" "}
+
+{
+clearance.security_subjects?.organisation ||
+"N/A"
+}
+
+</p>
+
+
+
+
+
+
+{
+
+clearance.security_subjects?.roblox_username && (
+
+<>
+
+<p className="mt-2">
+
+<b>Roblox:</b>
+
+{" "}
+
+{
+clearance.security_subjects.roblox_username
+}
+
+</p>
+
+
+
+<p>
+
+<b>ID:</b>
+
+{" "}
+
+{
+clearance.security_subjects.roblox_user_id
+}
+
+</p>
+
+
+</>
+
+)
+
+}
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<EditClearanceForm
+
+clearance={clearance}
 
 />
+
+
+
+
+
+
+
 
 
 </div>
