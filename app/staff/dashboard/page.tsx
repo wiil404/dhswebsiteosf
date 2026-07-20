@@ -23,119 +23,104 @@ import { logout } from "../actions/logout";
 export default async function Dashboard(){
 
 
-    const user = await getUser();
+const user =
+await getUser();
 
 
 
-    if(!user){
+if(!user){
 
-        redirect("/staff/login");
+    redirect("/staff/login");
 
-    }
-
-
+}
 
 
 
-    const profile =
-    await getProfile();
+const profile =
+await getProfile();
 
 
 
+if(!profile){
 
+    redirect("/staff/login");
 
-    if(!profile){
-
-        redirect("/staff/login");
-
-    }
-
+}
 
 
 
 
 
-    const {
-        data:employee
+const {
+    data:employee
 
-    } = await supabaseAdmin
+} = await supabaseAdmin
 
-    .from("employees")
+.from("employees")
 
-    .select(`
+.select(`
 
-        roblox_username,
+    roblox_username,
 
-        roblox_user_id,
+    roblox_user_id,
 
-        email,
+    email,
 
-        positions(
-            title
-        ),
+    positions(
+        title
+    ),
 
-        divisions(
-            name
-        )
-
-    `)
-
-    .eq(
-        "user_id",
-        user.id
+    divisions(
+        name
     )
 
-    .single();
+`)
+
+.eq(
+    "user_id",
+    user.id
+)
+
+.maybeSingle();
 
 
 
 
 
+const createNews =
+await canCreateNews();
 
 
 
-
-    const createNews =
-    await canCreateNews();
-
-
-
-    const editNews =
-    await canEditNews();
+const editNews =
+await canEditNews();
 
 
 
-    const deleteNews =
-    await canDeleteNews();
+const deleteNews =
+await canDeleteNews();
 
 
 
-    const manageUsers =
-    await canManageUsers();
+const manageUsers =
+await canManageUsers();
 
 
 
-    const viewAudit =
-    await hasPermission(
-        "audit.view"
-    );
+const viewAudit =
+await hasPermission(
+    "audit.view"
+);
 
 
 
-
-
-    const manageOrganisation =
-    profile.role === "Administrator";
-
+const manageOrganisation =
+profile.role === "Administrator";
 
 
 
-
-    const manageClearance =
-    await canManageClearance();
-
-
-
+const manageClearance =
+await canManageClearance();
 
 
 
@@ -144,81 +129,50 @@ export default async function Dashboard(){
 
 return (
 
-<main
-
-className="
+<main className="
 max-w-7xl
 mx-auto
 px-6
 py-16
-"
-
->
+">
 
 
-<div
-
-className="
+<div className="
 bg-white
 shadow-xl
 border
 border-gray-200
 p-8
 md:p-12
-"
-
->
+">
 
 
-
-
-
-
-
-{/* HEADER */}
-
-
-<div
-
-className="
+<div className="
 flex
 justify-between
 items-center
 border-b
-border-gray-200
 pb-8
-"
-
->
+">
 
 
 <div>
 
-
-<h1
-
-className="
+<h1 className="
 text-4xl
 font-bold
 text-[#003B6F]
-"
-
->
+">
 
 DHS Staff Dashboard
 
 </h1>
 
 
-
-<p
-
-className="
+<p className="
 mt-3
 text-gray-500
-"
-
->
+">
 
 Welcome back,{" "}
 
@@ -235,12 +189,7 @@ profile.email
 
 
 
-
-
-
-
 <form action={logout}>
-
 
 <button
 
@@ -250,8 +199,6 @@ text-white
 px-6
 py-3
 font-semibold
-hover:bg-red-700
-transition
 "
 
 >
@@ -264,7 +211,6 @@ Logout
 </form>
 
 
-
 </div>
 
 
@@ -273,30 +219,18 @@ Logout
 
 
 
-
-
-{/* PROFILE */}
-
-
-<div
-
-className="
+<div className="
 mt-10
 border
-border-[#D9E4EF]
 bg-[#F5F8FB]
 p-7
 flex
-items-center
 gap-6
-"
+items-center
+">
 
->
 
-
-<div
-
-className="
+<div className="
 w-20
 h-20
 rounded-full
@@ -307,27 +241,17 @@ items-center
 justify-center
 text-3xl
 font-bold
-"
-
->
+">
 
 {
 
-employee?.roblox_username
-?.charAt(0)
-
+employee?.roblox_username?.charAt(0)
 ||
-
 profile.email.charAt(0)
 
 }
 
-
 </div>
-
-
-
-
 
 
 
@@ -335,43 +259,29 @@ profile.email.charAt(0)
 <div>
 
 
-<h2
-
-className="
+<h2 className="
 text-2xl
 font-bold
-text-gray-900
-"
-
->
-
+">
 
 {
+
 employee?.roblox_username ||
 profile.email
-}
 
+}
 
 </h2>
 
 
-
-
-
-<p
-
-className="
-mt-1
+<p className="
 text-[#003B6F]
 font-semibold
-"
-
->
+">
 
 {
 
-employee?.positions?.title ||
-
+employee?.positions?.[0]?.title ||
 "Staff Member"
 
 }
@@ -379,21 +289,13 @@ employee?.positions?.title ||
 </p>
 
 
-
-
-
-<p
-
-className="
+<p className="
 text-gray-600
-"
-
->
+">
 
 {
 
-employee?.divisions?.name ||
-
+employee?.divisions?.[0]?.name ||
 "Department of Homeland Security"
 
 }
@@ -401,55 +303,34 @@ employee?.divisions?.name ||
 </p>
 
 
-
-
-
-
-<p
-
-className="
-mt-2
+<p className="
 text-sm
 text-gray-500
-"
-
->
+mt-2
+">
 
 Role: {profile.role}
 
 </p>
 
 
+</div>
+
 
 </div>
 
 
 
-</div>
 
 
 
 
-
-
-
-
-
-{/* PORTAL GRID */}
-
-
-<div
-
-className="
+<div className="
 mt-12
 grid
 md:grid-cols-2
 gap-6
-"
-
->
-
-
+">
 
 
 
@@ -471,10 +352,6 @@ description="Publish new DHS statements, notices and official releases."
 )
 
 }
-
-
-
-
 
 
 
@@ -502,10 +379,6 @@ description="Edit, publish and manage existing DHS announcements."
 
 
 
-
-
-
-
 {
 manageUsers && (
 
@@ -522,10 +395,6 @@ description="Manage staff accounts, access and user roles."
 )
 
 }
-
-
-
-
 
 
 
@@ -552,10 +421,6 @@ description="Manage divisions, positions and department structure."
 
 
 
-
-
-
-
 {
 manageClearance && (
 
@@ -565,17 +430,13 @@ href="/staff/clearance"
 
 title="Security Clearance Management"
 
-description="Manage DHS, White House, Capitol and Airport restricted area access, clearance levels and blacklists."
+description="Manage White House, Capitol, DHS and Airport restricted access."
 
 />
 
 )
 
 }
-
-
-
-
 
 
 
@@ -602,9 +463,6 @@ description="View and manage DHS employee records."
 
 
 
-
-
-
 <PortalCard
 
 href="/news"
@@ -614,8 +472,6 @@ title="Public News Portal"
 description="View publicly released DHS statements."
 
 />
-
-
 
 
 
@@ -643,14 +499,7 @@ description="Review staff actions and system activity."
 
 
 
-
 </div>
-
-
-
-
-
-
 
 
 </div>
@@ -658,14 +507,10 @@ description="Review staff actions and system activity."
 
 </main>
 
-
 );
 
 
 }
-
-
-
 
 
 
@@ -681,9 +526,7 @@ description
 }:{
 
 href:string;
-
 title:string;
-
 description:string;
 
 }){
@@ -697,25 +540,20 @@ href={href}
 
 className="
 group
-relative
-overflow-hidden
 border
-border-gray-200
 bg-white
 p-7
 shadow-sm
-transition
-duration-300
-hover:-translate-y-1
 hover:shadow-xl
+transition
+relative
+overflow-hidden
 "
 
 >
 
 
-<div
-
-className="
+<div className="
 absolute
 left-0
 top-0
@@ -723,75 +561,45 @@ h-full
 w-1
 bg-[#003B6F]
 group-hover:bg-[#F2C94C]
-transition
-"
-
-/>
+"/>
 
 
-
-
-
-<h2
-
-className="
+<h2 className="
 text-xl
 font-bold
 text-[#003B6F]
-"
-
->
+">
 
 {title}
 
 </h2>
 
 
-
-
-
-<p
-
-className="
+<p className="
 mt-3
 text-gray-600
-leading-relaxed
-"
-
->
+">
 
 {description}
 
 </p>
 
 
-
-
-
-<p
-
-className="
+<p className="
 mt-6
-text-sm
 font-bold
 text-[#003B6F]
 opacity-0
 group-hover:opacity-100
 transition
-"
-
->
+">
 
 Open Portal →
 
 </p>
 
 
-
-
-
 </Link>
-
 
 );
 
