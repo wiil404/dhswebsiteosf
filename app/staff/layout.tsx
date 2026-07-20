@@ -45,6 +45,13 @@ export default function StaffLayout({
                     </Link>
 
 
+                    <Link
+                        href="/staff/clearance"
+                        className="hover:underline"
+                        >
+                        Security Clearance
+                    </Link>
+
 
                 </div>
 
