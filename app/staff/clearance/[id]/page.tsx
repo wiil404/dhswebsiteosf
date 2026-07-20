@@ -188,12 +188,12 @@ Subject
 
 <p className="mt-3">
 
-<b>Name:</b>
+<b>Roblox Username:</b>
 
 {" "}
 
 {
-clearance.security_subjects?.full_name ||
+clearance.security_subjects?.roblox_username ||
 "N/A"
 }
 
