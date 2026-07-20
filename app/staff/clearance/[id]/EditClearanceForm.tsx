@@ -229,16 +229,12 @@ space-y-8
 {
 
 [
-
-["white_house","White House"],
-
-["capitol","Capitol"],
-
-["dhs","DHS Restricted Areas"],
-
-["airport","Airport Restricted Areas"]
-
-].map(([key,label])=>(
+    ["white_house","White House"],
+    ["capitol","Capitol"],
+    ["dhs","DHS Restricted Areas"],
+    ["airport","Airport Restricted Areas"]
+] as const
+.map(([key,label])=>(
 
 
 <div
