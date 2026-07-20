@@ -242,22 +242,22 @@ status:500
 const areas = [
 
     {
-        id:"white_house",
+        id:"fb97a785-4080-41e6-9557-e817b2573387",
         level:white_house
     },
 
     {
-        id:"capitol",
+        id:"f03d9324-d5e6-4938-b9a3-4509f07720d6",
         level:capitol
     },
 
     {
-        id:"dhs",
+        id:"084d43c2-ab2b-4b5e-8853-5ccee736aa13",
         level:dhs
     },
 
     {
-        id:"airport",
+        id:"d09b1145-4c9d-490f-8780-03dbaa39593f",
         level:airport
     }
 
