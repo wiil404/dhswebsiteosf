@@ -170,9 +170,6 @@ await supabaseAdmin
 
 .insert({
 
-full_name:
-subject_name ||
-organisation,
 
 organisation:
 organisation || null,
