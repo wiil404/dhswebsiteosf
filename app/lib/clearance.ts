@@ -117,9 +117,9 @@ export async function canManageClearance(){
 
         "Administrator",
 
-        "Secretary",
+        "Secretary of Homeland Security",
 
-        "Deputy Secretary",
+        "Deputy Secretary of Homeland Security",
 
         "Chief of Staff",
 
