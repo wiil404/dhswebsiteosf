@@ -12,6 +12,8 @@ import {
     hasPermission
 } from "../../lib/permissions";
 
+import { canManageClearance } from "../../lib/clearance";
+
 import { supabaseAdmin } from "../../lib/supabase-admin";
 
 import { logout } from "../actions/logout";
@@ -24,6 +26,7 @@ export default async function Dashboard(){
     const user = await getUser();
 
 
+
     if(!user){
 
         redirect("/staff/login");
@@ -32,7 +35,12 @@ export default async function Dashboard(){
 
 
 
-    const profile = await getProfile();
+
+
+    const profile =
+    await getProfile();
+
+
 
 
 
@@ -47,35 +55,39 @@ export default async function Dashboard(){
 
 
 
-
     const {
-
         data:employee
 
     } = await supabaseAdmin
 
-        .from("employees")
+    .from("employees")
 
-        .select(`
-            roblox_username,
-            roblox_user_id,
-            email,
+    .select(`
 
-            positions(
-                title
-            ),
+        roblox_username,
 
-            divisions(
-                name
-            )
-        `)
+        roblox_user_id,
 
-        .eq(
-            "user_id",
-            user.id
+        email,
+
+        positions(
+            title
+        ),
+
+        divisions(
+            name
         )
 
-        .single();
+    `)
+
+    .eq(
+        "user_id",
+        user.id
+    )
+
+    .single();
+
+
 
 
 
@@ -84,34 +96,44 @@ export default async function Dashboard(){
 
 
     const createNews =
-        await canCreateNews();
+    await canCreateNews();
 
 
 
     const editNews =
-        await canEditNews();
+    await canEditNews();
 
 
 
     const deleteNews =
-        await canDeleteNews();
+    await canDeleteNews();
 
 
 
     const manageUsers =
-        await canManageUsers();
+    await canManageUsers();
 
 
 
     const viewAudit =
-        await hasPermission(
-            "audit.view"
-        );
+    await hasPermission(
+        "audit.view"
+    );
+
+
 
 
 
     const manageOrganisation =
-        profile.role === "Administrator";
+    profile.role === "Administrator";
+
+
+
+
+
+    const manageClearance =
+    await canManageClearance();
+
 
 
 
@@ -348,7 +370,7 @@ font-semibold
 
 {
 
-employee?.positions?.[0]?.title ||
+employee?.positions?.title ||
 
 "Staff Member"
 
@@ -370,7 +392,7 @@ text-gray-600
 
 {
 
-employee?.divisions?.[0]?.name ||
+employee?.divisions?.name ||
 
 "Department of Homeland Security"
 
@@ -431,6 +453,8 @@ gap-6
 
 
 
+
+
 {
 createNews && (
 
@@ -447,6 +471,7 @@ description="Publish new DHS statements, notices and official releases."
 )
 
 }
+
 
 
 
@@ -516,6 +541,31 @@ href="/staff/organisation"
 title="Organisation Management"
 
 description="Manage divisions, positions and department structure."
+
+/>
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+{
+manageClearance && (
+
+<PortalCard
+
+href="/staff/clearance"
+
+title="Security Clearance Management"
+
+description="Manage DHS, White House, Capitol and Airport restricted area access, clearance levels and blacklists."
 
 />
 
