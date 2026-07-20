@@ -1,12 +1,26 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { getProfile } from "../../lib/permissions";
 import { canManageClearance } from "../../lib/clearance";
 import { supabaseAdmin } from "../../lib/supabase-admin";
 
 
 
-export default async function ClearancePage(){
+export default async function ClearanceManagement(){
+
+
+const profile =
+await getProfile();
+
+
+
+if(!profile){
+
+redirect("/staff/login");
+
+}
+
 
 
 const allowed =
@@ -16,7 +30,7 @@ await canManageClearance();
 
 if(!allowed){
 
-    redirect("/staff/dashboard");
+redirect("/staff/dashboard");
 
 }
 
@@ -25,63 +39,33 @@ if(!allowed){
 
 
 
-
 const {
-    data:clearances,
-    error
+
+data:clearances,
+
+error
 
 } = await supabaseAdmin
 
-
 .from("security_clearances")
-
 
 .select(`
 
-    id,
+*,
 
-    clearance_level,
-
-    white_house,
-
-    capitol,
-
-    dhs,
-
-    airport,
-
-    blacklisted,
-
-    blacklist_areas,
-
-
-    security_subjects(
-
-        id,
-
-        subject_name,
-
-        organisation,
-
-        subject_type,
-
-        roblox_username,
-
-        roblox_user_id
-
-    )
+security_subjects(
+    *
+)
 
 `)
 
-
 .order(
-    "created_at",
-    {
-        ascending:false
-    }
+"created_at",
+{
+ascending:false
+}
+
 );
-
-
 
 
 
@@ -111,7 +95,6 @@ p-10
 
 
 
-
 <div className="
 flex
 justify-between
@@ -123,7 +106,6 @@ pb-8
 
 <div>
 
-
 <h1 className="
 text-4xl
 font-bold
@@ -133,7 +115,6 @@ text-[#003B6F]
 Security Clearance Management
 
 </h1>
-
 
 
 <p className="
@@ -147,7 +128,6 @@ Manage DHS, White House, Capitol and Airport restricted access.
 
 
 </div>
-
 
 
 
@@ -183,20 +163,15 @@ font-bold
 
 
 {
+
 error && (
 
 <div className="
 mt-8
-bg-red-50
-border
-border-red-300
-p-5
+bg-red-100
 text-red-700
+p-5
 ">
-
-Database Error:
-
-{" "}
 
 {error.message}
 
@@ -216,19 +191,16 @@ Database Error:
 
 <div className="
 mt-10
-space-y-6
+space-y-8
 ">
 
 
 {
 
-clearances?.length ?
+clearances?.map((clearance:any)=>(
 
 
-clearances.map((clearance:any)=>(
-
-
-<div
+<section
 
 key={clearance.id}
 
@@ -236,13 +208,9 @@ className="
 border
 p-6
 shadow-sm
-bg-white
 "
 
 >
-
-
-
 
 
 
@@ -251,6 +219,7 @@ flex
 justify-between
 items-start
 "
+
 
 >
 
@@ -264,9 +233,14 @@ font-bold
 text-[#003B6F]
 ">
 
+
 {
 
-clearance.security_subjects?.subject_name
+clearance.security_subjects?.roblox_username ||
+
+clearance.security_subjects?.organisation ||
+
+"Unknown Subject"
 
 }
 
@@ -282,12 +256,19 @@ text-gray-600
 mt-2
 ">
 
-Type:
-
-{" "}
 
 {
-clearance.security_subjects?.subject_type
+
+clearance.security_subjects?.subject_type === "organisation"
+
+?
+
+"Organisation"
+
+:
+
+"Individual"
+
 }
 
 
@@ -299,44 +280,18 @@ clearance.security_subjects?.subject_type
 
 {
 
-clearance.security_subjects?.roblox_username && (
+clearance.security_subjects?.roblox_user_id && (
 
 <p className="
-text-gray-600
+text-sm
+text-gray-500
 ">
 
-Roblox:
+Roblox ID:
 
 {" "}
 
-{
-clearance.security_subjects.roblox_username
-}
-
-</p>
-
-)
-
-}
-
-
-
-
-{
-
-clearance.security_subjects?.organisation && (
-
-<p className="
-text-gray-600
-">
-
-Organisation:
-
-{" "}
-
-{
-clearance.security_subjects.organisation
-}
+{clearance.security_subjects.roblox_user_id}
 
 </p>
 
@@ -347,8 +302,6 @@ clearance.security_subjects.organisation
 
 
 </div>
-
-
 
 
 
@@ -359,20 +312,29 @@ clearance.security_subjects.organisation
 <div>
 
 
+{
+
+clearance.blacklisted && (
+
 <span className="
-bg-[#003B6F]
+bg-red-600
 text-white
 px-4
 py-2
 font-bold
 ">
 
-Level {clearance.clearance_level}
+BLACKLISTED
 
 </span>
 
+)
+
+}
+
 
 </div>
+
 
 
 </div>
@@ -388,43 +350,51 @@ Level {clearance.clearance_level}
 <div className="
 grid
 md:grid-cols-4
-gap-4
+gap-5
 mt-8
 ">
 
 
-<Area
+<AreaCard
 
-name="White House"
+title="White House"
 
-level={clearance.white_house}
-
-/>
-
-
-<Area
-
-name="Capitol"
-
-level={clearance.capitol}
+level={
+clearance.white_house
+}
 
 />
 
 
-<Area
+<AreaCard
 
-name="DHS"
+title="Capitol"
 
-level={clearance.dhs}
+level={
+clearance.capitol
+}
 
 />
 
 
-<Area
+<AreaCard
 
-name="Airport"
+title="DHS"
 
-level={clearance.airport}
+level={
+clearance.dhs
+}
+
+/>
+
+
+<AreaCard
+
+title="Airport"
+
+level={
+clearance.airport
+}
 
 />
 
@@ -444,28 +414,64 @@ level={clearance.airport}
 clearance.blacklisted && (
 
 <div className="
-mt-6
-bg-red-100
+mt-8
+bg-red-50
 border
-border-red-400
-p-4
-text-red-700
-font-bold
+border-red-200
+p-5
 ">
 
-⚠ BLACKLISTED
 
-<br/>
+<h3 className="
+font-bold
+text-red-700
+">
+
+Blacklist Information
+
+</h3>
+
+
+
+<p className="mt-2">
+
+Reason:
+
+{" "}
+
+{
+clearance.blacklist_reason ||
+"No reason provided"
+}
+
+</p>
+
+
+
+
+<p className="mt-2">
 
 Areas:
 
 {" "}
 
 {
-clearance.blacklist_areas?.join(", ")
-||
+
+clearance.blacklist_areas?.length
+
+?
+
+clearance.blacklist_areas.join(", ")
+
+:
+
 "All Areas"
+
 }
+
+
+</p>
+
 
 </div>
 
@@ -479,10 +485,14 @@ clearance.blacklist_areas?.join(", ")
 
 
 
+
+
 <div className="
-mt-6
+mt-8
+border-t
+pt-5
 flex
-gap-4
+gap-5
 ">
 
 
@@ -491,35 +501,14 @@ gap-4
 href={`/staff/clearance/${clearance.id}`}
 
 className="
-bg-gray-100
-px-5
-py-3
+text-[#003B6F]
 font-bold
+hover:underline
 "
 
 >
 
-View
-
-</Link>
-
-
-
-<Link
-
-href={`/staff/clearance/${clearance.id}/edit`}
-
-className="
-bg-[#003B6F]
-text-white
-px-5
-py-3
-font-bold
-"
-
->
-
-Modify
+View / Edit
 
 </Link>
 
@@ -530,25 +519,11 @@ Modify
 
 
 
-</div>
+
+</section>
 
 
 ))
-
-
-:
-
-
-<div className="
-text-gray-500
-text-center
-py-10
-">
-
-No active clearances found.
-
-</div>
-
 
 }
 
@@ -561,11 +536,30 @@ No active clearances found.
 
 
 
+
+{
+
+(!clearances || clearances.length===0) && (
+
+<p className="
+mt-10
+text-gray-500
+">
+
+No security clearances have been created.
+
+</p>
+
+)
+
+}
+
+
+
 </div>
 
 
 </main>
-
 
 );
 
@@ -579,17 +573,33 @@ No active clearances found.
 
 
 
-function Area({
 
-name,
+function AreaCard({
+
+title,
 level
 
 }:{
 
-name:string;
+title:string;
+
 level:number;
 
 }){
+
+
+const descriptions:any={
+
+1:"Level 1 - Full Clearance",
+
+2:"Level 2 - Restricted Access",
+
+3:"Level 3 - Controlled Access",
+
+4:"Level 4 - Invitation Only"
+
+};
+
 
 
 return (
@@ -601,15 +611,14 @@ bg-gray-50
 ">
 
 
-<p className="
+<h3 className="
 font-bold
 text-[#003B6F]
 ">
 
-{name}
+{title}
 
-</p>
-
+</h3>
 
 
 <p className="
@@ -620,6 +629,19 @@ font-semibold
 Level {level}
 
 </p>
+
+
+
+<p className="
+text-sm
+text-gray-600
+mt-1
+">
+
+{descriptions[level]}
+
+</p>
+
 
 
 </div>
