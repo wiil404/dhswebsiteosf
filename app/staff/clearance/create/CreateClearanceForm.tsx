@@ -11,11 +11,10 @@ useRouter
 
 
 
-export default function CreateClearanceForm(){
+export default function ClearanceCreateForm(){
 
 
-const router =
-useRouter();
+const router = useRouter();
 
 
 
@@ -24,11 +23,17 @@ useState(false);
 
 
 
+const [mode,setMode] =
+useState<
+"individual"|"organisation"
+>("individual");
+
+
 
 const [form,setForm] =
-useState({
+useState<any>({
 
-full_name:"",
+subject_name:"",
 
 organisation:"",
 
@@ -38,23 +43,101 @@ roblox_username:"",
 
 roblox_user_id:"",
 
-discord_username:"",
-
-email:"",
-
-notes:"",
 
 clearance_level:4,
 
-white_house:false,
 
-capitol:false,
+white_house:4,
 
-dhs:false,
+capitol:4,
 
-airport:false
+dhs:4,
+
+airport:4,
+
+
+blacklisted:false,
+
+blacklist_reason:"",
+
+blacklist_areas:[]
 
 });
+
+
+
+
+
+async function lookupRoblox(){
+
+
+if(!form.roblox_username)
+return;
+
+
+
+const response =
+await fetch(
+
+"/api/roblox/lookup",
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+username:
+form.roblox_username
+
+})
+
+}
+
+);
+
+
+
+const data =
+await response.json();
+
+
+
+if(data.success){
+
+
+setForm({
+
+...form,
+
+subject_name:
+data.username,
+
+roblox_user_id:
+data.id
+
+});
+
+
+}
+
+else{
+
+
+alert(
+"Roblox user not found"
+);
+
+
+}
+
+
+}
+
 
 
 
@@ -84,6 +167,56 @@ setForm({
 
 
 
+
+
+function toggleArea(
+area:string
+){
+
+
+let areas =
+[
+...form.blacklist_areas
+];
+
+
+
+if(areas.includes(area)){
+
+
+areas =
+areas.filter(
+(x)=>x!==area
+);
+
+
+}
+
+else{
+
+
+areas.push(area);
+
+
+}
+
+
+update(
+"blacklist_areas",
+areas
+);
+
+
+}
+
+
+
+
+
+
+
+
+
 async function submit(){
 
 
@@ -98,20 +231,19 @@ await fetch(
 
 {
 
-
 method:"POST",
 
-
 headers:{
-
-"Content-Type":
-"application/json"
-
+"Content-Type":"application/json"
 },
 
+body:JSON.stringify({
 
-body:JSON.stringify(form)
+...form,
 
+mode
+
+})
 
 }
 
@@ -119,12 +251,8 @@ body:JSON.stringify(form)
 
 
 
-
-
 const data =
 await response.json();
-
-
 
 
 
@@ -146,14 +274,16 @@ return;
 
 
 
-
-
 router.push(
 "/staff/clearance"
 );
 
 
+
 }
+
+
+
 
 
 
@@ -173,57 +303,17 @@ space-y-8
 
 
 
-<div className="
-grid
-md:grid-cols-2
-gap-5
+
+<div>
+
+
+<label className="
+font-bold
 ">
 
+Clearance Type
 
-<input
-
-className="
-border
-p-4
-"
-
-placeholder="Full Name"
-
-value={form.full_name}
-
-onChange={
-e=>update(
-"full_name",
-e.target.value
-)
-}
-
-/>
-
-
-
-
-<input
-
-className="
-border
-p-4
-"
-
-placeholder="Organisation (FBI, USMS, DHS etc)"
-
-value={form.organisation}
-
-onChange={
-e=>update(
-"organisation",
-e.target.value
-)
-}
-
-/>
-
-
+</label>
 
 
 
@@ -231,13 +321,214 @@ e.target.value
 
 className="
 border
-p-4
+p-3
+w-full
+mt-2
 "
 
-value={form.subject_type}
+value={mode}
 
 onChange={
-e=>update(
+e=>
+setMode(
+e.target.value as any
+)
+}
+
+>
+
+<option value="individual">
+Individual
+</option>
+
+
+<option value="organisation">
+Organisation / Agency
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{
+
+mode==="individual" && (
+
+
+<div className="
+space-y-4
+">
+
+
+<input
+
+className="
+border
+p-3
+w-full
+"
+
+placeholder="Roblox Username"
+
+value={
+form.roblox_username
+}
+
+onChange={
+e=>
+update(
+"roblox_username",
+e.target.value
+)
+}
+
+
+/>
+
+
+
+<button
+
+type="button"
+
+onClick={lookupRoblox}
+
+className="
+bg-gray-200
+px-5
+py-3
+font-bold
+"
+
+>
+
+Lookup Roblox Account
+
+</button>
+
+
+
+
+
+<input
+
+className="
+border
+p-3
+w-full
+bg-gray-100
+"
+
+placeholder="Roblox User ID"
+
+value={
+form.roblox_user_id
+}
+
+readOnly
+
+/>
+
+
+
+
+</div>
+
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+
+{
+
+mode==="organisation" && (
+
+
+<input
+
+className="
+border
+p-3
+w-full
+"
+
+placeholder="Organisation (FBI, USMS, etc.)"
+
+value={
+form.organisation
+}
+
+onChange={
+e=>
+update(
+"organisation",
+e.target.value
+)
+}
+
+
+/>
+
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+
+<div>
+
+
+<label className="font-bold">
+
+Subject Type
+
+</label>
+
+
+
+<select
+
+className="
+border
+p-3
+w-full
+mt-2
+"
+
+value={
+form.subject_type
+}
+
+onChange={
+e=>
+update(
 "subject_type",
 e.target.value
 )
@@ -257,7 +548,7 @@ DHS Employee
 
 
 <option>
-Law Enforcement
+Federal Agency
 </option>
 
 
@@ -266,138 +557,10 @@ Government Official
 </option>
 
 
-<option>
-Contractor
-</option>
-
-
 </select>
 
 
-
-
-
-<input
-
-className="
-border
-p-4
-"
-
-placeholder="Roblox Username"
-
-value={form.roblox_username}
-
-onChange={
-e=>update(
-"roblox_username",
-e.target.value
-)
-}
-
-/>
-
-
-
-
-<input
-
-className="
-border
-p-4
-"
-
-placeholder="Roblox User ID"
-
-value={form.roblox_user_id}
-
-onChange={
-e=>update(
-"roblox_user_id",
-e.target.value
-)
-}
-
-/>
-
-
-
-
-<input
-
-className="
-border
-p-4
-"
-
-placeholder="Discord Username"
-
-value={form.discord_username}
-
-onChange={
-e=>update(
-"discord_username",
-e.target.value
-)
-}
-
-/>
-
-
-
-
-<input
-
-className="
-border
-p-4
-"
-
-placeholder="Email"
-
-value={form.email}
-
-onChange={
-e=>update(
-"email",
-e.target.value
-)
-}
-
-/>
-
-
-
 </div>
-
-
-
-
-
-
-
-<textarea
-
-className="
-border
-p-4
-w-full
-"
-
-rows={4}
-
-placeholder="Notes"
-
-value={form.notes}
-
-onChange={
-e=>update(
-"notes",
-e.target.value
-)
-}
-
-/>
 
 
 
@@ -409,31 +572,30 @@ e.target.value
 
 <div>
 
-<h2 className="
-text-2xl
-font-bold
-text-[#003B6F]
-">
+
+<label className="font-bold">
 
 Clearance Level
 
-</h2>
-
+</label>
 
 
 <select
 
 className="
 border
-p-4
-mt-4
+p-3
 w-full
+mt-2
 "
 
-value={form.clearance_level}
+value={
+form.clearance_level
+}
 
 onChange={
-e=>update(
+e=>
+update(
 "clearance_level",
 Number(e.target.value)
 )
@@ -442,22 +604,22 @@ Number(e.target.value)
 >
 
 
-<option value={1}>
+<option value="1">
 Level 1 - Full Clearance
 </option>
 
 
-<option value={2}>
+<option value="2">
 Level 2
 </option>
 
 
-<option value={3}>
+<option value="3">
 Level 3
 </option>
 
 
-<option value={4}>
+<option value="4">
 Level 4 - Invitation Only
 </option>
 
@@ -474,7 +636,6 @@ Level 4 - Invitation Only
 
 
 
-<div>
 
 <h2 className="
 text-2xl
@@ -482,9 +643,12 @@ font-bold
 text-[#003B6F]
 ">
 
-Access Areas
+Area Access
 
 </h2>
+
+
+
 
 
 
@@ -500,17 +664,184 @@ Access Areas
 
 ["airport","Airport Restricted Areas"]
 
-].map(([key,label])=>(
+].map(([key,name])=>(
 
 
-<label
+<div
 
 key={key}
 
 className="
+border
+p-4
+"
+
+>
+
+
+<label className="font-bold">
+
+{name}
+
+</label>
+
+
+<select
+
+className="
+border
+p-2
+w-full
+mt-2
+"
+
+value={
+form[key]
+}
+
+onChange={
+e=>
+update(
+key,
+Number(e.target.value)
+)
+}
+
+>
+
+
+<option value="1">
+Level 1
+</option>
+
+<option value="2">
+Level 2
+</option>
+
+<option value="3">
+Level 3
+</option>
+
+<option value="4">
+Level 4
+</option>
+
+
+</select>
+
+
+</div>
+
+
+))
+
+
+}
+
+
+
+
+
+
+
+
+
+<div className="
+border
+p-5
+">
+
+
+<label className="
 flex
 gap-3
+font-bold
+">
+
+
+<input
+
+type="checkbox"
+
+checked={
+form.blacklisted
+}
+
+onChange={
+e=>
+update(
+"blacklisted",
+e.target.checked
+)
+}
+
+
+/>
+
+
+Blacklist Subject
+
+
+</label>
+
+
+
+
+
+{
+
+form.blacklisted && (
+
+<>
+
+
+<input
+
+className="
+border
+p-3
+w-full
 mt-4
+"
+
+placeholder="Blacklist Reason"
+
+value={
+form.blacklist_reason
+}
+
+onChange={
+e=>
+update(
+"blacklist_reason",
+e.target.value
+)
+}
+
+
+/>
+
+
+
+<p className="font-bold mt-5">
+
+Blacklist Areas
+
+</p>
+
+
+{
+
+["White House","Capitol","DHS","Airport"].map(area=>(
+
+
+<label
+
+key={area}
+
+className="
+block
+mt-2
 "
 
 >
@@ -521,26 +852,34 @@ mt-4
 type="checkbox"
 
 checked={
-(form as any)[key]
+form.blacklist_areas.includes(area)
 }
 
 onChange={
-e=>update(
-key,
-e.target.checked
-)
+()=>toggleArea(area)
 }
+
 
 />
 
+{" "}
 
-{label}
+{area}
 
 
 </label>
 
 
 ))
+
+
+}
+
+
+</>
+
+
+)
 
 
 }
@@ -554,11 +893,12 @@ e.target.checked
 
 
 
+
 <button
 
-disabled={loading}
-
 onClick={submit}
+
+disabled={loading}
 
 className="
 bg-[#003B6F]
@@ -580,8 +920,8 @@ loading
 
 }
 
-</button>
 
+</button>
 
 
 
