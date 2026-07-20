@@ -1,26 +1,7 @@
-import { redirect } from "next/navigation";
-
-import CreateClearanceForm from "./CreateClearanceForm";
-
-import { canManageClearance } from "../../../lib/clearance";
+import ClearanceCreateForm from "./ClearanceCreateForm";
 
 
-export default async function CreateClearancePage(){
-
-
-const allowed =
-await canManageClearance();
-
-
-
-if(!allowed){
-
-    redirect("/staff/dashboard");
-
-}
-
-
-
+export default function CreateClearancePage(){
 
 
 return (
@@ -37,7 +18,6 @@ py-16
 bg-white
 shadow-xl
 border
-border-gray-200
 p-10
 ">
 
@@ -53,12 +33,13 @@ Create Security Clearance
 </h1>
 
 
+
 <p className="
 mt-3
 text-gray-600
 ">
 
-Assign clearance access to employees, external agencies, or civilians.
+Create clearance for individuals, organisations, agencies or authorised guests.
 
 </p>
 
@@ -66,7 +47,7 @@ Assign clearance access to employees, external agencies, or civilians.
 
 
 
-<CreateClearanceForm />
+<ClearanceCreateForm />
 
 
 </div>
