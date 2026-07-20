@@ -1,33 +1,41 @@
 import { NextResponse } from "next/server";
 
-import { supabaseAdmin } from "../../../../lib/supabase-admin";
-
-import { canManageClearance } from "../../../../lib/clearance";
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
+import { getUser } from "@/app/lib/auth";
 
 
 
 export async function POST(
-request:Request
+request: Request
 ){
 
 
-const allowed =
-await canManageClearance();
+try{
+
+
+const user =
+await getUser();
 
 
 
-if(!allowed){
+if(!user){
+
 
 return NextResponse.json(
+
 {
-error:"Unauthorised"
+error:"Not authenticated"
 },
+
 {
-status:403
+status:401
 }
+
 );
 
+
 }
+
 
 
 
@@ -42,45 +50,150 @@ await request.json();
 
 const {
 
+mode,
+
+subject_name,
+
+organisation,
+
+subject_type,
+
+roblox_username,
+
+roblox_user_id,
+
+
+clearance_level,
+
+
+white_house,
+
+capitol,
+
+dhs,
+
+airport,
+
+
+blacklisted,
+
+blacklist_reason,
+
+blacklist_areas
+
+
+} = body;
+
+
+
+
+
+
+
+
+
+if(
+mode === "individual" &&
+!roblox_username
+){
+
+
+return NextResponse.json(
+
+{
+error:"Roblox username required"
+},
+
+{
+status:400
+}
+
+);
+
+
+}
+
+
+
+
+
+
+
+if(
+mode === "organisation" &&
+!organisation
+){
+
+
+return NextResponse.json(
+
+{
+error:"Organisation name required"
+},
+
+{
+status:400
+}
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+/*
+    Create Subject
+*/
+
+
+
+const {
+
 data:subject,
 
-error
+error:subjectError
 
-} = await supabaseAdmin
+}
 
+=
+await supabaseAdmin
 
 .from("security_subjects")
-
 
 .insert({
 
 full_name:
-body.full_name,
+subject_name ||
+organisation,
 
 organisation:
-body.organisation,
+organisation || null,
 
-subject_type:
-body.subject_type,
+
+subject_type,
+
 
 roblox_username:
-body.roblox_username,
+roblox_username || null,
+
 
 roblox_user_id:
-body.roblox_user_id,
+roblox_user_id || null,
 
-discord_username:
-body.discord_username,
 
-email:
-body.email,
-
-notes:
-body.notes
+created_at:
+new Date()
 
 
 })
-
 
 .select()
 
@@ -90,60 +203,103 @@ body.notes
 
 
 
-if(error){
+
+
+
+
+if(subjectError){
+
+
+console.error(subjectError);
+
+
 
 return NextResponse.json(
+
 {
-error:error.message
+error:subjectError.message
 },
+
 {
 status:500
 }
+
 );
+
 
 }
 
 
 
 
+
+
+
+
+
+/*
+    Create Clearance
+*/
 
 
 
 const {
 
+data:clearance,
+
 error:clearanceError
 
-} = await supabaseAdmin
+}
+
+=
+await supabaseAdmin
 
 
 .from("security_clearances")
 
-
 .insert({
+
 
 subject_id:
 subject.id,
 
-clearance_level:
-body.clearance_level,
+
+clearance_level,
 
 
-white_house:
-body.white_house,
+white_house,
+
+capitol,
+
+dhs,
+
+airport,
 
 
-capitol:
-body.capitol,
+blacklisted:
+blacklisted ?? false,
 
 
-dhs:
-body.dhs,
+blacklist_reason:
+blacklist_reason || null,
 
 
-airport:
-body.airport
+blacklist_areas:
+blacklist_areas || [],
 
-});
+
+created_at:
+new Date()
+
+
+
+})
+
+.select()
+
+.single();
+
+
 
 
 
@@ -153,16 +309,29 @@ body.airport
 
 if(clearanceError){
 
+
+console.error(clearanceError);
+
+
+
 return NextResponse.json(
+
 {
 error:clearanceError.message
 },
+
 {
 status:500
 }
+
 );
 
+
 }
+
+
+
+
 
 
 
@@ -171,9 +340,41 @@ status:500
 
 return NextResponse.json({
 
-success:true
+success:true,
+
+clearance
 
 });
+
+
+
+
+
+
+
+}
+
+catch(error:any){
+
+
+console.error(error);
+
+
+
+return NextResponse.json(
+
+{
+error:error.message
+},
+
+{
+status:500
+}
+
+);
+
+
+}
 
 
 }
