@@ -235,14 +235,81 @@ status:500
 
 
 /*
-    Create Clearance
+    Create Clearance Records
 */
+
+
+const areas = [
+
+    {
+        id:"white_house",
+        level:white_house
+    },
+
+    {
+        id:"capitol",
+        level:capitol
+    },
+
+    {
+        id:"dhs",
+        level:dhs
+    },
+
+    {
+        id:"airport",
+        level:airport
+    }
+
+];
+
+
+
+const clearanceRecords =
+areas
+
+.filter(
+area => area.level
+)
+
+.map(
+area => ({
+
+    subject_id:subject.id,
+
+    area_id:area.id,
+
+    clearance_level:area.level,
+
+
+    blacklisted:
+    blacklisted ?? false,
+
+
+    blacklist_reason:
+    blacklist_reason || null,
+
+
+    blacklist_areas:
+    blacklist_areas || [],
+
+
+    created_at:
+    new Date()
+
+})
+
+);
+
+
+
+
 
 
 
 const {
 
-data:clearance,
+data:clearances,
 
 error:clearanceError
 
@@ -251,52 +318,13 @@ error:clearanceError
 =
 await supabaseAdmin
 
-
 .from("security_clearances")
 
-.insert({
+.insert(
+clearanceRecords
+)
 
-
-subject_id:
-subject.id,
-
-
-clearance_level,
-
-
-white_house,
-
-capitol,
-
-dhs,
-
-airport,
-
-
-blacklisted:
-blacklisted ?? false,
-
-
-blacklist_reason:
-blacklist_reason || null,
-
-
-blacklist_areas:
-blacklist_areas || [],
-
-
-created_at:
-new Date()
-
-
-
-})
-
-.select()
-
-.single();
-
-
+.select();
 
 
 
@@ -322,56 +350,6 @@ status:500
 }
 
 );
-
-
-}
-
-
-
-
-
-
-
-
-
-
-return NextResponse.json({
-
-success:true,
-
-clearance
-
-});
-
-
-
-
-
-
-
-}
-
-catch(error:any){
-
-
-console.error(error);
-
-
-
-return NextResponse.json(
-
-{
-error:error.message
-},
-
-{
-status:500
-}
-
-);
-
-
-}
 
 
 }
