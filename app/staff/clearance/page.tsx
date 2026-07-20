@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { supabaseAdmin } from "../../lib/supabase-admin";
 import { canManageClearance } from "../../lib/clearance";
+import { supabaseAdmin } from "../../lib/supabase-admin";
 
 
 
@@ -24,47 +24,65 @@ if(!allowed){
 
 
 
+
+
 const {
-
-data:subjects,
-
-error
+    data:clearances,
+    error
 
 } = await supabaseAdmin
 
 
-.from("security_subjects")
+.from("security_clearances")
+
 
 .select(`
 
-id,
+    id,
 
-full_name,
-
-organisation,
-
-subject_type,
-
-roblox_username,
-
-security_clearances(
     clearance_level,
+
     white_house,
+
     capitol,
+
     dhs,
+
     airport,
-    blacklisted
-)
+
+    blacklisted,
+
+    blacklist_areas,
+
+
+    security_subjects(
+
+        id,
+
+        subject_name,
+
+        organisation,
+
+        subject_type,
+
+        roblox_username,
+
+        roblox_user_id
+
+    )
 
 `)
 
 
 .order(
-"created_at",
-{
-ascending:false
-}
+    "created_at",
+    {
+        ascending:false
+    }
 );
+
+
+
 
 
 
@@ -86,9 +104,9 @@ py-16
 bg-white
 shadow-xl
 border
-border-gray-200
 p-10
 ">
+
 
 
 
@@ -112,9 +130,10 @@ font-bold
 text-[#003B6F]
 ">
 
-DHS Security Clearance Management
+Security Clearance Management
 
 </h1>
+
 
 
 <p className="
@@ -122,7 +141,7 @@ mt-3
 text-gray-600
 ">
 
-Manage access permissions for DHS, White House, Capitol and Airport restricted areas.
+Manage DHS, White House, Capitol and Airport restricted access.
 
 </p>
 
@@ -132,12 +151,6 @@ Manage access permissions for DHS, White House, Capitol and Airport restricted a
 
 
 
-
-
-<div className="
-flex
-gap-4
-">
 
 
 <Link
@@ -154,37 +167,13 @@ font-bold
 
 >
 
-+ Add Subject
-
-</Link>
-
-
-
-
-<Link
-
-href="/staff/clearance/departments"
-
-className="
-bg-[#F2C94C]
-text-black
-px-6
-py-3
-font-bold
-"
-
->
-
-Departments
++ Create Clearance
 
 </Link>
 
 
 </div>
 
-
-
-</div>
 
 
 
@@ -194,19 +183,18 @@ Departments
 
 
 {
-
 error && (
 
 <div className="
 mt-8
 bg-red-50
 border
-border-red-200
+border-red-300
 p-5
 text-red-700
 ">
 
-Database error:
+Database Error:
 
 {" "}
 
@@ -225,108 +213,44 @@ Database error:
 
 
 
-{
-
-(!subjects || subjects.length === 0) && (
 
 <div className="
 mt-10
-bg-gray-50
-border
-p-10
-text-center
-">
-
-
-<h2 className="
-text-2xl
-font-bold
-text-[#003B6F]
-">
-
-No Clearance Subjects
-
-</h2>
-
-
-
-<p className="
-mt-3
-text-gray-600
-">
-
-No individuals or organisations have been assigned clearance yet.
-
-</p>
-
-
-
-<Link
-
-href="/staff/clearance/create"
-
-className="
-inline-block
-mt-6
-bg-[#003B6F]
-text-white
-px-6
-py-3
-font-bold
-"
-
->
-
-Create First Clearance Record
-
-</Link>
-
-
-
-</div>
-
-)
-
-}
-
-
-
-
-
-
-
-
-<div className="
-mt-10
-grid
-md:grid-cols-2
-gap-6
+space-y-6
 ">
 
 
 {
 
-subjects?.map((person:any)=>(
+clearances?.length ?
+
+
+clearances.map((clearance:any)=>(
 
 
 <div
 
-key={person.id}
+key={clearance.id}
 
 className="
 border
 p-6
 shadow-sm
+bg-white
 "
 
 >
 
 
+
+
+
+
 <div className="
 flex
 justify-between
+items-start
 "
-
 
 >
 
@@ -335,27 +259,39 @@ justify-between
 
 
 <h2 className="
-text-xl
+text-2xl
 font-bold
 text-[#003B6F]
 ">
 
-{person.full_name}
+{
+
+clearance.security_subjects?.subject_name
+
+}
+
 
 </h2>
 
 
+
+
+
 <p className="
 text-gray-600
+mt-2
 ">
 
-{person.organisation || "No Organisation"}
+Type:
+
+{" "}
+
+{
+clearance.security_subjects?.subject_type
+}
+
 
 </p>
-
-
-
-</div>
 
 
 
@@ -363,20 +299,46 @@ text-gray-600
 
 {
 
-person.security_clearances?.[0]?.blacklisted && (
+clearance.security_subjects?.roblox_username && (
 
-<span className="
-bg-red-600
-text-white
-px-3
-py-1
-text-sm
-font-bold
+<p className="
+text-gray-600
 ">
 
-BLACKLISTED
+Roblox:
 
-</span>
+{" "}
+
+{
+clearance.security_subjects.roblox_username
+}
+
+</p>
+
+)
+
+}
+
+
+
+
+{
+
+clearance.security_subjects?.organisation && (
+
+<p className="
+text-gray-600
+">
+
+Organisation:
+
+{" "}
+
+{
+clearance.security_subjects.organisation
+}
+
+</p>
 
 )
 
@@ -393,52 +355,123 @@ BLACKLISTED
 
 
 
-<div className="
-mt-5
-space-y-2
+
+<div>
+
+
+<span className="
+bg-[#003B6F]
+text-white
+px-4
+py-2
+font-bold
 ">
 
+Level {clearance.clearance_level}
 
-<p>
-
-Type:
-
-{" "}
-
-{person.subject_type}
-
-</p>
-
-
-
-<p>
-
-Clearance:
-
-{" "}
-
-
-{
-
-person.security_clearances?.[0]
-
-?
-
-`Level ${person.security_clearances[0].clearance_level}`
-
-:
-
-"No Clearance"
-
-}
-
-
-</p>
-
+</span>
 
 
 </div>
 
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="
+grid
+md:grid-cols-4
+gap-4
+mt-8
+">
+
+
+<Area
+
+name="White House"
+
+level={clearance.white_house}
+
+/>
+
+
+<Area
+
+name="Capitol"
+
+level={clearance.capitol}
+
+/>
+
+
+<Area
+
+name="DHS"
+
+level={clearance.dhs}
+
+/>
+
+
+<Area
+
+name="Airport"
+
+level={clearance.airport}
+
+/>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{
+
+clearance.blacklisted && (
+
+<div className="
+mt-6
+bg-red-100
+border
+border-red-400
+p-4
+text-red-700
+font-bold
+">
+
+⚠ BLACKLISTED
+
+<br/>
+
+Areas:
+
+{" "}
+
+{
+clearance.blacklist_areas?.join(", ")
+||
+"All Areas"
+}
+
+</div>
+
+)
+
+}
 
 
 
@@ -449,31 +482,49 @@ person.security_clearances?.[0]
 <div className="
 mt-6
 flex
-gap-3
+gap-4
 ">
 
 
 <Link
 
-href={`/staff/clearance/${person.id}`}
+href={`/staff/clearance/${clearance.id}`}
 
 className="
-bg-[#003B6F]
-text-white
-px-4
-py-2
+bg-gray-100
+px-5
+py-3
 font-bold
 "
 
 >
 
-Manage
+View
+
+</Link>
+
+
+
+<Link
+
+href={`/staff/clearance/${clearance.id}/edit`}
+
+className="
+bg-[#003B6F]
+text-white
+px-5
+py-3
+font-bold
+"
+
+>
+
+Modify
 
 </Link>
 
 
 </div>
-
 
 
 
@@ -485,11 +536,25 @@ Manage
 ))
 
 
-}
+:
 
+
+<div className="
+text-gray-500
+text-center
+py-10
+">
+
+No active clearances found.
 
 </div>
 
+
+}
+
+
+
+</div>
 
 
 
@@ -500,6 +565,64 @@ Manage
 
 
 </main>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+function Area({
+
+name,
+level
+
+}:{
+
+name:string;
+level:number;
+
+}){
+
+
+return (
+
+<div className="
+border
+p-4
+bg-gray-50
+">
+
+
+<p className="
+font-bold
+text-[#003B6F]
+">
+
+{name}
+
+</p>
+
+
+
+<p className="
+mt-2
+font-semibold
+">
+
+Level {level}
+
+</p>
+
+
+</div>
 
 );
 
