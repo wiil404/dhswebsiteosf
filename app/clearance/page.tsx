@@ -1,20 +1,19 @@
+import Link from "next/link";
+
 import { supabaseAdmin } from "../lib/supabase-admin";
 
 
 
-
-
-export default async function PublicClearancePage(){
+export default async function ClearanceRegistry(){
 
 
 const {
 
-data:subjects,
+data:subjects
 
-error
+}
 
-}=
-
+=
 await supabaseAdmin
 
 .from("security_subjects")
@@ -29,6 +28,8 @@ subject_type,
 
 roblox_username,
 
+public_visible,
+
 
 security_clearances(
 
@@ -37,8 +38,6 @@ id,
 clearance_level,
 
 blacklisted,
-
-expires_at,
 
 
 security_areas!area_id(
@@ -64,14 +63,10 @@ true
 "created_at",
 
 {
-
 ascending:false
-
 }
 
 );
-
-
 
 
 
@@ -81,36 +76,35 @@ return (
 
 <main className="
 min-h-screen
-bg-gray-100
-px-6
-py-16
+bg-[#F5F8FB]
 ">
 
 
 
-<div className="
-max-w-7xl
-mx-auto
-bg-white
-shadow-xl
-border
-">
 
 
-{/* HEADER */}
+
+{/* HERO */}
 
 
-<div className="
+<section className="
 bg-[#003B6F]
 text-white
-p-10
+px-6
+py-20
+">
+
+
+<div className="
+max-w-6xl
+mx-auto
 ">
 
 
 <p className="
 text-[#F2C94C]
 uppercase
-tracking-widest
+tracking-[0.3em]
 font-bold
 text-sm
 ">
@@ -122,85 +116,168 @@ Department of Homeland Security
 
 
 
+
 <h1 className="
 text-5xl
+md:text-7xl
 font-black
-mt-4
+mt-5
+leading-tight
 ">
 
-Public Security Clearance Registry
+Security Clearance Registry
 
 </h1>
 
 
 
 
+
 <p className="
-mt-4
-text-blue-100
+mt-6
 max-w-3xl
+text-lg
+text-blue-100
 ">
 
-Public verification directory for approved personnel and organisations
-holding DHS recognised facility access clearances.
+Official public verification portal for DHS recognised personnel
+and organisational security clearances.
 
 </p>
 
 
 
-</div>
 
 
 
-
-
-
-
-
-
-{
-
-error && (
 
 <div className="
-p-8
-text-red-600
-font-bold
+mt-10
+bg-white
+p-3
+max-w-2xl
+shadow-2xl
+flex
 ">
 
-Database Error:
 
-{error.message}
+<input
+
+placeholder="
+Search Roblox username or organisation...
+"
+
+className="
+flex-1
+p-4
+text-black
+outline-none
+"
+
+/>
+
+
+
+<button
+
+className="
+bg-[#F2C94C]
+text-black
+px-8
+font-black
+"
+
+>
+
+SEARCH
+
+</button>
+
+
 
 </div>
 
-)
-
-}
 
 
 
 
+</div>
+
+
+</section>
 
 
 
 
+
+
+
+
+
+{/* RECORDS */}
 
 
 <section className="
-p-10
+max-w-6xl
+mx-auto
+px-6
+py-16
 ">
 
 
+<div className="
+flex
+justify-between
+items-end
+mb-10
+">
+
+
+<div>
+
+
 <h2 className="
-text-3xl
+text-4xl
 font-black
 text-[#003B6F]
 ">
 
-Verified Clearance Holders
+Verified Records
 
 </h2>
+
+
+<p className="
+text-gray-500
+mt-2
+">
+
+Publicly available clearance authorisations.
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div className="
+text-sm
+font-bold
+text-gray-500
+">
+
+{subjects?.length || 0} Records
+
+</div>
+
+
+
+</div>
+
+
 
 
 
@@ -212,8 +289,9 @@ Verified Clearance Holders
 grid
 md:grid-cols-2
 gap-8
-mt-8
 ">
+
+
 
 
 
@@ -227,19 +305,40 @@ subjects?.map(
 
 
 
-<div
+<Link
+
+href={`/clearance/${subject.id}`}
 
 key={subject.id}
 
 className="
+group
+bg-white
 border
 shadow-sm
-p-8
-hover:shadow-xl
+hover:shadow-2xl
 transition
+p-8
+relative
+overflow-hidden
 "
 
+
 >
+
+
+<div className="
+absolute
+left-0
+top-0
+h-full
+w-1
+bg-[#F2C94C]
+group-hover:w-2
+transition
+"/>
+
+
 
 
 
@@ -248,7 +347,6 @@ transition
 <div className="
 flex
 justify-between
-items-start
 ">
 
 
@@ -265,9 +363,7 @@ text-[#003B6F]
 
 subject.roblox_username ||
 
-subject.organisation ||
-
-"Unknown"
+subject.organisation
 
 }
 
@@ -275,79 +371,19 @@ subject.organisation ||
 
 
 
-
 <p className="
 text-gray-500
-mt-1
 uppercase
+text-xs
 font-bold
-text-sm
+mt-2
 ">
 
-{
-
-subject.subject_type
-
-}
+{subject.subject_type}
 
 </p>
 
 
-</div>
-
-
-
-
-
-
-
-
-{
-
-subject.security_clearances?.some(
-
-(c:any)=>c.blacklisted
-
-)
-
-?
-
-(
-
-<span className="
-bg-red-600
-text-white
-px-4
-py-2
-font-black
-">
-
-BLACKLISTED
-
-</span>
-
-)
-
-:
-
-(
-
-<span className="
-bg-green-600
-text-white
-px-4
-py-2
-font-black
-">
-
-ACTIVE
-
-</span>
-
-)
-
-}
-
 
 </div>
 
@@ -357,17 +393,24 @@ ACTIVE
 
 
 
-
-
-<h4 className="
-mt-8
-font-bold
-text-gray-700
+<span className="
+bg-green-100
+text-green-700
+px-3
+py-1
+h-fit
+font-black
+text-sm
 ">
 
-Authorised Areas
+VERIFIED
 
-</h4>
+</span>
+
+
+
+</div>
+
 
 
 
@@ -377,96 +420,126 @@ Authorised Areas
 
 
 <div className="
-mt-4
+mt-8
 space-y-3
 ">
-
-
 
 
 {
 
 subject.security_clearances?.map(
 
-(clearance:any)=>(
+(c:any)=>(
 
 
 <div
 
-key={clearance.id}
+key={c.id}
 
 className="
 flex
 justify-between
 items-center
-border
+bg-[#F5F8FB]
 p-4
-bg-gray-50
 "
+
 
 >
 
 
 <span className="
 font-bold
+text-gray-700
 ">
 
-{
-
-clearance.security_areas?.name
-
-}
+{c.security_areas?.name}
 
 </span>
-
-
 
 
 
 
 <span className={`
+font-black
 px-3
 py-1
-font-black
 
 ${
 
-clearance.clearance_level === 1
+c.clearance_level===4
 
 ?
-
-"bg-green-100 text-green-700"
+"bg-orange-100 text-orange-700"
 
 :
 
-clearance.clearance_level === 2
+c.clearance_level===3
 
 ?
-
-"bg-blue-100 text-blue-700"
-
-:
-
-clearance.clearance_level === 3
-
-?
-
 "bg-yellow-100 text-yellow-700"
 
 :
 
-"bg-orange-100 text-orange-700"
+c.clearance_level===2
+
+?
+"bg-blue-100 text-blue-700"
+
+:
+
+"bg-green-100 text-green-700"
 
 }
 
 `}>
 
-CL{clearance.clearance_level}
+CL{c.clearance_level}
 
 </span>
 
 
+
 </div>
+
+
+)
+
+)
+
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<p className="
+mt-8
+text-[#003B6F]
+font-black
+group-hover:underline
+">
+
+View Verification →
+
+</p>
+
+
+
+
+
+
+
+</Link>
 
 
 )
@@ -480,30 +553,6 @@ CL{clearance.clearance_level}
 
 
 </div>
-
-
-
-
-
-
-
-
-
-</div>
-
-
-)
-
-)
-
-}
-
-
-
-</div>
-
-
-
 
 
 </section>
@@ -514,26 +563,23 @@ CL{clearance.clearance_level}
 
 
 
+
+
 <footer className="
-border-t
-p-8
+bg-[#003B6F]
+text-white
 text-center
+p-8
 text-sm
-text-gray-500
 ">
 
-This registry is maintained by the Department of Homeland Security.
-Unauthorised modification or misuse of clearance records is prohibited.
+
+Department of Homeland Security Public Verification Registry
 
 </footer>
 
 
 
-
-
-
-
-</div>
 
 
 </main>
