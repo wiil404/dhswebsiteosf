@@ -531,9 +531,9 @@ subject.created_at
 
 </div>
 
-</div>
 
 </div>
+    
 
 <section className="
 mt-14
