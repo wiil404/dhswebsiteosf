@@ -1,128 +1,389 @@
+import Link from "next/link";
+
+
 export default function Footer(){
 
     return (
 
-        <footer className="bg-[#003B6F] text-white mt-20">
+<footer className="
+bg-[#003B6F]
+text-white
+mt-20
+">
 
 
-            <div className="max-w-7xl mx-auto px-6 py-12">
+{/* GOLD ACCENT */}
 
+<div className="
+h-2
+bg-[#F2C94C]
+"/>
 
-                <div className="grid md:grid-cols-3 gap-10">
 
 
-                    <div>
 
-                        <h2 className="font-bold text-xl">
 
-                            Department of Homeland Security
+<div className="
+max-w-7xl
+mx-auto
+px-6
+py-14
+">
 
-                        </h2>
 
 
-                        <p className="mt-3 text-sm opacity-80">
 
-                            Protecting the Nation Through Service,
-                            Security, and Preparedness.
 
-                        </p>
+<div className="
+grid
+md:grid-cols-4
+gap-10
+">
 
 
-                    </div>
 
 
 
 
 
-                    <div>
+{/* BRAND */}
 
 
-                        <h3 className="font-bold">
+<div className="
+md:col-span-2
+">
 
-                            Quick Links
 
-                        </h3>
+<p className="
+text-[#F2C94C]
+uppercase
+tracking-[0.3em]
+font-black
+text-xs
+">
 
+Department of Homeland Security
 
-                        <ul className="mt-3 space-y-2 text-sm">
+</p>
 
 
-                            <li>
-                                News
-                            </li>
 
 
-                            <li>
-                                Divisions
-                            </li>
+<h2 className="
+text-3xl
+font-black
+mt-4
+">
 
+Protecting The Nation
 
-                            <li>
-                                Recruitment
-                            </li>
+</h2>
 
 
-                            <li>
-                                Documents
-                            </li>
 
 
-                        </ul>
+<p className="
+mt-5
+text-blue-100
+leading-relaxed
+max-w-xl
+">
 
+The Department of Homeland Security provides security,
+preparedness, and protection through dedicated divisions,
+personnel, and specialised agencies.
 
-                    </div>
+</p>
 
 
 
+</div>
 
 
 
-                    <div>
 
 
-                        <h3 className="font-bold">
 
-                            Contact
 
-                        </h3>
 
 
-                        <p className="mt-3 text-sm">
 
-                            Department Headquarters
+{/* EXPLORE */}
 
-                            <br />
 
-                            Washington, D.C.
+<div>
 
-                        </p>
 
+<h3 className="
+text-lg
+font-black
+uppercase
+tracking-wide
+">
 
-                    </div>
+Explore
 
+</h3>
 
 
-                </div>
 
+<div className="
+mt-5
+space-y-3
+text-blue-100
+">
 
 
 
+<FooterLink
+href="/about"
+text="About DHS"
+/>
 
-                <div className="border-t border-white/30 mt-10 pt-6 text-sm">
 
 
-                    © {new Date().getFullYear()} Department of Homeland Security
+<FooterLink
+href="/divisions"
+text="Our Mission"
+/>
 
 
-                </div>
 
+<FooterLink
+href="/news"
+text="Latest News"
+/>
 
 
-            </div>
 
+<FooterLink
+href="/documents"
+text="Resources"
+/>
 
-        </footer>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* SERVICES */}
+
+
+<div>
+
+
+<h3 className="
+text-lg
+font-black
+uppercase
+tracking-wide
+">
+
+Services
+
+</h3>
+
+
+
+
+<div className="
+mt-5
+space-y-3
+text-blue-100
+">
+
+
+
+<FooterLink
+
+href="/recruitment"
+
+text="Careers"
+
+/>
+
+
+
+<FooterLink
+
+href="/clearance"
+
+text="Security Clearance Registry"
+
+/>
+
+
+
+<FooterLink
+
+href="/staff/dashboard"
+
+text="Staff Portal"
+
+/>
+
+
+
+<FooterLink
+
+href="/contact"
+
+text="Contact"
+
+/>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* LOWER BAR */}
+
+
+<div className="
+border-t
+border-white/20
+mt-14
+pt-8
+flex
+flex-col
+md:flex-row
+justify-between
+gap-4
+text-sm
+text-blue-100
+">
+
+
+
+<p>
+
+© {new Date().getFullYear()} Department of Homeland Security
+
+</p>
+
+
+
+
+
+<p className="
+font-bold
+">
+
+Official Department Website
+
+</p>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+</footer>
+
 
     );
+
+}
+
+
+
+
+
+
+
+function FooterLink({
+
+href,
+
+text
+
+}:{
+
+href:string;
+
+text:string;
+
+}){
+
+
+return (
+
+<Link
+
+href={href}
+
+className="
+group
+flex
+items-center
+gap-2
+hover:text-[#F2C94C]
+transition
+"
+
+>
+
+
+<span>
+
+{text}
+
+</span>
+
+
+<span className="
+opacity-0
+group-hover:opacity-100
+transition
+">
+
+→
+
+</span>
+
+
+</Link>
+
+
+);
+
 
 }
