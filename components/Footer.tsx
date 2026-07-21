@@ -234,15 +234,6 @@ text="Staff Portal"
 
 
 
-<FooterLink
-
-href="/contact"
-
-text="Contact"
-
-/>
-
-
 
 </div>
 
