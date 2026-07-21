@@ -201,7 +201,25 @@ Manage DHS, White House, Capitol and Airport restricted access.
 
 
 
+<Link
 
+href="/staff/clearance/create"
+
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-bold
+hover:bg-[#002B52]
+transition
+"
+
+>
+
++ Create Clearance
+
+</Link>
 
 
 
