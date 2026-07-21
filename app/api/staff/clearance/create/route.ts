@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
+
 import { getUser } from "@/app/lib/auth";
 
 
 
+
 export async function POST(
-request: Request
+
+request:Request
+
 ){
 
 
@@ -41,6 +45,7 @@ status:401
 
 
 
+
 const body =
 await request.json();
 
@@ -50,36 +55,27 @@ await request.json();
 
 const {
 
-mode,
 
-subject_name,
+mode,
 
 organisation,
 
 subject_type,
+
 
 roblox_username,
 
 roblox_user_id,
 
 
-clearance_level,
-
-
-white_house,
-
-capitol,
-
-dhs,
-
-airport,
+clearances,
 
 
 blacklisted,
 
-blacklist_reason,
+blacklist_areas,
 
-blacklist_areas
+blacklist_reason
 
 
 } = body;
@@ -92,8 +88,10 @@ blacklist_areas
 
 
 
+
 if(
-mode === "individual" &&
+mode === "individual"
+&&
 !roblox_username
 ){
 
@@ -110,17 +108,14 @@ status:400
 
 );
 
-
 }
 
 
 
 
-
-
-
 if(
-mode === "organisation" &&
+mode === "organisation"
+&&
 !organisation
 ){
 
@@ -128,7 +123,7 @@ mode === "organisation" &&
 return NextResponse.json(
 
 {
-error:"Organisation name required"
+error:"Organisation required"
 },
 
 {
@@ -136,7 +131,6 @@ status:400
 }
 
 );
-
 
 }
 
@@ -202,13 +196,10 @@ new Date()
 
 
 
-
-
 if(subjectError){
 
 
 console.error(subjectError);
-
 
 
 return NextResponse.json(
@@ -235,69 +226,106 @@ status:500
 
 
 /*
-    Create Clearance Records
+    Get Security Areas
 */
 
 
-const areas = [
+const {
 
-    {
-        id:"fb97a785-4080-41e6-9557-e817b2573387",
-        level:white_house
-    },
+data:areas,
 
-    {
-        id:"f03d9324-d5e6-4938-b9a3-4509f07720d6",
-        level:capitol
-    },
+error:areaError
 
-    {
-        id:"084d43c2-ab2b-4b5e-8853-5ccee736aa13",
-        level:dhs
-    },
+}
 
-    {
-        id:"d09b1145-4c9d-490f-8780-03dbaa39593f",
-        level:airport
-    }
+=
+await supabaseAdmin
 
-];
+.from("security_areas")
+
+.select(
+"id,name"
+);
 
 
 
-const clearanceRecords =
-areas
-
-.filter(
-area => area.level
-)
-
-.map(
-area => ({
-
-    subject_id:subject.id,
-
-    area_id:area.id,
-
-    clearance_level:area.level,
 
 
-    blacklisted:
-    blacklisted ?? false,
+
+if(areaError || !areas){
 
 
-    blacklist_reason:
-    blacklist_reason || null,
+return NextResponse.json(
+
+{
+error:"Unable to load security areas"
+},
+
+{
+status:500
+}
+
+);
+
+}
 
 
-    blacklist_areas:
-    blacklist_areas || [],
 
 
-    created_at:
-    new Date()
 
-})
+
+
+
+
+/*
+    Convert clearance names into area IDs
+*/
+
+
+const areaMap:any = {};
+
+
+
+areas.forEach(
+
+(area:any)=>{
+
+
+const name =
+area.name.toLowerCase();
+
+
+
+if(name.includes("airport")){
+
+areaMap.airport = area.id;
+
+}
+
+
+if(name.includes("white house")){
+
+areaMap.white_house = area.id;
+
+}
+
+
+if(name.includes("capitol")){
+
+areaMap.capitol = area.id;
+
+}
+
+
+if(name.includes("dhs")){
+
+areaMap.dhs = area.id;
+
+}
+
+
+
+}
 
 );
 
@@ -307,9 +335,117 @@ area => ({
 
 
 
+
+
+/*
+    Create clearance rows
+*/
+
+
+
+const clearanceRows:any[] = [];
+
+
+
+
+
+
+Object.entries(clearances || {})
+
+.forEach(
+
+([key,value]:any)=>{
+
+
+if(!value)
+return;
+
+
+
+if(!areaMap[key])
+return;
+
+
+
+
+clearanceRows.push({
+
+subject_id:
+subject.id,
+
+
+area_id:
+areaMap[key],
+
+
+
+clearance_level:
+Number(value),
+
+
+
+blacklisted:
+blacklisted || false,
+
+
+blacklist_reason:
+blacklist_reason || null,
+
+
+blacklist_areas:
+blacklist_areas || [],
+
+
+created_at:
+new Date(),
+
+updated_at:
+new Date()
+
+
+});
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+if(clearanceRows.length === 0){
+
+
+return NextResponse.json(
+
+{
+error:"At least one facility clearance is required"
+},
+
+{
+status:400
+}
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
 const {
 
-data:clearances,
+data:clearancesCreated,
 
 error:clearanceError
 
@@ -321,11 +457,10 @@ await supabaseAdmin
 .from("security_clearances")
 
 .insert(
-clearanceRecords
+clearanceRows
 )
 
 .select();
-
 
 
 
@@ -336,7 +471,6 @@ if(clearanceError){
 
 
 console.error(clearanceError);
-
 
 
 return NextResponse.json(
@@ -354,20 +488,36 @@ status:500
 
 }
 
-    
+
+
+
+
+
+
+
 
 
 return NextResponse.json({
 
-    success:true,
+success:true,
 
-    clearances
+
+subject_id:
+subject.id,
+
+
+clearances:
+clearancesCreated
+
 
 });
 
 
-}
 
+
+
+
+}
 
 catch(error:any){
 
@@ -379,11 +529,11 @@ console.error(error);
 return NextResponse.json(
 
 {
-    error:error.message
+error:error.message
 },
 
 {
-    status:500
+status:500
 }
 
 );
