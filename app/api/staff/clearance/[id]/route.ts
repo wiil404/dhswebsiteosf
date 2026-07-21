@@ -1,34 +1,27 @@
 import { NextResponse } from "next/server";
 
-import { supabaseAdmin } from "../../../../lib/supabase-admin";
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
-import { getUser } from "../../../../lib/auth";
-
-import { getProfile } from "../../../../lib/permissions";
-
-import { canManageClearance } from "../../../../lib/clearance";
-
-import { createAuditLog } from "../../../../lib/audit";
+import { getUser } from "@/app/lib/auth";
 
 
 
-
-export async function PATCH(
+export async function DELETE(
 
 request:Request,
 
 {
 params
 }:{
-
 params:Promise<{
     id:string
 }>
-
 }
 
 ){
 
+
+try{
 
 
 const user =
@@ -37,6 +30,7 @@ await getUser();
 
 
 if(!user){
+
 
 return NextResponse.json(
 
@@ -57,64 +51,7 @@ status:401
 
 
 
-
-const profile =
-await getProfile();
-
-
-
-if(!profile){
-
-return NextResponse.json(
-
-{
-error:"No profile found"
-},
-
-{
-status:403
-}
-
-);
-
-}
-
-
-
-
-
-
-
-const allowed =
-await canManageClearance();
-
-
-
-if(!allowed){
-
-return NextResponse.json(
-
-{
-error:"You do not have permission to manage security clearances"
-},
-
-{
-status:403
-}
-
-);
-
-}
-
-
-
-
-
-
-
-const {
-id
-} =
+const {id} =
 await params;
 
 
@@ -123,100 +60,44 @@ await params;
 
 
 
-const body =
-await request.json();
-
-
-
-
-
+/*
+    Delete clearance records first
+*/
 
 
 const {
 
-white_house,
+error:clearanceError
 
-capitol,
+}
 
-dhs,
-
-airport,
-
-blacklisted,
-
-blacklist_areas,
-
-blacklist_reason,
-
-notes
-
-
-} = body;
-
-
-
-
-
-
-
-
-
-const {
-
-data:clearance,
-
-error
-
-} = await supabaseAdmin
+=
+await supabaseAdmin
 
 .from("security_clearances")
 
-.update({
-
-white_house,
-
-capitol,
-
-dhs,
-
-airport,
-
-blacklisted,
-
-blacklist_areas,
-
-blacklist_reason,
-
-notes,
-
-updated_at:new Date()
-
-})
+.delete()
 
 .eq(
-"id",
+"subject_id",
 id
-)
-
-.select()
-
-.single();
+);
 
 
 
 
 
 
+if(clearanceError){
 
 
-
-if(error){
+console.error(clearanceError);
 
 
 return NextResponse.json(
 
 {
-error:error.message
+error:clearanceError.message
 },
 
 {
@@ -235,25 +116,55 @@ status:500
 
 
 
-
-await createAuditLog({
-
-action:"SECURITY_CLEARANCE_UPDATED",
-
-severity:"WARNING",
-
-targetType:"Security Clearance",
-
-targetId:id,
-
-description:
-
-`Updated security clearance ${id} by ${profile.email}`
+/*
+    Delete subject
+*/
 
 
-});
+const {
+
+error:subjectError
+
+}
+
+=
+await supabaseAdmin
+
+.from("security_subjects")
+
+.delete()
+
+.eq(
+"id",
+id
+);
 
 
+
+
+
+
+
+if(subjectError){
+
+
+console.error(subjectError);
+
+
+return NextResponse.json(
+
+{
+error:subjectError.message
+},
+
+{
+status:500
+}
+
+);
+
+
+}
 
 
 
@@ -263,12 +174,38 @@ description:
 
 return NextResponse.json({
 
-success:true,
-
-clearance
+success:true
 
 });
 
+
+
+
+
+
+
+}
+
+catch(error:any){
+
+
+console.error(error);
+
+
+return NextResponse.json(
+
+{
+error:error.message
+},
+
+{
+status:500
+}
+
+);
+
+
+}
 
 
 }
