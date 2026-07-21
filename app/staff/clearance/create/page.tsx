@@ -1,70 +1,9 @@
 "use client";
 
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import {useState} from "react";
 
-
-
-const clearanceLevels = [
-
-{
-level:1,
-title:"Full Clearance",
-description:
-"Multiple Guests. No Search Required."
-},
-
-{
-level:2,
-title:"Restricted Clearance",
-description:
-"1 Guest. No Search. Lanyard Required. PEOC lockdown access if authorised."
-},
-
-{
-level:3,
-title:"Controlled Clearance",
-description:
-"No Guests. Search Required. Lanyard Required."
-},
-
-{
-level:4,
-title:"Invitation Only",
-description:
-"Access upon invitation. No Guests. Search & Lanyard Required."
-}
-
-];
-
-
-
-
-
-const areas = [
-
-{
-key:"white_house",
-name:"White House Ground Access"
-},
-
-{
-key:"capitol",
-name:"Capitol Area"
-},
-
-{
-key:"dhs",
-name:"DHS Restricted Areas"
-},
-
-{
-key:"airport",
-name:"Airport Restricted Areas"
-}
-
-];
+import {useRouter} from "next/navigation";
 
 
 
@@ -73,139 +12,61 @@ name:"Airport Restricted Areas"
 export default function CreateClearance(){
 
 
-const router =
-useRouter();
+const router = useRouter();
 
 
 
-const [loading,setLoading] =
-useState(false);
+const [loading,setLoading] = useState(false);
+
+const [lookupLoading,setLookupLoading] = useState(false);
 
 
 
-const [mode,setMode] =
-useState<
-"individual" |
-"organisation"
->(
-"individual"
-);
+const [mode,setMode] = useState<
+"individual" | "organisation"
+>("individual");
 
 
 
-const [robloxUsername,setRobloxUsername] =
-useState("");
 
 
-
-const [form,setForm] =
-useState<any>({
-
-subject_name:"",
+const [form,setForm] = useState<any>({
 
 organisation:"",
 
 subject_type:"individual",
+
 
 roblox_username:"",
 
 roblox_user_id:"",
 
 
-clearance_level:4,
+
+clearances:{
 
 
-white_house:4,
+white_house:"",
 
-capitol:4,
+capitol:"",
 
-dhs:4,
+dhs:"",
 
-airport:4,
+airport:""
+
+
+},
+
 
 
 blacklisted:false,
 
-blacklist_reason:"",
+blacklist_areas:[],
 
-blacklist_areas:[]
+blacklist_reason:""
+
 
 });
-
-
-
-
-
-
-
-async function lookupRoblox(){
-
-
-if(!robloxUsername)
-return;
-
-
-
-const response =
-await fetch(
-
-"/api/roblox/lookup",
-
-{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify({
-
-username:robloxUsername
-
-})
-
-}
-
-);
-
-
-
-const data =
-await response.json();
-
-
-
-
-if(!response.ok){
-
-
-alert(data.error);
-
-return;
-
-}
-
-
-
-
-
-setForm({
-
-...form,
-
-roblox_username:data.username,
-
-roblox_user_id:data.id,
-
-subject_name:data.username
-
-});
-
-
-}
 
 
 
@@ -216,8 +77,11 @@ subject_name:data.username
 
 
 function update(
-key:string,
+
+field:string,
+
 value:any
+
 ){
 
 
@@ -225,7 +89,7 @@ setForm({
 
 ...form,
 
-[key]:value
+[field]:value
 
 });
 
@@ -239,22 +103,172 @@ setForm({
 
 
 
-function toggleBlacklistArea(
-area:string
+
+async function lookupRoblox(){
+
+
+if(!form.roblox_username){
+
+alert(
+"Enter a Roblox username first"
+);
+
+return;
+
+}
+
+
+
+setLookupLoading(true);
+
+
+
+
+try{
+
+
+const response = await fetch(
+
+`/api/roblox/lookup?username=${form.roblox_username}`
+
+);
+
+
+
+
+
+const data =
+await response.json();
+
+
+
+
+
+
+if(!response.ok){
+
+
+alert(
+data.error ||
+"Roblox user not found"
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+
+setForm({
+
+...form,
+
+roblox_user_id:data.id
+
+});
+
+
+
+
+
+}
+
+catch(error){
+
+
+console.error(error);
+
+
+alert(
+"Roblox lookup failed"
+);
+
+
+}
+
+finally{
+
+
+setLookupLoading(false);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+function updateClearance(
+
+area:string,
+
+value:string
+
 ){
 
 
-let current =
-form.blacklist_areas || [];
+setForm({
+
+...form,
+
+clearances:{
+
+
+...form.clearances,
+
+
+[area]:value
+
+
+}
+
+
+});
+
+
+}
 
 
 
-if(current.includes(area)){
 
 
-current =
-current.filter(
-(x:string)=>x!==area
+
+
+
+
+function toggleBlacklistArea(
+
+area:string
+
+){
+
+
+let areas = [
+...form.blacklist_areas
+];
+
+
+
+if(
+areas.includes(area)
+){
+
+
+areas =
+areas.filter(
+(x)=>x!==area
 );
 
 
@@ -263,7 +277,7 @@ current.filter(
 else{
 
 
-current.push(area);
+areas.push(area);
 
 
 }
@@ -271,10 +285,14 @@ current.push(area);
 
 
 
-update(
-"blacklist_areas",
-current
-);
+
+setForm({
+
+...form,
+
+blacklist_areas:areas
+
+});
 
 
 }
@@ -294,6 +312,7 @@ setLoading(true);
 
 
 
+
 const response =
 await fetch(
 
@@ -309,13 +328,42 @@ headers:{
 
 },
 
-body:JSON.stringify({
 
-...form,
+body:JSON.stringify({
 
 mode,
 
-subject_type:mode
+organisation:
+form.organisation,
+
+subject_type:
+mode,
+
+
+roblox_username:
+form.roblox_username,
+
+
+roblox_user_id:
+form.roblox_user_id,
+
+
+
+clearances:
+form.clearances,
+
+
+blacklisted:
+form.blacklisted,
+
+
+blacklist_areas:
+form.blacklist_areas,
+
+
+blacklist_reason:
+form.blacklist_reason
+
 
 })
 
@@ -325,31 +373,44 @@ subject_type:mode
 
 
 
-const data =
+
+
+const result =
 await response.json();
+
+
 
 
 
 if(!response.ok){
 
 
-alert(data.error);
+alert(
+result.error ||
+"Failed creating clearance"
+);
+
 
 setLoading(false);
 
 return;
 
+
 }
+
+
 
 
 
 
 router.push(
-"/staff/clearance"
+`/staff/clearance/${result.subject_id}`
 );
 
 
+
 }
+
 
 
 
@@ -370,15 +431,18 @@ py-16
 
 <div className="
 bg-white
-shadow-xl
 border
+shadow-xl
 p-10
 ">
 
 
+
+
+
 <h1 className="
 text-4xl
-font-bold
+font-black
 text-[#003B6F]
 ">
 
@@ -387,12 +451,15 @@ Create Security Clearance
 </h1>
 
 
+
+
+
 <p className="
 mt-3
 text-gray-600
 ">
 
-Assign clearance permissions for DHS protected areas.
+Create clearance access for DHS employees, external agencies or authorised civilians.
 
 </p>
 
@@ -402,8 +469,10 @@ Assign clearance permissions for DHS protected areas.
 
 
 
+
+
 <div className="
-mt-8
+mt-10
 flex
 gap-4
 ">
@@ -415,23 +484,21 @@ onClick={()=>{
 
 setMode("individual");
 
-update(
-"subject_type",
-"individual"
-);
-
 }}
 
-className={`
-px-5 py-3 font-bold
-${
+className={
+
 mode==="individual"
+
 ?
-"bg-[#003B6F] text-white"
+
+"bg-[#003B6F] text-white px-6 py-3 font-bold"
+
 :
-"bg-gray-200"
+
+"border px-6 py-3 font-bold"
+
 }
-`}
 
 >
 
@@ -441,29 +508,29 @@ Individual
 
 
 
+
+
 <button
 
 onClick={()=>{
 
 setMode("organisation");
 
-update(
-"subject_type",
-"organisation"
-);
-
 }}
 
-className={`
-px-5 py-3 font-bold
-${
+className={
+
 mode==="organisation"
+
 ?
-"bg-[#003B6F] text-white"
+
+"bg-[#003B6F] text-white px-6 py-3 font-bold"
+
 :
-"bg-gray-200"
+
+"border px-6 py-3 font-bold"
+
 }
-`}
 
 >
 
@@ -472,6 +539,7 @@ Organisation
 </button>
 
 
+
 </div>
 
 
@@ -482,23 +550,16 @@ Organisation
 
 
 
+
 {
-mode==="individual" && (
 
-<div className="mt-8">
+mode==="individual"
 
+&&
 
-<label className="font-bold">
-
-Roblox Username
-
-</label>
-
-
-<div className="
-flex
-gap-3
-mt-2
+<section className="
+mt-10
+space-y-4
 ">
 
 
@@ -506,19 +567,29 @@ mt-2
 
 className="
 border
-p-3
-flex-1
+p-4
+w-full
 "
 
-value={robloxUsername}
+placeholder="Roblox Username"
 
-onChange={
-e=>setRobloxUsername(
+value={
+form.roblox_username
+}
+
+onChange={e=>
+
+update(
+"roblox_username",
 e.target.value
 )
+
 }
 
 />
+
+
+
 
 
 <button
@@ -526,86 +597,54 @@ e.target.value
 onClick={lookupRoblox}
 
 className="
-bg-[#003B6F]
+bg-gray-800
 text-white
 px-5
+py-3
 font-bold
 "
 
 >
 
-Lookup
+{
+
+lookupLoading
+?
+"Checking..."
+:
+"Lookup Roblox ID"
+
+}
 
 </button>
 
 
-</div>
 
 
-
-
-
-{
-
-form.roblox_user_id && (
-
-<p className="
-mt-3
-text-green-600
-font-bold
-">
-
-Verified Roblox ID:
-{form.roblox_user_id}
-
-</p>
-
-)
-
-}
-
-
-</div>
-
-)
-
-}
-
-
-
-
-
-
-
-
-{
-mode==="organisation" && (
 
 <input
 
 className="
 border
-p-3
+p-4
 w-full
-mt-8
+bg-gray-100
 "
 
-placeholder="
-Organisation Name
-"
+readOnly
 
-value={form.organisation}
+placeholder="Roblox User ID"
 
-onChange={
-e=>update(
-"organisation",
-e.target.value
-)
+value={
+form.roblox_user_id
 }
 
 />
 
-)
+
+
+</section>
+
 
 }
 
@@ -617,7 +656,54 @@ e.target.value
 
 
 
-<section className="mt-12">
+
+{
+
+mode==="organisation"
+
+&&
+
+
+<input
+
+className="
+mt-10
+border
+p-4
+w-full
+"
+
+placeholder="Organisation Name"
+
+value={
+form.organisation
+}
+
+onChange={e=>
+
+update(
+"organisation",
+e.target.value
+)
+
+}
+
+/>
+
+
+}
+
+
+
+
+
+
+
+
+
+<section className="
+mt-12
+">
 
 
 <h2 className="
@@ -626,40 +712,47 @@ font-bold
 text-[#003B6F]
 ">
 
-Area Clearance
+Facility Access
 
 </h2>
 
 
 
-<div className="
-grid
-md:grid-cols-2
-gap-5
-mt-6
-">
 
 
 {
 
-areas.map(area=>(
+[
+
+["white_house","White House Grounds"],
+
+["capitol","United States Capitol"],
+
+["dhs","DHS Restricted Areas"],
+
+["airport","Airport Restricted Areas"]
+
+].map(([key,label])=>(
 
 
 <div
 
-key={area.key}
+key={key}
 
 className="
 border
 p-5
+mt-4
 "
 
 >
 
 
-<h3 className="font-bold">
+<h3 className="
+font-bold
+">
 
-{area.name}
+{label}
 
 </h3>
 
@@ -670,57 +763,70 @@ p-5
 className="
 border
 p-3
-w-full
 mt-3
 "
 
 value={
-form[area.key]
+form.clearances[key]
 }
 
-onChange={
-e=>update(
-area.key,
-Number(e.target.value)
+onChange={e=>
+
+updateClearance(
+key,
+e.target.value
 )
+
 }
 
 >
 
+<option value="">
 
-{
-
-clearanceLevels.map(level=>(
-
-<option
-
-key={level.level}
-
-value={level.level}
-
->
-
-Level {level.level}
+No Access
 
 </option>
 
-))
 
-}
+<option value="1">
+
+Level 1
+
+</option>
+
+
+<option value="2">
+
+Level 2
+
+</option>
+
+
+<option value="3">
+
+Level 3
+
+</option>
+
+
+<option value="4">
+
+Level 4
+
+</option>
 
 
 </select>
 
 
+
 </div>
 
 
 ))
 
+
 }
-
-
-</div>
 
 
 </section>
@@ -733,13 +839,15 @@ Level {level.level}
 
 
 
-<section className="mt-12">
+<section className="
+mt-12
+">
 
 
 <h2 className="
 text-2xl
 font-bold
-text-[#003B6F]
+text-red-700
 ">
 
 Blacklist
@@ -748,11 +856,13 @@ Blacklist
 
 
 
+
+
+
 <label className="
 flex
 gap-3
-mt-5
-font-bold
+mt-4
 ">
 
 
@@ -764,11 +874,13 @@ checked={
 form.blacklisted
 }
 
-onChange={
-e=>update(
+onChange={e=>
+
+update(
 "blacklisted",
 e.target.checked
 )
+
 }
 
 />
@@ -784,63 +896,39 @@ Blacklist Subject
 
 
 
+
 {
 
 form.blacklisted && (
 
-<div className="mt-5">
-
-
-<input
-
-className="
-border
-p-3
-w-full
-"
-
-placeholder="
-Reason
-"
-
-value={
-form.blacklist_reason
-}
-
-onChange={
-e=>update(
-"blacklist_reason",
-e.target.value
-)
-}
-
-/>
-
-
-
-<h3 className="
-font-bold
-mt-6
+<div className="
+mt-5
+space-y-4
 ">
-
-Blacklist Areas
-
-</h3>
-
 
 
 {
 
-areas.map(area=>(
+[
+
+["white_house","White House"],
+
+["capitol","Capitol"],
+
+["dhs","DHS"],
+
+["airport","Airport"]
+
+].map(([key,label])=>(
 
 
 <label
 
-key={area.key}
+key={key}
 
 className="
-block
-mt-3
+flex
+gap-3
 "
 
 >
@@ -850,22 +938,12 @@ mt-3
 
 type="checkbox"
 
-checked={
-form.blacklist_areas.includes(
-area.key
-)
-}
-
-onChange={()=>toggleBlacklistArea(
-area.key
-)}
+onChange={()=>toggleBlacklistArea(key)}
 
 />
 
 
-{" "}
-
-{area.name}
+{label}
 
 
 </label>
@@ -877,12 +955,41 @@ area.key
 }
 
 
+
+
+
+<textarea
+
+className="
+border
+p-4
+w-full
+"
+
+placeholder="Blacklist Reason"
+
+value={
+form.blacklist_reason
+}
+
+onChange={e=>
+
+update(
+"blacklist_reason",
+e.target.value
+)
+
+}
+
+/>
+
+
+
 </div>
 
 )
 
 }
-
 
 
 </section>
@@ -894,11 +1001,12 @@ area.key
 
 
 
+
 <button
 
-disabled={loading}
-
 onClick={submit}
+
+disabled={loading}
 
 className="
 mt-12
@@ -906,8 +1014,7 @@ bg-[#003B6F]
 text-white
 px-10
 py-4
-font-bold
-disabled:opacity-50
+font-black
 "
 
 >
@@ -932,6 +1039,7 @@ loading
 
 
 </main>
+
 
 );
 
