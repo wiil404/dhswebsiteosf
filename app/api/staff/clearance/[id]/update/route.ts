@@ -109,9 +109,8 @@ status:400
 
 
 /*
-    Get existing clearance records
+    Get existing records
 */
-
 
 
 const {
@@ -166,6 +165,53 @@ status:500
 
 
 }
+
+
+
+
+
+
+
+
+
+/*
+    Get White House ID
+*/
+
+
+const {
+
+data:whiteHouseArea
+
+}
+
+=
+await supabaseAdmin
+
+.from("security_areas")
+
+.select("id")
+
+.ilike(
+
+"name",
+
+"%White House%"
+
+)
+
+.single();
+
+
+
+
+
+
+
+
+
+const whiteHouseId =
+whiteHouseArea?.id;
 
 
 
@@ -265,20 +311,24 @@ clearances[areaId];
 
 
 
-/*
-    No level means remove access
-*/
-
-
 if(
 !data.level
 ){
 
-
 continue;
 
-
 }
+
+
+
+
+
+
+
+
+const isWhiteHouse =
+areaId === whiteHouseId;
+
 
 
 
@@ -297,27 +347,62 @@ data.level
 
 
 
+/*
+    White House only
+*/
+
+
 peoc_access:
 
-data.peoc_access || false,
+isWhiteHouse
+
+?
+
+data.peoc_access ?? false
+
+:
+
+false,
+
 
 
 
 white_house_lanyard:
 
-data.white_house_lanyard || false,
+isWhiteHouse
+
+?
+
+data.white_house_lanyard ?? false
+
+:
+
+false,
+
 
 
 
 lanyard_required:
 
-data.lanyard_required || false,
+isWhiteHouse
+
+?
+
+data.lanyard_required ?? false
+
+:
+
+false,
+
+
+
 
 
 
 blacklisted:
 
-data.blacklisted || false,
+data.blacklisted ?? false,
+
 
 
 
@@ -327,9 +412,11 @@ data.blacklist_reason || null,
 
 
 
+
 expires_at:
 
 data.expires_at || null,
+
 
 
 
@@ -339,9 +426,11 @@ data.notes || null,
 
 
 
+
 override_department:
 
-data.override_department || false,
+data.override_department ?? false,
+
 
 
 
