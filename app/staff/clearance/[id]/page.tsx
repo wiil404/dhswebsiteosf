@@ -1,10 +1,11 @@
 import Link from "next/link";
-
 import { notFound } from "next/navigation";
 
 import { supabaseAdmin } from "../../../lib/supabase-admin";
 
 import DeleteClearanceButton from "./DeleteClearanceButton";
+
+
 
 export default async function ClearanceProfile({
 
@@ -12,16 +13,14 @@ params
 
 }:{
 
-params:Promise<{
+params: Promise<{
     id:string
 }>
 
 }){
 
 
-const {id} =
-await params;
-
+const {id} = await params;
 
 
 
@@ -140,9 +139,7 @@ p-10
 
 
 
-
 {/* HEADER */}
-
 
 <div className="
 bg-[#003B6F]
@@ -186,15 +183,14 @@ subject.organisation ||
 
 
 
+
 <p className="
 mt-3
 text-xl
 ">
 
 {
-
 subject.subject_type
-
 }
 
 </p>
@@ -210,7 +206,9 @@ subject.subject_type
 
 
 
-{/* DETAILS */}
+
+
+{/* INFORMATION */}
 
 
 <section className="
@@ -219,7 +217,6 @@ grid
 md:grid-cols-3
 gap-6
 ">
-
 
 
 <InfoCard
@@ -243,6 +240,7 @@ subject.organisation || "N/A"
 ]}
 
 />
+
 
 
 
@@ -330,15 +328,13 @@ Facility Clearances
 
 
 
+
 <div className="
 grid
 md:grid-cols-2
 gap-6
 mt-8
 ">
-
-
-
 
 
 {
@@ -359,6 +355,7 @@ shadow-sm
 "
 
 >
+
 
 
 <div className="
@@ -383,13 +380,37 @@ clearance.security_areas?.name
 
 
 
-<span className="
-bg-[#003B6F]
-text-white
+
+<span className={`
 px-4
 py-2
 font-black
-">
+text-white
+${
+
+clearance.clearance_level === 1
+?
+"bg-green-600"
+
+:
+
+clearance.clearance_level === 2
+?
+"bg-blue-600"
+
+:
+
+clearance.clearance_level === 3
+?
+"bg-yellow-500 text-black"
+
+:
+
+"bg-orange-600"
+
+}
+
+`}>
 
 CL{clearance.clearance_level}
 
@@ -421,10 +442,9 @@ clearance.security_areas?.description
 
 
 
-
 <div className="
 mt-6
-space-y-2
+space-y-3
 ">
 
 
@@ -440,6 +460,7 @@ clearance.peoc_access
 
 
 
+
 <Status
 
 label="Lanyard Required"
@@ -449,6 +470,7 @@ clearance.lanyard_required
 }
 
 />
+
 
 
 
@@ -464,8 +486,9 @@ clearance.white_house_lanyard
 
 
 
-
 </div>
+
+
 
 
 
@@ -482,7 +505,7 @@ clearance.blacklisted && (
 mt-6
 bg-red-100
 border
-border-red-300
+border-red-400
 p-4
 ">
 
@@ -497,6 +520,7 @@ BLACKLISTED
 </h4>
 
 
+
 <p className="
 mt-2
 text-red-700
@@ -504,7 +528,9 @@ text-red-700
 
 {
 clearance.blacklist_reason ||
+
 "No reason provided"
+
 }
 
 </p>
@@ -515,7 +541,6 @@ clearance.blacklist_reason ||
 )
 
 }
-
 
 
 
@@ -539,6 +564,10 @@ clearance.blacklist_reason ||
 
 
 
+
+
+
+{/* ACTIONS */}
 
 
 <div className="
@@ -569,6 +598,8 @@ Edit Clearance
 
 
 
+
+
 <DeleteClearanceButton
 
 id={subject.id}
@@ -579,44 +610,6 @@ id={subject.id}
 
 
 
-<Link
-
-href="/staff/clearance"
-
-className="
-bg-gray-200
-px-6
-py-3
-font-bold
-"
-
->
-
-Back
-
-</Link>
-
-
-</div>
-
-
-<Link
-
-href={`/staff/clearance/${subject.id}/edit`}
-
-className="
-bg-yellow-500
-px-6
-py-3
-font-bold
-"
-
->
-
-Edit Clearance
-
-</Link>
-
 
 
 
@@ -636,6 +629,7 @@ font-bold
 Back
 
 </Link>
+
 
 
 </div>
@@ -699,6 +693,7 @@ text-[#003B6F]
 </h3>
 
 
+
 <div className="
 mt-4
 space-y-2
@@ -709,6 +704,7 @@ text-gray-700
 {
 
 items.map(
+
 (item,index)=>(
 
 <p key={index}>
@@ -733,6 +729,8 @@ items.map(
 
 
 }
+
+
 
 
 
@@ -770,6 +768,8 @@ pb-2
 {label}
 
 </span>
+
+
 
 
 <span className={
