@@ -1,61 +1,61 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-import { getProfile } from "../../lib/permissions";
-import { canManageClearance } from "../../lib/clearance";
 import { supabaseAdmin } from "../../lib/supabase-admin";
 
 
 
-export default async function ClearanceManagement(){
-
-
-const profile =
-await getProfile();
-
-
-
-if(!profile){
-
-redirect("/staff/login");
-
-}
-
-
-
-const allowed =
-await canManageClearance();
-
-
-
-if(!allowed){
-
-redirect("/staff/dashboard");
-
-}
-
-
-
-
+export default async function ClearancePage(){
 
 
 const {
 
-data:clearances,
+data:subjects,
 
 error
 
 } = await supabaseAdmin
 
-.from("security_clearances")
+.from("security_subjects")
 
 .select(`
 
-*,
+id,
 
-security_subjects(
-    *
+organisation,
+
+subject_type,
+
+roblox_username,
+
+roblox_user_id,
+
+active,
+
+public_visible,
+
+created_at,
+
+
+security_clearances(
+
+id,
+
+clearance_level,
+
+blacklisted,
+
+blacklist_reason,
+
+expires_at,
+
+security_areas(
+
+name
+
 )
+
+)
+
 
 `)
 
@@ -66,6 +66,77 @@ ascending:false
 }
 
 );
+
+
+
+
+
+if(error){
+
+
+return (
+
+<main className="max-w-7xl mx-auto px-6 py-16">
+
+<div className="
+bg-white
+border
+shadow-xl
+p-8
+">
+
+<h1 className="
+text-3xl
+font-bold
+text-red-600
+">
+
+Database Error
+
+</h1>
+
+
+<p className="mt-4">
+
+{error.message}
+
+</p>
+
+</div>
+
+</main>
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+const totalSubjects =
+subjects?.length || 0;
+
+
+const organisations =
+subjects?.filter(
+x=>x.subject_type==="organisation"
+)
+.length || 0;
+
+
+const blacklisted =
+subjects?.filter(
+x=>
+x.security_clearances?.some(
+(c:any)=>c.blacklisted
+)
+)
+.length || 0;
 
 
 
@@ -88,27 +159,28 @@ py-16
 bg-white
 shadow-xl
 border
-p-10
+border-gray-200
+p-8
+md:p-12
 ">
 
 
 
 
 
+
+{/* HEADER */}
+
+
 <div className="
-flex
-justify-between
-items-center
 border-b
 pb-8
 ">
 
 
-<div>
-
 <h1 className="
 text-4xl
-font-bold
+font-black
 text-[#003B6F]
 ">
 
@@ -133,351 +205,374 @@ Manage DHS, White House, Capitol and Airport restricted access.
 
 
 
-<Link
-
-href="/staff/clearance/create"
-
-className="
-bg-[#003B6F]
-text-white
-px-6
-py-3
-font-bold
-"
-
->
-
-+ Create Clearance
-
-</Link>
-
-
-</div>
 
 
 
 
+{/* STATS */}
 
-
-
-
-
-{
-
-error && (
 
 <div className="
-mt-8
-bg-red-100
-text-red-700
-p-5
+grid
+md:grid-cols-4
+gap-6
+mt-10
 ">
 
-{error.message}
 
-</div>
 
+<StatCard
+
+title="Subjects"
+
+value={totalSubjects}
+
+/>
+
+
+
+<StatCard
+
+title="Organisations"
+
+value={organisations}
+
+/>
+
+
+
+
+<StatCard
+
+title="Blacklisted"
+
+value={blacklisted}
+
+/>
+
+
+
+<StatCard
+
+title="Active Records"
+
+value={
+subjects?.reduce(
+(total:any,subject:any)=>
+total+
+(subject.security_clearances?.length||0),
+0
 )
-
 }
 
+/>
+
+
+
+</div>
 
 
 
 
 
 
+
+
+
+{/* TABLE */}
+
+
+<section className="
+mt-12
+">
 
 
 <div className="
-mt-10
-space-y-8
+overflow-x-auto
 ">
+
+
+<table className="
+w-full
+border-collapse
+">
+
+
+<thead>
+
+
+<tr className="
+bg-[#003B6F]
+text-white
+text-left
+">
+
+
+<th className="p-4">
+Subject
+</th>
+
+
+<th className="p-4">
+Type
+</th>
+
+
+<th className="p-4">
+White House
+</th>
+
+
+<th className="p-4">
+Capitol
+</th>
+
+
+<th className="p-4">
+DHS
+</th>
+
+
+<th className="p-4">
+Airport
+</th>
+
+
+<th className="p-4">
+Status
+</th>
+
+
+<th className="p-4">
+Actions
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+
+
+<tbody>
 
 
 {
 
-clearances?.map((clearance:any)=>(
+subjects?.map(
+(subject:any)=>(
 
 
-<section
+<tr
 
-key={clearance.id}
+key={subject.id}
 
 className="
-border
-p-6
-shadow-sm
+border-b
+hover:bg-gray-50
 "
 
 >
 
 
-
-<div className="
-flex
-justify-between
-items-start
-"
+<td className="p-4">
 
 
->
-
-
-<div>
-
-
-<h2 className="
-text-2xl
+<p className="
 font-bold
 text-[#003B6F]
 ">
 
-
 {
 
-clearance.security_subjects?.roblox_username ||
+subject.roblox_username ||
 
-clearance.security_subjects?.organisation ||
+subject.organisation ||
 
-"Unknown Subject"
-
-}
-
-
-</h2>
-
-
-
-
-
-<p className="
-text-gray-600
-mt-2
-">
-
-
-{
-
-clearance.security_subjects?.subject_type === "organisation"
-
-?
-
-"Organisation"
-
-:
-
-"Individual"
+"Unknown"
 
 }
-
 
 </p>
 
 
-
-
-
 {
 
-clearance.security_subjects?.roblox_user_id && (
+subject.roblox_user_id &&
 
 <p className="
 text-sm
 text-gray-500
 ">
 
-Roblox ID:
-
-{" "}
-
-{clearance.security_subjects.roblox_user_id}
+Roblox ID: {subject.roblox_user_id}
 
 </p>
-
-)
 
 }
 
 
-
-</div>
-
+</td>
 
 
 
 
 
 
-<div>
+
+<td className="p-4">
+
+
+<span className="
+uppercase
+text-sm
+font-bold
+">
+
+{subject.subject_type}
+
+</span>
+
+
+</td>
+
+
+
+
+
+
+
+
+
+<td className="p-4">
+
+<ClearanceBadge
+
+clearances={
+subject.security_clearances
+}
+
+area="White House Grounds"
+
+/>
+
+</td>
+
+
+
+
+
+
+<td className="p-4">
+
+<ClearanceBadge
+
+clearances={
+subject.security_clearances
+}
+
+area="United States Capitol"
+
+/>
+
+</td>
+
+
+
+
+
+
+<td className="p-4">
+
+<ClearanceBadge
+
+clearances={
+subject.security_clearances
+}
+
+area="DHS Restricted Areas"
+
+/>
+
+</td>
+
+
+
+
+
+
+
+<td className="p-4">
+
+<ClearanceBadge
+
+clearances={
+subject.security_clearances
+}
+
+area="Airport Restricted Areas"
+
+/>
+
+</td>
+
+
+
+
+
+
+
+<td className="p-4">
 
 
 {
 
-clearance.blacklisted && (
+subject.security_clearances?.some(
+(c:any)=>c.blacklisted
+)
+
+?
+
 
 <span className="
-bg-red-600
-text-white
-px-4
-py-2
+bg-red-100
+text-red-700
+px-3
+py-1
 font-bold
+text-sm
 ">
 
 BLACKLISTED
 
 </span>
 
-)
-
-}
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div className="
-grid
-md:grid-cols-4
-gap-5
-mt-8
-">
-
-
-<AreaCard
-
-title="White House"
-
-level={
-clearance.white_house
-}
-
-/>
-
-
-<AreaCard
-
-title="Capitol"
-
-level={
-clearance.capitol
-}
-
-/>
-
-
-<AreaCard
-
-title="DHS"
-
-level={
-clearance.dhs
-}
-
-/>
-
-
-<AreaCard
-
-title="Airport"
-
-level={
-clearance.airport
-}
-
-/>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-{
-
-clearance.blacklisted && (
-
-<div className="
-mt-8
-bg-red-50
-border
-border-red-200
-p-5
-">
-
-
-<h3 className="
-font-bold
-text-red-700
-">
-
-Blacklist Information
-
-</h3>
-
-
-
-<p className="mt-2">
-
-Reason:
-
-{" "}
-
-{
-clearance.blacklist_reason ||
-"No reason provided"
-}
-
-</p>
-
-
-
-
-<p className="mt-2">
-
-Areas:
-
-{" "}
-
-{
-
-clearance.blacklist_areas?.length
-
-?
-
-clearance.blacklist_areas.join(", ")
 
 :
 
-"All Areas"
+<span className="
+bg-green-100
+text-green-700
+px-3
+py-1
+font-bold
+text-sm
+">
+
+ACTIVE
+
+</span>
+
 
 }
 
 
-</p>
-
-
-</div>
-
-)
-
-}
+</td>
 
 
 
@@ -485,74 +580,93 @@ clearance.blacklist_areas.join(", ")
 
 
 
+<td className="p-4">
 
 
 <div className="
-mt-8
-border-t
-pt-5
 flex
-gap-5
+gap-3
 ">
 
 
 <Link
 
-href={`/staff/clearance/${clearance.id}`}
+href={`/staff/clearance/${subject.id}`}
 
 className="
-text-[#003B6F]
+bg-[#003B6F]
+text-white
+px-4
+py-2
 font-bold
-hover:underline
 "
 
 >
 
-View / Edit
+View
 
 </Link>
+
+
+
+
+
+<Link
+
+href={`/staff/clearance/${subject.id}/edit`}
+
+className="
+bg-yellow-500
+text-black
+px-4
+py-2
+font-bold
+"
+
+>
+
+Edit
+
+</Link>
+
 
 
 </div>
 
 
+</td>
 
 
+
+
+
+
+</tr>
+
+
+)
+
+)
+
+}
+
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
 
 
 </section>
 
 
-))
-
-}
 
 
 
-</div>
-
-
-
-
-
-
-
-{
-
-(!clearances || clearances.length===0) && (
-
-<p className="
-mt-10
-text-gray-500
-">
-
-No security clearances have been created.
-
-</p>
-
-)
-
-}
 
 
 
@@ -560,6 +674,98 @@ No security clearances have been created.
 
 
 </main>
+
+
+);
+
+}
+
+
+
+
+
+
+
+
+
+function ClearanceBadge({
+
+clearances,
+
+area
+
+}:{
+
+clearances:any[];
+
+area:string;
+
+}){
+
+
+const clearance =
+clearances?.find(
+(c:any)=>
+c.security_areas?.name===area
+);
+
+
+
+
+if(!clearance){
+
+
+return (
+
+<span className="
+text-gray-400
+font-bold
+">
+
+—
+
+</span>
+
+);
+
+
+}
+
+
+
+
+const colours:any={
+
+1:
+"bg-green-100 text-green-700",
+
+2:
+"bg-blue-100 text-blue-700",
+
+3:
+"bg-yellow-100 text-yellow-700",
+
+4:
+"bg-orange-100 text-orange-700"
+
+};
+
+
+
+
+
+return (
+
+<span className={`
+px-3
+py-1
+font-black
+${colours[clearance.clearance_level] || ""}
+`}>
+
+CL{clearance.clearance_level}
+
+</span>
 
 );
 
@@ -574,74 +780,52 @@ No security clearances have been created.
 
 
 
-function AreaCard({
+function StatCard({
 
 title,
-level
+
+value
 
 }:{
 
 title:string;
 
-level:number;
+value:number;
 
 }){
-
-
-const descriptions:any={
-
-1:"Level 1 - Full Clearance",
-
-2:"Level 2 - Restricted Access",
-
-3:"Level 3 - Controlled Access",
-
-4:"Level 4 - Invitation Only"
-
-};
-
 
 
 return (
 
 <div className="
 border
-p-4
-bg-gray-50
+p-6
+bg-[#F5F8FB]
 ">
-
-
-<h3 className="
-font-bold
-text-[#003B6F]
-">
-
-{title}
-
-</h3>
-
-
-<p className="
-mt-2
-font-semibold
-">
-
-Level {level}
-
-</p>
-
 
 
 <p className="
 text-sm
-text-gray-600
-mt-1
+uppercase
+text-gray-500
+font-bold
 ">
 
-{descriptions[level]}
+{title}
 
 </p>
 
+
+<p className="
+text-4xl
+font-black
+text-[#003B6F]
+mt-2
+">
+
+{value}
+
+</p>
 
 
 </div>
