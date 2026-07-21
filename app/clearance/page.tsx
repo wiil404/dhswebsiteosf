@@ -9,8 +9,8 @@ searchParams
 
 }:{
 
-searchParams: Promise<{
-    search?: string
+searchParams:Promise<{
+    search?:string
 }>
 
 }){
@@ -21,6 +21,8 @@ const {
 search
 
 }=await searchParams;
+
+
 
 
 
@@ -40,6 +42,8 @@ subject_type,
 roblox_username,
 
 public_visible,
+
+status,
 
 
 security_clearances(
@@ -88,7 +92,7 @@ ascending:false
 if(search){
 
 
-query = query.or(
+query=query.or(
 
 `roblox_username.ilike.%${search}%,organisation.ilike.%${search}%`
 
@@ -96,6 +100,7 @@ query = query.or(
 
 
 }
+
 
 
 
@@ -111,6 +116,18 @@ error
 }=await query;
 
 
+
+
+
+
+
+
+
+if(error){
+
+console.error(error);
+
+}
 
 
 
@@ -182,8 +199,7 @@ max-w-3xl
 text-blue-100
 ">
 
-Search publicly available DHS clearance records
-for verified personnel and organisations.
+Official public verification portal for DHS authorised personnel and organisations.
 
 </p>
 
@@ -281,6 +297,104 @@ py-16
 
 
 
+
+{/* CLEARANCE GUIDE */}
+
+
+
+<div className="
+bg-white
+border
+shadow-sm
+p-8
+mb-12
+">
+
+
+<h2 className="
+text-3xl
+font-black
+text-[#003B6F]
+">
+
+Clearance Level Guide
+
+</h2>
+
+
+
+
+
+<div className="
+grid
+md:grid-cols-4
+gap-5
+mt-6
+">
+
+
+<LevelCard
+
+level="CL1"
+
+title="Operational"
+
+desc="Standard authorised access"
+
+/>
+
+
+
+<LevelCard
+
+level="CL2"
+
+title="Restricted"
+
+desc="Controlled access areas"
+
+/>
+
+
+
+<LevelCard
+
+level="CL3"
+
+title="Sensitive"
+
+desc="High-security locations"
+
+/>
+
+
+
+<LevelCard
+
+level="CL4"
+
+title="Executive"
+
+desc="Special authorisation"
+
+/>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
 <div className="
 flex
 justify-between
@@ -334,7 +448,6 @@ Publicly available security authorisations.
 
 
 
-
 <p className="
 font-bold
 text-gray-500
@@ -358,14 +471,17 @@ text-gray-500
 
 {
 
-(!subjects || subjects.length===0) && (
+(!subjects || subjects.length===0)
+
+&&
+
+(
 
 <div className="
 bg-white
 border
 p-12
 text-center
-shadow
 ">
 
 
@@ -378,7 +494,6 @@ text-[#003B6F]
 No Records Found
 
 </h3>
-
 
 
 <p className="
@@ -417,6 +532,7 @@ gap-8
 
 
 
+
 {
 
 subjects?.map(
@@ -438,13 +554,13 @@ p-8
 shadow-sm
 hover:shadow-xl
 transition
-group
 relative
 overflow-hidden
 "
 
 
 >
+
 
 
 <div className="
@@ -454,8 +570,6 @@ top-0
 h-full
 w-1
 bg-[#F2C94C]
-group-hover:w-2
-transition
 "/>
 
 
@@ -463,6 +577,17 @@ transition
 
 
 
+
+
+<div className="
+flex
+justify-between
+items-start
+gap-4
+">
+
+
+<div>
 
 
 <h3 className="
@@ -475,7 +600,9 @@ text-[#003B6F]
 
 subject.roblox_username ||
 
-subject.organisation
+subject.organisation ||
+
+"Unknown"
 
 }
 
@@ -498,6 +625,25 @@ mt-2
 </p>
 
 
+</div>
+
+
+
+
+
+<StatusBadge
+
+status={
+subject.status
+}
+
+/>
+
+
+
+</div>
+
+
 
 
 
@@ -506,9 +652,12 @@ mt-2
 
 
 <div className="
-mt-6
+mt-8
 space-y-3
 ">
+
+
+
 
 
 {
@@ -527,7 +676,9 @@ bg-[#F5F8FB]
 p-4
 flex
 justify-between
+items-center
 "
+
 
 >
 
@@ -543,14 +694,54 @@ font-bold
 
 
 
-<span className="
+
+
+<span
+
+className={`
+px-3
+py-1
 font-black
-text-[#003B6F]
-">
+
+${
+
+c.clearance_level===4
+
+?
+
+"bg-orange-100 text-orange-700"
+
+:
+
+c.clearance_level===3
+
+?
+
+"bg-yellow-100 text-yellow-700"
+
+:
+
+c.clearance_level===2
+
+?
+
+"bg-blue-100 text-blue-700"
+
+:
+
+"bg-green-100 text-green-700"
+
+}
+
+`}
+
+>
 
 CL{c.clearance_level}
 
 </span>
+
+
 
 
 
@@ -562,6 +753,8 @@ CL{c.clearance_level}
 )
 
 }
+
+
 
 
 
@@ -583,7 +776,6 @@ text-[#003B6F]
 View Verification →
 
 </p>
-
 
 
 
@@ -637,6 +829,170 @@ Department of Homeland Security Public Verification Registry
 
 </main>
 
+
+);
+
+}
+
+
+
+
+
+
+
+
+
+function StatusBadge({
+
+status
+
+}:{
+
+status:string
+
+}){
+
+
+const states:any={
+
+
+verified:{
+
+text:"✓ VERIFIED",
+
+style:"bg-green-100 text-green-700"
+
+},
+
+
+suspended:{
+
+text:"⚠ SUSPENDED",
+
+style:"bg-yellow-100 text-yellow-700"
+
+},
+
+
+revoked:{
+
+text:"✕ REVOKED",
+
+style:"bg-red-100 text-red-700"
+
+},
+
+
+expired:{
+
+text:"EXPIRED",
+
+style:"bg-gray-200 text-gray-700"
+
+}
+
+
+};
+
+
+
+
+
+const current =
+states[status] || states.verified;
+
+
+
+
+
+return (
+
+<span className={`
+px-4
+py-2
+font-black
+text-sm
+${current.style}
+`}>
+
+{current.text}
+
+</span>
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function LevelCard({
+
+level,
+
+title,
+
+desc
+
+}:{
+
+level:string;
+
+title:string;
+
+desc:string;
+
+}){
+
+
+return (
+
+<div className="
+bg-[#F5F8FB]
+border
+p-5
+">
+
+
+<p className="
+text-3xl
+font-black
+text-[#003B6F]
+">
+
+{level}
+
+</p>
+
+
+<p className="
+font-bold
+mt-2
+">
+
+{title}
+
+</p>
+
+
+<p className="
+text-sm
+text-gray-500
+mt-1
+">
+
+{desc}
+
+</p>
+
+
+</div>
 
 );
 
