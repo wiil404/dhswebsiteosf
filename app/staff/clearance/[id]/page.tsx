@@ -1,9 +1,12 @@
 import Link from "next/link";
+
 import { notFound } from "next/navigation";
 
 import { supabaseAdmin } from "../../../lib/supabase-admin";
 
 import DeleteClearanceButton from "./DeleteClearanceButton";
+
+
 
 
 
@@ -13,14 +16,16 @@ params
 
 }:{
 
-params: Promise<{
+params:Promise<{
     id:string
 }>
 
 }){
 
 
-const {id} = await params;
+const {id} =
+await params;
+
 
 
 
@@ -32,7 +37,10 @@ data:subject,
 
 error
 
-} = await supabaseAdmin
+}
+
+=
+await supabaseAdmin
 
 .from("security_subjects")
 
@@ -73,8 +81,6 @@ blacklisted,
 
 blacklist_reason,
 
-blacklist_areas,
-
 expires_at,
 
 notes,
@@ -93,11 +99,15 @@ description
 `)
 
 .eq(
+
 "id",
+
 id
+
 )
 
 .single();
+
 
 
 
@@ -109,7 +119,6 @@ if(error || !subject){
 notFound();
 
 }
-
 
 
 
@@ -139,7 +148,9 @@ p-10
 
 
 
+
 {/* HEADER */}
+
 
 <div className="
 bg-[#003B6F]
@@ -184,6 +195,7 @@ subject.organisation ||
 
 
 
+
 <p className="
 mt-3
 text-xl
@@ -196,7 +208,6 @@ subject.subject_type
 </p>
 
 
-
 </div>
 
 
@@ -207,8 +218,8 @@ subject.subject_type
 
 
 
+{/* DETAILS */}
 
-{/* INFORMATION */}
 
 
 <section className="
@@ -217,6 +228,7 @@ grid
 md:grid-cols-3
 gap-6
 ">
+
 
 
 <InfoCard
@@ -284,13 +296,14 @@ subject.created_at
 .toLocaleDateString()
 }`,
 
-`Clearances: ${
+`Clearance Records: ${
 subject.security_clearances.length
 }`
 
 ]}
 
 />
+
 
 
 
@@ -301,10 +314,6 @@ subject.security_clearances.length
 
 
 
-
-
-
-{/* CLEARANCES */}
 
 
 
@@ -337,6 +346,10 @@ mt-8
 ">
 
 
+
+
+
+
 {
 
 subject.security_clearances.map(
@@ -344,207 +357,13 @@ subject.security_clearances.map(
 (clearance:any)=>(
 
 
-<div
+<ClearanceCard
 
 key={clearance.id}
 
-className="
-border
-p-6
-shadow-sm
-"
-
->
-
-
-
-<div className="
-flex
-justify-between
-items-center
-">
-
-
-<h3 className="
-text-xl
-font-bold
-text-[#003B6F]
-">
-
-{
-clearance.security_areas?.name
-}
-
-</h3>
-
-
-
-
-
-<span className={`
-px-4
-py-2
-font-black
-text-white
-${
-
-clearance.clearance_level === 1
-?
-"bg-green-600"
-
-:
-
-clearance.clearance_level === 2
-?
-"bg-blue-600"
-
-:
-
-clearance.clearance_level === 3
-?
-"bg-yellow-500 text-black"
-
-:
-
-"bg-orange-600"
-
-}
-
-`}>
-
-CL{clearance.clearance_level}
-
-</span>
-
-
-</div>
-
-
-
-
-
-
-
-<p className="
-mt-4
-text-gray-600
-">
-
-{
-clearance.security_areas?.description
-}
-
-</p>
-
-
-
-
-
-
-
-<div className="
-mt-6
-space-y-3
-">
-
-
-<Status
-
-label="PEOC Access"
-
-value={
-clearance.peoc_access
-}
+clearance={clearance}
 
 />
-
-
-
-
-<Status
-
-label="Lanyard Required"
-
-value={
-clearance.lanyard_required
-}
-
-/>
-
-
-
-
-<Status
-
-label="White House Lanyard"
-
-value={
-clearance.white_house_lanyard
-}
-
-/>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-{
-
-clearance.blacklisted && (
-
-<div className="
-mt-6
-bg-red-100
-border
-border-red-400
-p-4
-">
-
-
-<h4 className="
-font-black
-text-red-700
-">
-
-BLACKLISTED
-
-</h4>
-
-
-
-<p className="
-mt-2
-text-red-700
-">
-
-{
-clearance.blacklist_reason ||
-
-"No reason provided"
-
-}
-
-</p>
-
-
-</div>
-
-)
-
-}
-
-
-
-</div>
 
 
 )
@@ -552,6 +371,12 @@ clearance.blacklist_reason ||
 )
 
 }
+
+
+
+
+
+
 
 
 </div>
@@ -565,9 +390,6 @@ clearance.blacklist_reason ||
 
 
 
-
-
-{/* ACTIONS */}
 
 
 <div className="
@@ -612,7 +434,6 @@ id={subject.id}
 
 
 
-
 <Link
 
 href="/staff/clearance"
@@ -639,10 +460,345 @@ Back
 
 
 
+
 </div>
 
 
 </main>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function ClearanceCard({
+
+clearance
+
+}:{
+
+clearance:any;
+
+}){
+
+
+const isWhiteHouse =
+
+clearance.security_areas?.name === "White House Grounds";
+
+
+
+
+
+return (
+
+<div className="
+border
+p-6
+shadow-sm
+">
+
+
+<div className="
+flex
+justify-between
+items-center
+">
+
+
+<h3 className="
+text-xl
+font-bold
+text-[#003B6F]
+">
+
+{
+
+clearance.security_areas?.name ||
+
+"Unknown Area"
+
+}
+
+</h3>
+
+
+
+
+
+
+<span className={`
+px-4
+py-2
+font-black
+text-white
+
+${
+
+clearance.clearance_level === 1
+
+?
+
+"bg-green-600"
+
+:
+
+clearance.clearance_level === 2
+
+?
+
+"bg-blue-600"
+
+:
+
+clearance.clearance_level === 3
+
+?
+
+"bg-yellow-500 text-black"
+
+:
+
+"bg-orange-600"
+
+}
+
+`}>
+
+CL{clearance.clearance_level}
+
+</span>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<p className="
+mt-4
+text-gray-600
+">
+
+{
+
+clearance.security_areas?.description
+
+}
+
+</p>
+
+
+
+
+
+
+
+
+
+{/* WHITE HOUSE ONLY */}
+
+
+{
+
+isWhiteHouse && (
+
+<div className="
+mt-6
+space-y-3
+">
+
+
+<Status
+
+label="PEOC Access"
+
+value={
+clearance.peoc_access
+}
+
+/>
+
+
+
+
+
+<Status
+
+label="White House Lanyard"
+
+value={
+clearance.white_house_lanyard
+}
+
+/>
+
+
+
+
+
+<Status
+
+label="Lanyard Required"
+
+value={
+clearance.lanyard_required
+}
+
+/>
+
+
+
+</div>
+
+)
+
+}
+
+
+
+
+
+
+
+
+
+<div className="
+mt-6
+space-y-2
+text-sm
+text-gray-600
+">
+
+
+{
+
+clearance.expires_at &&
+
+<p>
+
+<strong>
+Expires:
+</strong>{" "}
+
+{
+
+new Date(
+clearance.expires_at
+)
+.toLocaleDateString()
+
+}
+
+</p>
+
+}
+
+
+
+
+
+
+
+{
+
+clearance.notes &&
+
+<p>
+
+<strong>
+Notes:
+</strong>{" "}
+
+{
+clearance.notes
+}
+
+</p>
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{
+
+clearance.blacklisted && (
+
+<div className="
+mt-6
+bg-red-100
+border
+border-red-400
+p-4
+">
+
+
+<h4 className="
+font-black
+text-red-700
+">
+
+BLACKLISTED
+
+</h4>
+
+
+
+
+<p className="
+mt-2
+text-red-700
+">
+
+{
+
+clearance.blacklist_reason ||
+
+"No reason provided"
+
+}
+
+</p>
+
+
+</div>
+
+)
+
+}
+
+
+
+
+
+
+
+
+</div>
 
 
 );
@@ -694,6 +850,8 @@ text-[#003B6F]
 
 
 
+
+
 <div className="
 mt-4
 space-y-2
@@ -724,6 +882,7 @@ items.map(
 
 
 </div>
+
 
 );
 
@@ -772,6 +931,7 @@ pb-2
 
 
 
+
 <span className={
 
 value
@@ -789,17 +949,23 @@ value
 {
 
 value
+
 ?
+
 "YES"
+
 :
+
 "NO"
 
 }
+
 
 </span>
 
 
 </div>
+
 
 );
 
