@@ -543,7 +543,6 @@ subject.created_at
 
 </div>
 
-// CONTINUED
 
 
 <section className="
