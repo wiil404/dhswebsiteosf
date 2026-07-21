@@ -250,7 +250,6 @@ Official public clearance registry record
 
 </div>
 
-
 </section>
 
 
@@ -532,13 +531,9 @@ subject.created_at
 
 </div>
 
+</div>
 
-
-
-
-
-
-
+</div>
 
 <section className="
 mt-14
@@ -933,7 +928,7 @@ clearance.blacklist_reason ||
 
 </section>
 
-id="yq3m8n"
+
 <section className="
 mt-14
 bg-white
@@ -1566,6 +1561,3 @@ text-[#003B6F]
 
 
 }
-
-
-</div>
