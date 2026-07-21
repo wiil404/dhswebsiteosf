@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 
 import { supabaseAdmin } from "../../lib/supabase-admin";
 
+import DHSSeal from "../../components/clearance/DHSSeal";
+import PrintButton from "../../components/clearance/PrintButton";
+
 
 
 export default async function PublicClearanceProfile({
@@ -19,7 +22,6 @@ params:Promise<{
 
 
 const {id}=await params;
-
 
 
 
@@ -46,6 +48,8 @@ roblox_username,
 roblox_user_id,
 
 status,
+
+verified_at,
 
 created_at,
 
@@ -103,7 +107,7 @@ notFound();
 
 
 
-const registryId =
+const registryID =
 generateRegistryID(
 subject.id,
 subject.subject_type
@@ -112,12 +116,17 @@ subject.subject_type
 
 
 
+const clearances =
+subject.security_clearances || [];
 
 
-const activeClearances =
-subject.security_clearances?.length || 0;
 
 
+
+const verifiedAt =
+subject.verified_at ||
+
+subject.created_at;
 
 
 
@@ -130,6 +139,7 @@ return (
 <main className="
 min-h-screen
 bg-[#F5F8FB]
+print:bg-white
 ">
 
 
@@ -138,14 +148,13 @@ bg-[#F5F8FB]
 
 
 
-{/* HERO */}
-
-
 <section className="
 bg-[#003B6F]
 text-white
 px-6
-py-20
+py-16
+print:bg-white
+print:text-black
 ">
 
 
@@ -155,10 +164,25 @@ mx-auto
 ">
 
 
+
+<div className="
+flex
+items-center
+gap-8
+">
+
+
+<DHSSeal />
+
+
+
+<div>
+
+
 <p className="
-text-[#F2C94C]
 uppercase
 tracking-[0.35em]
+text-[#F2C94C]
 font-bold
 text-sm
 ">
@@ -170,25 +194,22 @@ Department of Homeland Security
 
 
 
-
 <h1 className="
-text-6xl
+text-5xl
 font-black
-mt-5
+mt-4
 ">
 
-Security Clearance
+Security Clearance Certificate
 
 </h1>
 
 
 
 
-
 <p className="
-mt-4
+mt-3
 text-blue-100
-text-xl
 ">
 
 Official public verification record
@@ -200,7 +221,16 @@ Official public verification record
 </div>
 
 
+
+</div>
+
+
+
+</div>
+
+
 </section>
+
 
 
 
@@ -222,17 +252,36 @@ py-12
 
 
 
-
-{/* CREDENTIAL */}
-
-
-
 <div className="
+relative
 bg-white
 shadow-2xl
 border
 overflow-hidden
+print:shadow-none
 ">
+
+
+
+
+
+{/* SCAN ANIMATION */}
+
+
+<div className="
+absolute
+top-0
+left-0
+w-full
+h-1
+bg-[#F2C94C]
+animate-pulse
+print:hidden
+"/>
+
+
+
+
 
 
 
@@ -240,8 +289,8 @@ overflow-hidden
 bg-gradient-to-r
 from-[#003B6F]
 to-[#005AA7]
-p-10
 text-white
+p-10
 ">
 
 
@@ -252,39 +301,18 @@ text-white
 flex
 justify-between
 items-start
-gap-5
+gap-8
 ">
+
 
 
 <div>
-
-
-<div className="
-w-24
-h-24
-rounded-full
-border-4
-border-white
-flex
-items-center
-justify-center
-text-4xl
-font-black
-">
-
-DHS
-
-</div>
-
-
-
 
 
 
 <h2 className="
 text-5xl
 font-black
-mt-8
 ">
 
 {
@@ -309,11 +337,10 @@ mt-3
 text-blue-100
 ">
 
-{
-subject.subject_type
-}
+{subject.subject_type}
 
 </p>
+
 
 
 </div>
@@ -333,12 +360,14 @@ subject.status
 
 
 
-
 </div>
 
 
 
 </div>
+
+
+
 
 
 
@@ -356,7 +385,7 @@ p-10
 
 <div className="
 grid
-md:grid-cols-3
+md:grid-cols-4
 gap-5
 ">
 
@@ -369,7 +398,7 @@ gap-5
 title="Registry ID"
 
 value={
-registryId
+registryID
 }
 
 />
@@ -380,10 +409,10 @@ registryId
 
 <Stat
 
-title="Clearance Areas"
+title="Access Areas"
 
 value={
-String(activeClearances)
+String(clearances.length)
 }
 
 />
@@ -394,12 +423,24 @@ String(activeClearances)
 
 <Stat
 
-title="Record Status"
+title="Classification"
 
-value={
-subject.status?.toUpperCase() || "VERIFIED"
-}
+value="
+DHS"
+ 
+/>
 
+
+
+
+
+<Stat
+
+title="Verification"
+
+value="
+ACTIVE"
+ 
 />
 
 
@@ -413,23 +454,27 @@ subject.status?.toUpperCase() || "VERIFIED"
 
 
 
+
+
 <div className="
 grid
 md:grid-cols-2
 gap-6
-mt-8
+mt-10
 ">
 
 
 
 
 
-<Info
+
+<InfoCard
 
 title="Roblox Username"
 
 value={
-subject.roblox_username || "Organisation Account"
+subject.roblox_username ||
+"N/A"
 }
 
 />
@@ -438,12 +483,13 @@ subject.roblox_username || "Organisation Account"
 
 
 
-<Info
+<InfoCard
 
 title="Roblox User ID"
 
 value={
-subject.roblox_user_id || "N/A"
+subject.roblox_user_id ||
+"N/A"
 }
 
 />
@@ -452,12 +498,13 @@ subject.roblox_user_id || "N/A"
 
 
 
-<Info
+<InfoCard
 
 title="Organisation"
 
 value={
-subject.organisation || "Independent Personnel"
+subject.organisation ||
+"Individual Personnel"
 }
 
 />
@@ -466,9 +513,9 @@ subject.organisation || "Independent Personnel"
 
 
 
-<Info
+<InfoCard
 
-title="Issued"
+title="Issued Date"
 
 value={
 new Date(
@@ -481,12 +528,6 @@ subject.created_at
 
 
 
-</div>
-
-
-
-
-</div>
 
 
 
@@ -497,15 +538,17 @@ subject.created_at
 
 
 
+</div>
 
 
+</div>
 
-{/* ACCESS GRID */}
-
+// CONTINUED
 
 
 <section className="
 mt-14
+print:mt-8
 ">
 
 
@@ -515,9 +558,21 @@ font-black
 text-[#003B6F]
 ">
 
-Authorised Access
+Authorised Access Profile
 
 </h2>
+
+
+
+<p className="
+mt-2
+text-gray-500
+">
+
+Approved facilities and security classification levels.
+
+</p>
+
 
 
 
@@ -535,41 +590,74 @@ mt-8
 
 
 
-
 {
 
-subject.security_clearances?.map(
+clearances.map(
 
-(c:any)=>(
-
+(clearance:any)=>(
 
 
 <div
 
-key={c.id}
+key={clearance.id}
 
 className="
+relative
 bg-white
 border
 shadow-lg
 p-8
-relative
 overflow-hidden
 "
-
 
 >
 
 
-<div className="
+<div className={`
 absolute
 left-0
 top-0
 h-full
 w-2
-bg-[#F2C94C]
-"/>
+${
 
+clearance.blacklisted
+
+?
+
+"bg-red-600"
+
+:
+
+clearance.clearance_level === 4
+
+?
+
+"bg-orange-500"
+
+:
+
+clearance.clearance_level === 3
+
+?
+
+"bg-yellow-500"
+
+:
+
+clearance.clearance_level === 2
+
+?
+
+"bg-blue-500"
+
+:
+
+"bg-green-500"
+
+}
+
+`}/>
 
 
 
@@ -578,8 +666,10 @@ bg-[#F2C94C]
 <div className="
 flex
 justify-between
-items-center
+items-start
+gap-4
 ">
+
 
 
 <div>
@@ -592,25 +682,28 @@ text-[#003B6F]
 ">
 
 {
-c.security_areas?.name
+clearance.security_areas?.name
 }
 
 </h3>
 
 
+
 <p className="
-text-gray-500
-mt-2
+mt-3
+text-gray-600
 ">
 
 {
-c.security_areas?.description
+clearance.security_areas?.description
 }
 
 </p>
 
 
+
 </div>
+
 
 
 
@@ -620,10 +713,11 @@ c.security_areas?.description
 <ClearanceBadge
 
 level={
-c.clearance_level
+clearance.clearance_level
 }
 
 />
+
 
 
 
@@ -635,13 +729,35 @@ c.clearance_level
 
 
 
+<div className="
+mt-8
+">
+
+
+<AccessBar
+
+level={
+clearance.clearance_level
+}
+
+/>
+
+
+</div>
+
+
+
+
+
+
 
 {
 
-c.expires_at &&
+clearance.expires_at &&
 
 <p className="
 mt-6
+text-sm
 font-bold
 text-gray-500
 ">
@@ -652,7 +768,7 @@ Expires:
 
 {
 new Date(
-c.expires_at
+clearance.expires_at
 )
 .toLocaleDateString()
 }
@@ -665,11 +781,9 @@ c.expires_at
 
 
 
-
-
 {
 
-c.blacklisted &&
+clearance.blacklisted &&
 
 <div className="
 mt-6
@@ -680,34 +794,35 @@ p-5
 ">
 
 
-<h4 className="
-font-black
+<p className="
 text-red-700
+font-black
 ">
 
 ACCESS REVOKED
 
-</h4>
+</p>
 
 
 
 <p className="
-text-red-700
+text-red-600
 mt-2
 ">
 
 {
-c.blacklist_reason ||
+clearance.blacklist_reason ||
 "No reason provided"
 }
 
 </p>
 
 
+
 </div>
 
-}
 
+}
 
 
 
@@ -723,7 +838,9 @@ c.blacklist_reason ||
 
 
 
+
 </div>
+
 
 
 </section>
@@ -736,55 +853,130 @@ c.blacklist_reason ||
 
 
 
-{/* FOOTER */}
+{/* VERIFICATION PANEL */}
 
 
-<div className="
+<section className="
 mt-14
 bg-white
 border
-p-8
+shadow-xl
+p-10
 text-center
 ">
 
 
-<p className="
-text-green-600
-font-black
-text-xl
+<div className="
+text-5xl
 ">
 
-✓ AUTHENTICATED SECURITY RECORD
+✓
 
-</p>
+</div>
+
+
+
+<h2 className="
+mt-4
+text-3xl
+font-black
+text-green-600
+">
+
+VERIFIED SECURITY RECORD
+
+</h2>
+
+
 
 
 
 <p className="
 mt-3
-text-gray-500
+text-gray-600
 ">
 
-This record is maintained by the Department of Homeland Security Clearance Registry.
+This clearance record has been authenticated through the
+Department of Homeland Security Clearance Registry.
 
 </p>
 
 
 
-<p className="
-mt-5
-font-black
-text-[#003B6F]
+
+
+
+<div className="
+grid
+md:grid-cols-3
+gap-5
+mt-8
 ">
 
-{registryId}
 
-</p>
+<InfoCard
+
+title="Registry Number"
+
+value={
+registryID
+}
+
+/>
+
+
+
+
+<InfoCard
+
+title="Verified"
+
+value={
+new Date(
+verifiedAt
+)
+.toLocaleDateString()
+}
+
+/>
+
+
+
+
+<InfoCard
+
+title="Record"
+
+value="ACTIVE"
+
+/>
+
 
 
 </div>
 
 
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<div className="
+mt-10
+flex
+gap-4
+print:hidden
+">
+
+
+<PrintButton />
 
 
 
@@ -795,10 +987,7 @@ text-[#003B6F]
 href="/clearance"
 
 className="
-inline-block
-mt-10
-bg-[#003B6F]
-text-white
+bg-gray-200
 px-8
 py-4
 font-black
@@ -806,9 +995,64 @@ font-black
 
 >
 
-← Return Registry
+Return Registry
 
 </Link>
+
+
+</div>
+
+
+
+
+
+
+
+<footer className="
+mt-14
+bg-[#003B6F]
+text-white
+p-8
+text-center
+print:bg-white
+print:text-black
+">
+
+
+<p className="
+font-black
+">
+
+DEPARTMENT OF HOMELAND SECURITY
+
+</p>
+
+
+
+<p className="
+mt-2
+text-sm
+opacity-80
+">
+
+Security Clearance Registry
+
+</p>
+
+
+
+<p className="
+mt-4
+font-bold
+">
+
+{registryID}
+
+</p>
+
+
+</footer>
+
 
 
 
@@ -821,13 +1065,13 @@ font-black
 
 
 
-
 </main>
+
 
 );
 
-
 }
+
 
 
 
@@ -846,29 +1090,309 @@ type:string
 ){
 
 
-const number =
+
+const numeric =
+
 parseInt(
-id.replace(/-/g,"").slice(0,5),
+
+id.replace(/-/g,"").slice(0,8),
+
 16
+
 )
+
 .toString()
+
 .slice(0,5)
-.padStart(5,"0");
+
+.padStart(
+5,
+"0"
+);
+
+
 
 
 
 const prefix =
-type==="organisation"
+
+type === "organisation"
+
 ?
+
 "1H"
+
 :
+
 "2H";
 
 
 
-return `DHS${prefix}${number}`;
+
+
+return `DHS-${prefix}-${numeric}`;
+
 
 }
+
+
+
+
+
+
+
+
+
+function StatusBadge({
+
+status
+
+}:{
+
+status:string | null
+
+}){
+
+
+const current =
+(status || "verified")
+.toLowerCase();
+
+
+
+
+
+const styles:any={
+
+
+verified:
+"bg-green-100 text-green-700",
+
+
+active:
+"bg-green-100 text-green-700",
+
+
+suspended:
+"bg-yellow-100 text-yellow-700",
+
+
+revoked:
+"bg-red-100 text-red-700"
+
+
+};
+
+
+
+
+
+return (
+
+<div className={`
+px-6
+py-3
+font-black
+${styles[current] || styles.verified}
+`}>
+
+✓ {current.toUpperCase()}
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function ClearanceBadge({
+
+level
+
+}:{
+
+level:number
+
+}){
+
+
+const levels:any={
+
+
+1:{
+name:"STANDARD",
+style:"bg-green-100 text-green-700"
+},
+
+
+2:{
+name:"LIMITED",
+style:"bg-blue-100 text-blue-700"
+},
+
+
+3:{
+name:"RESTRICTED",
+style:"bg-yellow-100 text-yellow-700"
+},
+
+
+4:{
+name:"EXECUTIVE",
+style:"bg-orange-100 text-orange-700"
+}
+
+
+
+};
+
+
+
+
+const item =
+levels[level] || levels[1];
+
+
+
+
+
+return (
+
+<div className={`
+px-5
+py-4
+font-black
+text-center
+${item.style}
+`}>
+
+<p>
+CL{level}
+</p>
+
+<p className="
+text-xs
+mt-1
+">
+
+{item.name}
+
+</p>
+
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function AccessBar({
+
+level
+
+}:{
+
+level:number
+
+}){
+
+
+return (
+
+<div>
+
+
+<div className="
+flex
+gap-1
+">
+
+
+{
+
+[1,2,3,4].map(
+
+(x)=>(
+
+
+<div
+
+key={x}
+
+className={`
+h-3
+flex-1
+${
+
+x <= level
+
+?
+
+"bg-[#003B6F]"
+
+:
+
+"bg-gray-200"
+
+}
+
+`}
+
+/>
+
+
+)
+
+)
+
+}
+
+
+</div>
+
+
+
+
+<p className="
+text-xs
+uppercase
+font-bold
+text-gray-500
+mt-2
+">
+
+Security Level {level}/4
+
+</p>
+
+
+</div>
+
+
+);
+
+
+}
+
 
 
 
@@ -897,7 +1421,7 @@ return (
 <div className="
 bg-[#F5F8FB]
 border
-p-6
+p-5
 ">
 
 
@@ -914,8 +1438,8 @@ text-gray-500
 
 
 <p className="
-mt-3
-text-2xl
+mt-2
+text-xl
 font-black
 text-[#003B6F]
 ">
@@ -926,6 +1450,7 @@ text-[#003B6F]
 
 
 </div>
+
 
 );
 
@@ -940,7 +1465,7 @@ text-[#003B6F]
 
 
 
-function Info({
+function InfoCard({
 
 title,
 
@@ -959,6 +1484,7 @@ return (
 
 <div className="
 border
+bg-[#F5F8FB]
 p-5
 ">
 
@@ -989,94 +1515,6 @@ text-[#003B6F]
 
 </div>
 
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-function ClearanceBadge({
-
-level
-
-}:{
-
-level:number
-
-}){
-
-
-const data:any={
-
-1:["CL1","bg-green-100 text-green-700"],
-
-2:["CL2","bg-blue-100 text-blue-700"],
-
-3:["CL3","bg-yellow-100 text-yellow-700"],
-
-4:["CL4","bg-orange-100 text-orange-700"]
-
-};
-
-
-
-return (
-
-<div className={`
-px-5
-py-4
-font-black
-text-xl
-${data[level]?.[1]}
-`}>
-
-{data[level]?.[0]}
-
-</div>
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-function StatusBadge({
-
-status
-
-}:{
-
-status:string
-
-}){
-
-
-return (
-
-<div className="
-bg-green-100
-text-green-700
-px-6
-py-3
-font-black
-">
-
-✓ {status?.toUpperCase() || "VERIFIED"}
-
-</div>
 
 );
 
