@@ -353,13 +353,14 @@ pb-16
 
 >
 
+
 <div
 
 className="
-bg-white
+relative
+overflow-hidden
+bg-[#003B6F]
 shadow-xl
-border
-border-gray-200
 "
 
 >
@@ -368,46 +369,45 @@ border-gray-200
 <div
 
 className="
-h-2
-bg-[#F2C94C]
+absolute
+right-0
+top-0
+h-full
+w-1/3
+bg-[#005AA7]
+opacity-50
 "
 
 />
 
 
 
+
+
 <div
 
 className="
+relative
 p-10
-md:p-14
-flex
-flex-col
-md:flex-row
-items-center
-justify-between
-gap-10
+md:p-12
 "
 
 >
-
-
-<div>
 
 
 <p
 
 className="
 uppercase
-text-sm
+tracking-[0.3em]
+text-[#F2C94C]
 font-bold
-tracking-widest
-text-[#003B6F]
+text-sm
 "
 
 >
 
-Security Verification
+Department Services
 
 </p>
 
@@ -422,15 +422,15 @@ mt-4
 text-4xl
 md:text-5xl
 font-black
-text-[#003B6F]
-leading-tight
+text-white
 "
 
 >
 
-DHS Clearance Registry
+Security Clearance Verification
 
 </h2>
+
 
 
 
@@ -439,20 +439,31 @@ DHS Clearance Registry
 <p
 
 className="
-mt-5
-text-lg
-text-gray-700
+mt-4
 max-w-3xl
+text-blue-100
+text-lg
 leading-relaxed
 "
 
 >
 
-The official Department of Homeland Security public verification portal. Review authorised personnel and organisations holding approved security clearance records.
+The Department of Homeland Security provides a public verification service for authorised personnel and organisations. Search active security clearance records through the official DHS registry.
 
 </p>
 
 
+
+
+
+
+<div
+
+className="
+mt-8
+"
+
+>
 
 
 <Link
@@ -461,13 +472,13 @@ href="/clearance"
 
 className="
 inline-flex
-mt-8
-bg-[#003B6F]
-text-white
-px-7
-py-3
-font-bold
-hover:bg-[#002B52]
+items-center
+bg-[#F2C94C]
+text-[#003B6F]
+px-8
+py-4
+font-black
+hover:translate-x-2
 transition
 "
 
@@ -480,94 +491,6 @@ Access Clearance Registry →
 
 
 </div>
-
-
-
-
-
-
-<div
-
-className="
-hidden
-md:flex
-w-64
-h-64
-bg-[#F5F8FB]
-border
-items-center
-justify-center
-"
-
->
-
-
-<div
-
-className="
-text-center
-"
-
->
-
-
-<p
-
-className="
-text-5xl
-font-black
-text-[#003B6F]
-"
-
->
-
-DHS
-
-</p>
-
-
-<p
-
-className="
-mt-2
-text-sm
-font-bold
-uppercase
-tracking-widest
-text-gray-500
-"
-
->
-
-Clearance
-
-</p>
-
-
-<p
-
-className="
-text-sm
-font-bold
-uppercase
-tracking-widest
-text-gray-500
-"
-
->
-
-Registry
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
 
 
 
