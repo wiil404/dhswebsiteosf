@@ -48,10 +48,8 @@ blacklist_reason,
 
 expires_at,
 
-security_areas(
-
-name
-
+security_areas!area_id(
+    name
 )
 
 )
