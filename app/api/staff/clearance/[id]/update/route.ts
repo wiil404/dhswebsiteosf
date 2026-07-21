@@ -10,7 +10,7 @@ import { getUser } from "@/app/lib/auth";
 
 export async function POST(
 
-request:Request,
+request: Request,
 
 {
 
@@ -57,6 +57,7 @@ status:401
 
 
 
+
 const {id} =
 await params;
 
@@ -64,9 +65,9 @@ await params;
 
 
 
-
 const body =
 await request.json();
+
 
 
 
@@ -87,7 +88,7 @@ if(!clearances){
 return NextResponse.json(
 
 {
-error:"No clearance data provided"
+error:"Missing clearance data"
 },
 
 {
@@ -106,8 +107,9 @@ status:400
 
 
 
+
 /*
-    Get current clearance records
+    Get existing clearance records
 */
 
 
@@ -146,6 +148,7 @@ id
 
 
 
+
 if(existingError){
 
 
@@ -172,7 +175,12 @@ status:500
 
 
 
-const incomingAreaIds =
+/*
+    Delete removed areas
+*/
+
+
+const incomingAreas =
 Object.keys(clearances);
 
 
@@ -180,29 +188,23 @@ Object.keys(clearances);
 
 
 
-
-
-/*
-    Remove clearances that were deleted
-*/
-
-
-const deleteIds = existing
+const removeIds = existing
 
 ?.filter(
 
-(item:any)=>
+(record:any)=>
 
-!incomingAreaIds.includes(
-item.area_id
+!incomingAreas.includes(
+record.area_id
 )
 
 )
 
 .map(
 
-(item:any)=>
-item.id
+(record:any)=>
+
+record.id
 
 );
 
@@ -211,9 +213,10 @@ item.id
 
 
 
+
 if(
-deleteIds &&
-deleteIds.length > 0
+removeIds &&
+removeIds.length
 ){
 
 
@@ -227,7 +230,7 @@ await supabaseAdmin
 
 "id",
 
-deleteIds
+removeIds
 
 );
 
@@ -243,29 +246,114 @@ deleteIds
 
 
 /*
-    Update / Insert clearance records
+    Update / Insert
 */
 
 
+
 for(
-const areaId of incomingAreaIds
+const areaId of incomingAreas
 ){
 
 
 
-const clearance =
+const data =
 clearances[areaId];
 
 
 
 
+
+
+/*
+    No level means remove access
+*/
+
+
 if(
-!clearance.level
+!data.level
 ){
+
 
 continue;
 
+
 }
+
+
+
+
+
+
+
+const payload = {
+
+
+clearance_level:
+
+Number(
+data.level
+),
+
+
+
+peoc_access:
+
+data.peoc_access || false,
+
+
+
+white_house_lanyard:
+
+data.white_house_lanyard || false,
+
+
+
+lanyard_required:
+
+data.lanyard_required || false,
+
+
+
+blacklisted:
+
+data.blacklisted || false,
+
+
+
+blacklist_reason:
+
+data.blacklist_reason || null,
+
+
+
+expires_at:
+
+data.expires_at || null,
+
+
+
+notes:
+
+data.notes || null,
+
+
+
+override_department:
+
+data.override_department || false,
+
+
+
+updated_at:
+
+new Date()
+
+
+};
+
+
+
 
 
 
@@ -274,12 +362,11 @@ continue;
 const existingRecord =
 existing?.find(
 
-(item:any)=>
+(record:any)=>
 
-item.area_id === areaId
+record.area_id === areaId
 
 );
-
 
 
 
@@ -290,24 +377,23 @@ item.area_id === areaId
 if(existingRecord){
 
 
+
+const {
+
+error
+
+}
+
+=
 await supabaseAdmin
 
 .from("security_clearances")
 
-.update({
+.update(
 
-clearance_level:
+payload
 
-Number(
-clearance.level
-),
-
-
-updated_at:
-
-new Date()
-
-})
+)
 
 .eq(
 
@@ -319,12 +405,31 @@ existingRecord.id
 
 
 
+
+
+if(error){
+
+throw error;
+
+}
+
+
+
 }
 
 else{
 
 
 
+
+
+const {
+
+error
+
+}
+
+=
 await supabaseAdmin
 
 .from("security_clearances")
@@ -337,34 +442,30 @@ subject_id:id,
 area_id:areaId,
 
 
-clearance_level:
-
-Number(
-clearance.level
-),
+...payload,
 
 
-blacklisted:false,
-
-
-created_at:
-
-new Date(),
-
-
-updated_at:
-
-new Date()
+created_at:new Date()
 
 });
 
 
+
+
+
+if(error){
+
+throw error;
+
 }
 
 
 
 }
 
+
+
+}
 
 
 
@@ -384,15 +485,20 @@ success:true
 
 
 
+
 }
 
 catch(error:any){
 
 
 console.error(
+
 "UPDATE CLEARANCE ERROR:",
+
 error
+
 );
+
 
 
 
