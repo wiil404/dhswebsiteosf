@@ -123,13 +123,31 @@ setLookupLoading(true);
 
 
 
-
 try{
 
 
 const response = await fetch(
 
-`/api/roblox/lookup?username=${form.roblox_username}`
+"/api/roblox/lookup",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+username:
+form.roblox_username
+
+})
+
+}
 
 );
 
@@ -144,13 +162,15 @@ await response.json();
 
 
 
-
 if(!response.ok){
 
 
 alert(
+
 data.error ||
+
 "Roblox user not found"
+
 );
 
 
@@ -164,13 +184,16 @@ return;
 
 
 
+
 setForm({
 
 ...form,
 
-roblox_user_id:data.id
+roblox_user_id:
+data.id
 
 });
+
 
 
 
@@ -181,7 +204,9 @@ roblox_user_id:data.id
 catch(error){
 
 
-console.error(error);
+console.error(
+error
+);
 
 
 alert(
@@ -201,7 +226,6 @@ setLookupLoading(false);
 
 
 }
-
 
 
 
