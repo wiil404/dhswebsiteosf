@@ -2,7 +2,9 @@
 
 
 import {useState} from "react";
+
 import {useRouter} from "next/navigation";
+
 
 
 
@@ -45,21 +47,26 @@ id:c.id,
 
 level:String(c.clearance_level),
 
-peoc_access:c.peoc_access,
 
-white_house_lanyard:c.white_house_lanyard,
+peoc_access:c.peoc_access ?? false,
 
-lanyard_required:c.lanyard_required,
+white_house_lanyard:c.white_house_lanyard ?? false,
 
-blacklisted:c.blacklisted,
+lanyard_required:c.lanyard_required ?? false,
+
+
+blacklisted:c.blacklisted ?? false,
 
 blacklist_reason:c.blacklist_reason || "",
 
+
 expires_at:c.expires_at || "",
+
 
 notes:c.notes || "",
 
-override_department:c.override_department || ""
+
+override_department:c.override_department ?? false
 
 };
 
@@ -81,6 +88,7 @@ useState(initial);
 
 const [loading,setLoading] =
 useState(false);
+
 
 
 
@@ -337,6 +345,10 @@ Level 4 - Invitation Only
 
 
 
+{
+
+area.name === "White House Grounds" && (
+
 <div className="
 grid
 md:grid-cols-2
@@ -359,7 +371,7 @@ type="checkbox"
 className="ml-3"
 
 checked={
-form[area.id]?.peoc_access || false
+form[area.id]?.peoc_access ?? false
 }
 
 onChange={e=>
@@ -396,7 +408,7 @@ type="checkbox"
 className="ml-3"
 
 checked={
-form[area.id]?.white_house_lanyard || false
+form[area.id]?.white_house_lanyard ?? false
 }
 
 onChange={e=>
@@ -435,7 +447,7 @@ type="checkbox"
 className="ml-3"
 
 checked={
-form[area.id]?.lanyard_required || false
+form[area.id]?.lanyard_required ?? false
 }
 
 onChange={e=>
@@ -457,12 +469,25 @@ e.target.checked
 </label>
 
 
+</div>
+
+)
+
+}
 
 
 
 
 
-<label>
+
+
+
+
+<label className="
+block
+mt-6
+font-bold
+">
 
 Blacklist Area
 
@@ -473,7 +498,7 @@ type="checkbox"
 className="ml-3"
 
 checked={
-form[area.id]?.blacklisted || false
+form[area.id]?.blacklisted ?? false
 }
 
 onChange={e=>
@@ -494,93 +519,6 @@ e.target.checked
 
 </label>
 
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<input
-
-className="
-border
-p-3
-w-full
-mt-5
-"
-
-type="date"
-
-value={
-
-form[area.id]?.expires_at || ""
-
-}
-
-onChange={e=>
-
-update(
-
-area.id,
-
-"expires_at",
-
-e.target.value
-
-)
-
-}
-
-placeholder="Expiry Date"
-
-/>
-
-
-
-
-
-
-
-
-
-<textarea
-
-className="
-border
-p-3
-w-full
-mt-5
-"
-
-placeholder="Notes"
-
-value={
-
-form[area.id]?.notes || ""
-
-}
-
-onChange={e=>
-
-update(
-
-area.id,
-
-"notes",
-
-e.target.value
-
-)
-
-}
-
-/>
 
 
 
@@ -634,6 +572,87 @@ e.target.value
 
 
 
+<input
+
+className="
+border
+p-3
+w-full
+mt-5
+"
+
+type="date"
+
+value={
+
+form[area.id]?.expires_at || ""
+
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"expires_at",
+
+e.target.value
+
+)
+
+}
+
+/>
+
+
+
+
+
+
+
+
+
+<textarea
+
+className="
+border
+p-3
+w-full
+mt-5
+"
+
+placeholder="Notes"
+
+value={
+
+form[area.id]?.notes || ""
+
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"notes",
+
+e.target.value
+
+)
+
+}
+
+/>
+
+
+
+
+
+
+
+
 </div>
 
 
@@ -671,9 +690,13 @@ font-black
 {
 
 loading
+
 ?
+
 "Saving..."
+
 :
+
 "Save Clearance Changes"
 
 }
