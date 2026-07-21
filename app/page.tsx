@@ -357,10 +357,10 @@ pb-16
 <div
 
 className="
-relative
-overflow-hidden
-bg-[#003B6F]
+bg-white
 shadow-xl
+border
+border-gray-200
 "
 
 >
@@ -369,13 +369,8 @@ shadow-xl
 <div
 
 className="
-absolute
-right-0
-top-0
-h-full
-w-1/3
-bg-[#005AA7]
-opacity-50
+h-2
+bg-[#003B6F]
 "
 
 />
@@ -383,31 +378,47 @@ opacity-50
 
 
 
+<div
+
+className="
+p-10
+md:p-14
+"
+
+>
+
 
 <div
 
 className="
-relative
-p-10
-md:p-12
+flex
+flex-col
+md:flex-row
+justify-between
+items-start
+md:items-center
+gap-8
 "
 
 >
+
+
+<div>
 
 
 <p
 
 className="
 uppercase
-tracking-[0.3em]
-text-[#F2C94C]
-font-bold
 text-sm
+font-bold
+tracking-widest
+text-[#003B6F]
 "
 
 >
 
-Department Services
+Public Verification Service
 
 </p>
 
@@ -422,15 +433,15 @@ mt-4
 text-4xl
 md:text-5xl
 font-black
-text-white
+text-[#003B6F]
+leading-tight
 "
 
 >
 
-Security Clearance Verification
+Security Clearance Registry
 
 </h2>
-
 
 
 
@@ -439,31 +450,28 @@ Security Clearance Verification
 <p
 
 className="
-mt-4
-max-w-3xl
-text-blue-100
+mt-5
 text-lg
+text-gray-700
+max-w-4xl
 leading-relaxed
 "
 
 >
 
-The Department of Homeland Security provides a public verification service for authorised personnel and organisations. Search active security clearance records through the official DHS registry.
+Verify authorised DHS personnel and organisations through the official public clearance database. Access approved security records, clearance levels, and verification information.
 
 </p>
 
 
 
+</div>
 
 
 
-<div
 
-className="
-mt-8
-"
 
->
+
 
 
 <Link
@@ -471,26 +479,26 @@ mt-8
 href="/clearance"
 
 className="
-inline-flex
-items-center
-bg-[#F2C94C]
-text-[#003B6F]
+shrink-0
+bg-[#003B6F]
+text-white
 px-8
 py-4
 font-black
-hover:translate-x-2
+hover:bg-[#002B52]
 transition
 "
 
 >
 
-Access Clearance Registry →
+View Registry →
 
 </Link>
 
 
 
 </div>
+
 
 
 
@@ -501,7 +509,6 @@ Access Clearance Registry →
 
 
 </section>
-
 
 
 
