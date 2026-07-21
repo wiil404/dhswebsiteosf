@@ -2,9 +2,7 @@
 
 
 import {useState} from "react";
-
 import {useRouter} from "next/navigation";
-
 
 
 
@@ -30,7 +28,9 @@ useRouter();
 
 
 
-const existing:any = {};
+
+const initial:any = {};
+
 
 
 
@@ -39,15 +39,27 @@ subject.security_clearances?.forEach(
 (c:any)=>{
 
 
-existing[c.area_id] = {
+initial[c.area_id] = {
 
 id:c.id,
 
-level:c.clearance_level,
+level:String(c.clearance_level),
+
+peoc_access:c.peoc_access,
+
+white_house_lanyard:c.white_house_lanyard,
+
+lanyard_required:c.lanyard_required,
 
 blacklisted:c.blacklisted,
 
-reason:c.blacklist_reason
+blacklist_reason:c.blacklist_reason || "",
+
+expires_at:c.expires_at || "",
+
+notes:c.notes || "",
+
+override_department:c.override_department || ""
 
 };
 
@@ -63,8 +75,7 @@ reason:c.blacklist_reason
 
 
 const [form,setForm] =
-useState(existing);
-
+useState(initial);
 
 
 
@@ -78,12 +89,13 @@ useState(false);
 
 
 
-
-function updateLevel(
+function update(
 
 area:string,
 
-level:string
+field:string,
+
+value:any
 
 ){
 
@@ -96,7 +108,7 @@ setForm({
 
 ...form[area],
 
-level
+[field]:value
 
 }
 
@@ -120,7 +132,6 @@ setLoading(true);
 
 
 
-
 const response =
 await fetch(
 
@@ -135,7 +146,6 @@ headers:{
 "Content-Type":"application/json"
 
 },
-
 
 body:JSON.stringify({
 
@@ -164,8 +174,7 @@ if(!response.ok){
 
 
 alert(
-data.error ||
-"Update failed"
+data.error
 );
 
 
@@ -180,9 +189,10 @@ return;
 
 
 
-
 router.push(
+
 `/staff/clearance/${subject.id}`
+
 );
 
 
@@ -200,13 +210,15 @@ router.refresh();
 
 
 
-
 return (
 
 <div className="
 mt-10
-space-y-6
+space-y-8
 ">
+
+
+
 
 
 
@@ -217,6 +229,7 @@ space-y-6
 areas.map(
 
 (area:any)=>(
+
 
 
 <div
@@ -231,14 +244,18 @@ p-6
 >
 
 
+
 <h2 className="
-font-bold
+text-xl
+font-black
 text-[#003B6F]
 ">
 
 {area.name}
 
 </h2>
+
+
 
 
 
@@ -258,12 +275,16 @@ form[area.id]?.level || ""
 
 }
 
-
 onChange={e=>
 
-updateLevel(
+update(
+
 area.id,
+
+"level",
+
 e.target.value
+
 )
 
 }
@@ -280,28 +301,28 @@ No Access
 
 <option value="1">
 
-Clearance Level 1
+Level 1 - Full Clearance
 
 </option>
 
 
 <option value="2">
 
-Clearance Level 2
+Level 2 - Limited Access
 
 </option>
 
 
 <option value="3">
 
-Clearance Level 3
+Level 3 - Restricted
 
 </option>
 
 
 <option value="4">
 
-Clearance Level 4
+Level 4 - Invitation Only
 
 </option>
 
@@ -311,7 +332,310 @@ Clearance Level 4
 
 
 
+
+
+
+
+
+<div className="
+grid
+md:grid-cols-2
+gap-4
+mt-6
+">
+
+
+
+
+
+<label>
+
+PEOC Access
+
+<input
+
+type="checkbox"
+
+className="ml-3"
+
+checked={
+form[area.id]?.peoc_access || false
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"peoc_access",
+
+e.target.checked
+
+)
+
+}
+
+/>
+
+</label>
+
+
+
+
+
+
+<label>
+
+White House Lanyard
+
+<input
+
+type="checkbox"
+
+className="ml-3"
+
+checked={
+form[area.id]?.white_house_lanyard || false
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"white_house_lanyard",
+
+e.target.checked
+
+)
+
+}
+
+/>
+
+</label>
+
+
+
+
+
+
+
+
+<label>
+
+Lanyard Required
+
+<input
+
+type="checkbox"
+
+className="ml-3"
+
+checked={
+form[area.id]?.lanyard_required || false
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"lanyard_required",
+
+e.target.checked
+
+)
+
+}
+
+/>
+
+</label>
+
+
+
+
+
+
+
+<label>
+
+Blacklist Area
+
+<input
+
+type="checkbox"
+
+className="ml-3"
+
+checked={
+form[area.id]?.blacklisted || false
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"blacklisted",
+
+e.target.checked
+
+)
+
+}
+
+/>
+
+</label>
+
+
+
 </div>
+
+
+
+
+
+
+
+
+
+<input
+
+className="
+border
+p-3
+w-full
+mt-5
+"
+
+type="date"
+
+value={
+
+form[area.id]?.expires_at || ""
+
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"expires_at",
+
+e.target.value
+
+)
+
+}
+
+placeholder="Expiry Date"
+
+/>
+
+
+
+
+
+
+
+
+
+<textarea
+
+className="
+border
+p-3
+w-full
+mt-5
+"
+
+placeholder="Notes"
+
+value={
+
+form[area.id]?.notes || ""
+
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"notes",
+
+e.target.value
+
+)
+
+}
+
+/>
+
+
+
+
+
+
+
+
+{
+
+form[area.id]?.blacklisted &&
+
+<textarea
+
+className="
+border
+border-red-400
+p-3
+w-full
+mt-5
+"
+
+placeholder="Blacklist reason"
+
+value={
+
+form[area.id]?.blacklist_reason || ""
+
+}
+
+onChange={e=>
+
+update(
+
+area.id,
+
+"blacklist_reason",
+
+e.target.value
+
+)
+
+}
+
+/>
+
+
+}
+
+
+
+
+
+</div>
+
 
 
 )
@@ -319,6 +643,8 @@ Clearance Level 4
 )
 
 }
+
+
 
 
 
@@ -335,13 +661,12 @@ disabled={loading}
 className="
 bg-[#003B6F]
 text-white
-px-8
+px-10
 py-4
-font-bold
+font-black
 "
 
 >
-
 
 {
 
@@ -349,7 +674,7 @@ loading
 ?
 "Saving..."
 :
-"Save Changes"
+"Save Clearance Changes"
 
 }
 
@@ -359,7 +684,9 @@ loading
 
 
 
+
 </div>
+
 
 );
 
