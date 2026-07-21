@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { supabaseAdmin } from "../../../lib/supabase-admin";
 
-
+import DeleteClearanceButton from "./DeleteClearanceButton";
 
 export default async function ClearanceProfile({
 
@@ -546,6 +546,58 @@ mt-12
 flex
 gap-4
 ">
+
+
+<Link
+
+href={`/staff/clearance/${subject.id}/edit`}
+
+className="
+bg-yellow-500
+px-6
+py-3
+font-bold
+"
+
+>
+
+Edit Clearance
+
+</Link>
+
+
+
+
+
+<DeleteClearanceButton
+
+id={subject.id}
+
+/>
+
+
+
+
+
+<Link
+
+href="/staff/clearance"
+
+className="
+bg-gray-200
+px-6
+py-3
+font-bold
+"
+
+>
+
+Back
+
+</Link>
+
+
+</div>
 
 
 <Link
