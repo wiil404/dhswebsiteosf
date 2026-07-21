@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 import Breadcrumb from "@/components/Breadcrumb";
 
 
+
 export default async function Home() {
 
 
@@ -24,6 +25,7 @@ export default async function Home() {
         .limit(1)
 
         .maybeSingle();
+
 
 
 
@@ -50,6 +52,8 @@ export default async function Home() {
 
 
 
+
+
     console.log(
         "NEWS DATA:",
         news
@@ -60,6 +64,8 @@ export default async function Home() {
         "NEWS ERROR:",
         newsError
     );
+
+
 
 
 
@@ -78,7 +84,11 @@ return (
 
 
 
+
+
+
 {/* FEATURE CARDS */}
+
 
 <section
 
@@ -105,6 +115,9 @@ gap-8
 >
 
 
+
+
+
 <FeatureCard
 
 image="/hero/recruitment.jpg"
@@ -118,6 +131,8 @@ description="Begin your career serving the nation alongside dedicated profession
 button="Apply Now"
 
 />
+
+
 
 
 
@@ -140,6 +155,9 @@ button="View Divisions"
 
 
 
+
+
+
 <FeatureCard
 
 image="/hero/about.jpg"
@@ -156,19 +174,14 @@ button="Learn More"
 
 
 
+
+
 </div>
 
 
 </section>
 
-
-
-
-
-
-
-
-
+id="p2"
 {/* FEATURED STATEMENT */}
 
 
@@ -319,6 +332,137 @@ Read Full Statement →
 )
 
 }
+
+
+
+
+
+
+
+
+{/* CLEARANCE REGISTRY */}
+
+
+<section
+
+className="
+max-w-7xl
+mx-auto
+px-6
+pb-16
+"
+
+>
+
+
+<div
+
+className="
+bg-[#003B6F]
+shadow-xl
+p-10
+md:p-14
+text-white
+flex
+flex-col
+md:flex-row
+items-center
+justify-between
+gap-8
+"
+
+>
+
+
+<div>
+
+
+<p
+
+className="
+uppercase
+tracking-[0.3em]
+text-[#F2C94C]
+font-black
+text-sm
+"
+
+>
+
+Public Verification System
+
+</p>
+
+
+
+
+<h2
+
+className="
+text-4xl
+font-black
+mt-4
+"
+
+>
+
+DHS Clearance Registry
+
+</h2>
+
+
+
+
+
+<p
+
+className="
+mt-4
+text-blue-100
+max-w-3xl
+leading-relaxed
+"
+
+>
+
+The Department of Homeland Security Clearance Registry provides public verification of authorised personnel and organisations holding approved security access credentials.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+<Link
+
+href="/clearance"
+
+className="
+bg-[#F2C94C]
+text-[#003B6F]
+px-8
+py-4
+font-black
+hover:scale-105
+transition
+"
+
+>
+
+View Registry →
+
+</Link>
+
+
+
+</div>
+
+
+</section>
 
 
 
@@ -518,62 +662,6 @@ leading-relaxed
 
 </p>
 
-
-
-
-
-{
-
-article.employees && (
-
-<div
-
-className="
-mt-6
-border-t
-pt-4
-"
-
->
-
-
-<p
-
-className="
-font-bold
-text-gray-900
-"
-
->
-
-Author: {article.employees.roblox_username}
-
-</p>
-
-
-
-<p
-
-className="
-text-sm
-text-gray-600
-"
-
->
-
-{
-article.employees.positions?.title ||
-"Staff Member"
-}
-
-</p>
-
-
-</div>
-
-)
-
-}
 
 
 
