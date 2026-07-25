@@ -1,47 +1,106 @@
 import Image from "next/image";
 
 
-export default function SecretaryPage(){
+async function getRobloxAvatar(){
+
+    const username = "WiIl404";
+
+
+    try {
+
+        const userResponse = await fetch(
+            `https://users.roblox.com/v1/users/search?keyword=${username}&limit=1`,
+            {
+                cache:"no-store"
+            }
+        );
+
+
+        const userData = await userResponse.json();
+
+
+        if(!userData.data?.length){
+            return null;
+        }
+
+
+        const user = userData.data[0];
+
+
+        const avatarResponse = await fetch(
+
+            `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=420x420&format=Png&isCircular=true`,
+
+            {
+                cache:"no-store"
+            }
+
+        );
+
+
+        const avatarData = await avatarResponse.json();
+
+
+        return {
+
+            id:user.id,
+
+            avatar:
+            avatarData.data?.[0]?.imageUrl
+
+        };
+
+
+    }
+
+    catch{
+
+        return null;
+
+    }
+
+}
+
+
+
+
+
+
+export default async function SecretaryPage(){
+
+
+const roblox = await getRobloxAvatar();
+
+
 
 
 return (
 
-<main
 
-className="
-relative
-py-16
-"
+<main className="relative py-16 min-h-screen">
 
->
+
+
 
 
 {/* BACKGROUND */}
 
-<div
-
-className="
+<div className="
 absolute
 inset-0
 -z-10
 bg-[#003B6F]
 overflow-hidden
-"
-
->
+">
 
 
-<div
-
-className="
+<div className="
 absolute
 inset-0
 opacity-10
 bg-[linear-gradient(45deg,transparent_45%,white_46%,transparent_47%),linear-gradient(-45deg,transparent_45%,white_46%,transparent_47%)]
 bg-[length:120px_120px]
-"
-
-/>
+"/>
 
 
 </div>
@@ -52,41 +111,28 @@ bg-[length:120px_120px]
 
 
 
-
-
-<section
-
-className="
-max-w-6xl
+<section className="
+max-w-7xl
 mx-auto
 px-6
-"
-
->
+">
 
 
-<div
-
-className="
+<div className="
 bg-white
 shadow-2xl
 border
-border-gray-200
-"
-
->
+overflow-hidden
+">
 
 
-{/* GOLD BAR */}
 
-<div
 
-className="
-h-2
+
+<div className="
+h-3
 bg-[#F2C94C]
-"
-
-/>
+"/>
 
 
 
@@ -94,60 +140,55 @@ bg-[#F2C94C]
 
 
 
-<div
 
-className="
-p-8
+{/* HEADER */}
+
+
+<div className="
+bg-gradient-to-r
+from-[#003B6F]
+to-[#005AA7]
+text-white
+p-10
 md:p-14
-"
-
->
+">
 
 
-
-
-
-
-
-{/* HEADER PROFILE */}
-
-
-<div
-
-className="
+<div className="
 flex
 flex-col
 md:flex-row
 items-center
 gap-10
-border-b
-pb-10
-"
-
->
+">
 
 
 
-<div
 
-className="
+
+
+<div className="
 relative
 w-52
 h-52
 rounded-full
-overflow-hidden
 border-4
-border-[#003B6F]
-shadow-lg
-"
+border-white
+shadow-2xl
+overflow-hidden
+bg-white/20
+">
 
->
+
+{
+
+roblox?.avatar && (
 
 <Image
 
-src="/leadership/secretary.png"
+src={roblox.avatar}
 
-alt="Secretary of Homeland Security"
+alt="Secretary Roblox Avatar"
 
 fill
 
@@ -156,6 +197,11 @@ object-cover
 "
 
 />
+
+)
+
+}
+
 
 
 </div>
@@ -170,17 +216,13 @@ object-cover
 <div>
 
 
-<p
-
-className="
+<p className="
 uppercase
-tracking-[0.2em]
+tracking-[0.35em]
+text-[#F2C94C]
+font-black
 text-sm
-font-bold
-text-[#003B6F]
-"
-
->
+">
 
 Department of Homeland Security
 
@@ -191,18 +233,13 @@ Department of Homeland Security
 
 
 
-<h1
-
-className="
-mt-4
+<h1 className="
 text-5xl
-font-bold
-text-[#003B6F]
-"
+font-black
+mt-4
+">
 
->
-
-chedvn
+WiIl404
 
 </h1>
 
@@ -211,15 +248,11 @@ chedvn
 
 
 
-<h2
-
-className="
-mt-3
+<h2 className="
 text-2xl
-text-gray-700
-"
-
->
+mt-3
+text-blue-100
+">
 
 Secretary of Homeland Security
 
@@ -229,18 +262,43 @@ Secretary of Homeland Security
 
 
 
-<p
 
-className="
+
+<div className="
 mt-5
-text-gray-600
-"
+flex
+gap-4
+flex-wrap
+">
 
->
 
-Leading the Department of Homeland Security's mission to protect the nation, secure our borders, and strengthen communities.
+<span className="
+bg-green-500/20
+border
+border-green-300
+px-5
+py-2
+font-bold
+">
 
-</p>
+✓ VERIFIED EXECUTIVE
+
+</span>
+
+
+
+
+
+<span className="
+bg-white/10
+px-5
+py-2
+font-bold
+">
+
+Roblox ID: {roblox?.id || "Unavailable"}
+
+</span>
 
 
 
@@ -248,11 +306,86 @@ Leading the Department of Homeland Security's mission to protect the nation, sec
 
 
 
+
+
 </div>
 
 
 
 
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* PROFILE STATS */}
+
+
+<div className="
+p-10
+md:p-14
+">
+
+
+<div className="
+grid
+md:grid-cols-4
+gap-6
+">
+
+
+<Stat
+
+title="Position"
+
+value="Secretary"
+
+/>
+
+
+
+<Stat
+
+title="Department"
+
+value="DHS"
+
+/>
+
+
+
+
+<Stat
+
+title="Status"
+
+value="Active"
+
+/>
+
+
+
+
+<Stat
+
+title="Office"
+
+value="Executive"
+
+/>
+
+
+
+</div>
 
 
 
@@ -261,24 +394,16 @@ Leading the Department of Homeland Security's mission to protect the nation, sec
 {/* BIOGRAPHY */}
 
 
-<section
-
-className="
-mt-12
-"
-
->
+<section className="
+mt-14
+">
 
 
-<h2
-
-className="
-text-3xl
-font-bold
+<h2 className="
+text-4xl
+font-black
 text-[#003B6F]
-"
-
->
+">
 
 Biography
 
@@ -288,22 +413,109 @@ Biography
 
 
 
-<p
-
-className="
-mt-5
+<p className="
+mt-6
 text-lg
 leading-relaxed
 text-gray-700
-"
+">
 
->
+WiIl404 serves as the Secretary of Homeland Security, leading the Department's mission to protect the nation through operational readiness, national security coordination, emergency preparedness, border security, and public safety initiatives.
 
-Chedvn was appointed as Secretary of Homeland Security to lead the Department's efforts across national security, emergency preparedness, border security, cybersecurity, and public safety.
+<br/>
+<br/>
 
-With extensive experience in public service and leadership, the Secretary works alongside DHS personnel and partner agencies to advance the Department's mission and protect the American people.
+Previously serving as Secretary of Homeland Security, WiIl404 was renominated under President Owen's Administration to continue leading the Department. Prior to his appointment, he served in numerous senior national leadership roles including six separate appointments as General and as Chairman of the Joint Chiefs of Staff.
+
+<br/>
+<br/>
+
+Throughout his career, the Secretary has held a variety of public-facing positions focused on military leadership, government operations, and interagency cooperation. His experience continues to guide DHS in strengthening its workforce, improving operational capability, and maintaining public trust.
 
 </p>
+
+
+</section>
+
+{/* CAREER TIMELINE */}
+
+
+<section className="
+mt-14
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Career Timeline
+
+</h2>
+
+
+
+
+
+<div className="
+mt-8
+space-y-6
+">
+
+
+<TimelineItem
+
+title="Secretary of Homeland Security"
+
+description="Currently serving as the head of the Department of Homeland Security, overseeing national security operations, emergency preparedness, border security, and departmental strategy."
+
+/>
+
+
+
+
+
+<TimelineItem
+
+title="Secretary of Homeland Security — Previous Administration"
+
+description="Previously served as Secretary of Homeland Security before being renominated under President Owen's Administration."
+
+/>
+
+
+
+
+
+
+<TimelineItem
+
+title="Chairman of the Joint Chiefs of Staff"
+
+description="Served as Chairman of the Joint Chiefs of Staff, advising senior government leadership on military readiness, operations, and national defence matters."
+
+/>
+
+
+
+
+
+
+<TimelineItem
+
+title="General Officer Service"
+
+description="Completed six separate General appointments, providing extensive leadership experience across military and government operations."
+
+/>
+
+
+
+
+
+</div>
 
 
 </section>
@@ -319,24 +531,17 @@ With extensive experience in public service and leadership, the Secretary works 
 {/* PRIORITIES */}
 
 
-<section
 
-className="
-mt-12
-"
-
->
+<section className="
+mt-14
+">
 
 
-<h2
-
-className="
-text-3xl
-font-bold
+<h2 className="
+text-4xl
+font-black
 text-[#003B6F]
-"
-
->
+">
 
 Secretary's Priorities
 
@@ -347,58 +552,26 @@ Secretary's Priorities
 
 
 
-<div
 
-className="
+<div className="
 grid
 md:grid-cols-3
 gap-6
-mt-6
-"
-
->
+mt-8
+">
 
 
-<div
-
-className="
-border
-p-6
-bg-gray-50
-"
-
->
-
-<h3
-
-className="
-font-bold
-text-xl
-text-[#003B6F]
-"
-
->
-
-National Security
-
-</h3>
 
 
-<p
-
-className="
-mt-3
-text-gray-600
-"
-
->
-
-Protecting the nation through preparedness, intelligence coordination, and operational excellence.
-
-</p>
 
 
-</div>
+<PrioritiesCard
+
+title="National Security"
+
+description="Strengthening DHS operational readiness through improved coordination, intelligence sharing, and strategic planning."
+
+/>
 
 
 
@@ -406,46 +579,13 @@ Protecting the nation through preparedness, intelligence coordination, and opera
 
 
 
-<div
+<PrioritiesCard
 
-className="
-border
-p-6
-bg-gray-50
-"
+title="Operational Excellence"
 
->
+description="Building a professional department through training, accountability, and effective leadership."
 
-<h3
-
-className="
-font-bold
-text-xl
-text-[#003B6F]
-"
-
->
-
-Community Resilience
-
-</h3>
-
-
-<p
-
-className="
-mt-3
-text-gray-600
-"
-
->
-
-Supporting communities through disaster response, recovery, and emergency management.
-
-</p>
-
-
-</div>
+/>
 
 
 
@@ -453,46 +593,17 @@ Supporting communities through disaster response, recovery, and emergency manage
 
 
 
-<div
 
-className="
-border
-p-6
-bg-gray-50
-"
+<PrioritiesCard
 
->
+title="Public Service"
 
-<h3
+description="Maintaining trust through transparency, communication, and dedication to protecting communities."
 
-className="
-font-bold
-text-xl
-text-[#003B6F]
-"
-
->
-
-Department Excellence
-
-</h3>
+/>
 
 
-<p
 
-className="
-mt-3
-text-gray-600
-"
-
->
-
-Building a professional workforce dedicated to service and public trust.
-
-</p>
-
-
-</div>
 
 
 
@@ -512,48 +623,39 @@ Building a professional workforce dedicated to service and public trust.
 {/* QUOTE */}
 
 
-<section
 
-className="
-mt-12
+<section className="
+mt-14
 border-l-4
-border-[#003B6F]
-bg-gray-50
+border-[#F2C94C]
+bg-[#F5F8FB]
 p-8
-"
-
->
+">
 
 
-<p
-
-className="
-text-xl
+<p className="
+text-2xl
 italic
 text-gray-700
-"
+">
 
->
-
-"Together, we will continue to strengthen the security of our nation and serve the communities that depend on us."
+"Leadership is built through service, preparation, and the commitment to protect those who depend on us. The Department of Homeland Security will continue to stand ready."
 
 </p>
 
 
 
-<p
 
-className="
-mt-4
-font-bold
+<p className="
+mt-5
+font-black
 text-[#003B6F]
-"
+">
 
->
-
-— Secretary chedvn
+— Secretary WiIl404
 
 </p>
+
 
 
 </section>
@@ -566,29 +668,22 @@ text-[#003B6F]
 
 
 
-{/* OFFICE INFORMATION */}
+{/* OFFICE */}
 
 
-<section
 
-className="
-mt-12
+<section className="
+mt-14
 border-t
-pt-8
-"
-
->
+pt-10
+">
 
 
-<h2
-
-className="
-text-2xl
-font-bold
+<h2 className="
+text-3xl
+font-black
 text-[#003B6F]
-"
-
->
+">
 
 Office of the Secretary
 
@@ -596,38 +691,59 @@ Office of the Secretary
 
 
 
-<div
 
-className="
-mt-4
-text-gray-700
-"
-
->
-
-
-<p>
-
-Department of Homeland Security
-
-</p>
+<div className="
+grid
+md:grid-cols-3
+gap-6
+mt-6
+">
 
 
-<p>
-
-Washington, D.C.
-
-</p>
 
 
-<p>
 
-Official Leadership Office
+<InfoBox
 
-</p>
+title="Department"
+
+value="Department of Homeland Security"
+
+/>
+
+
+
+
+
+
+<InfoBox
+
+title="Location"
+
+value="Washington, D.C."
+
+/>
+
+
+
+
+
+
+<InfoBox
+
+title="Role"
+
+value="Executive Leadership Office"
+
+/>
+
+
+
+
 
 
 </div>
+
 
 
 </section>
@@ -642,13 +758,278 @@ Official Leadership Office
 
 </div>
 
+
 </div>
 
 
 </section>
+
 
 
 </main>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function Stat({
+
+title,
+
+value
+
+}:{
+
+title:string;
+
+value:string;
+
+}){
+
+
+return (
+
+<div className="
+bg-[#F5F8FB]
+border
+p-6
+">
+
+
+<p className="
+text-xs
+uppercase
+tracking-widest
+font-bold
+text-gray-500
+">
+
+{title}
+
+</p>
+
+
+
+<p className="
+mt-3
+text-2xl
+font-black
+text-[#003B6F]
+">
+
+{value}
+
+</p>
+
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function TimelineItem({
+
+title,
+
+description
+
+}:{
+
+title:string;
+
+description:string;
+
+}){
+
+
+return (
+
+<div className="
+relative
+border-l-4
+border-[#003B6F]
+pl-6
+">
+
+
+<h3 className="
+text-xl
+font-black
+text-[#003B6F]
+">
+
+{title}
+
+</h3>
+
+
+
+
+<p className="
+mt-2
+text-gray-600
+leading-relaxed
+">
+
+{description}
+
+</p>
+
+
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function PrioritiesCard({
+
+title,
+
+description
+
+}:{
+
+title:string;
+
+description:string;
+
+}){
+
+
+return (
+
+<div className="
+border
+bg-[#F5F8FB]
+p-7
+shadow-sm
+">
+
+
+<h3 className="
+text-xl
+font-black
+text-[#003B6F]
+">
+
+{title}
+
+</h3>
+
+
+
+
+<p className="
+mt-3
+text-gray-600
+leading-relaxed
+">
+
+{description}
+
+</p>
+
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function InfoBox({
+
+title,
+
+value
+
+}:{
+
+title:string;
+
+value:string;
+
+}){
+
+
+return (
+
+<div className="
+border
+bg-white
+p-6
+">
+
+
+<p className="
+text-xs
+uppercase
+font-bold
+tracking-widest
+text-gray-500
+">
+
+{title}
+
+</p>
+
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{value}
+
+</p>
+
+
+
+</div>
 
 
 );
