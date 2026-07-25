@@ -3,47 +3,64 @@ import Image from "next/image";
 
 async function getRobloxAvatar(){
 
-    const username = "WiIl404";
+    const userId = "333195903";
 
 
     try {
 
+
         const userResponse = await fetch(
-            `https://users.roblox.com/v1/users/search?keyword=${username}&limit=1`,
+
+            `https://users.roblox.com/v1/users/${userId}`,
+
             {
                 cache:"no-store"
             }
+
         );
 
 
-        const userData = await userResponse.json();
 
+        if(!userResponse.ok){
 
-        if(!userData.data?.length){
             return null;
+
         }
 
 
-        const user = userData.data[0];
+
+        const user = await userResponse.json();
+
+
+
 
 
         const avatarResponse = await fetch(
 
-            `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${user.id}&size=420x420&format=Png&isCircular=true`,
+            `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=420x420&format=Png&isCircular=true`,
 
             {
                 cache:"no-store"
             }
 
         );
+
+
 
 
         const avatarData = await avatarResponse.json();
 
 
+
+
+
         return {
 
             id:user.id,
+
+            username:user.name,
+
+            displayName:user.displayName,
 
             avatar:
             avatarData.data?.[0]?.imageUrl
@@ -51,16 +68,23 @@ async function getRobloxAvatar(){
         };
 
 
+
     }
 
-    catch{
+    catch(error){
+
+        console.error(
+            "Roblox lookup failed:",
+            error
+        );
+
 
         return null;
 
     }
 
-}
 
+}
 
 
 
@@ -296,7 +320,7 @@ py-2
 font-bold
 ">
 
-Roblox ID: {roblox?.id || "Unavailable"}
+Roblox ID: {roblox?.id || "333195903"}
 
 </span>
 
