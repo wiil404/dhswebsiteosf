@@ -63,7 +63,7 @@ group-hover:text-[#F2C94C]
 transition
 ">
 
-SECRETARY CHEDVN
+SECRETARY WILL404
 
 </span>
 
