@@ -128,7 +128,7 @@ text-5xl
 font-black
 ">
 
-{contract.title}
+{contracts?.[0]?.title || "My Contracts"}
 
 </h1>
 
