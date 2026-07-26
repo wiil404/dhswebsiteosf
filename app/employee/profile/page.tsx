@@ -504,12 +504,19 @@ gap-6
 title="Date Joined"
 
 value={
+
 employee.hire_date
+
 ?
+
 new Date(employee.hire_date)
 .toLocaleDateString()
+
 :
-"Not recorded"
+
+new Date(employee.created_at)
+.toLocaleDateString()
+
 }
 
 />
@@ -524,12 +531,18 @@ new Date(employee.hire_date)
 title="Appointment Date"
 
 value={
+
 employee.appointment_date
+
 ?
+
 new Date(employee.appointment_date)
 .toLocaleDateString()
+
 :
+
 "Not recorded"
+
 }
 
 />
