@@ -24,43 +24,18 @@ const { data:contract, error } = await supabaseAdmin
 
 .from("contracts")
 
-.select(`
-
-*,
-
-employees(
-
-roblox_username,
-
-employee_number,
-
-roblox_user_id,
-
-positions(
-
-title
-
-),
-
-divisions(
-
-name
-
-)
-
-)
-
-`)
+.select("*")
 
 .eq(
-
 "id",
-
-params.id
-
+id
 )
 
 .single();
+
+  console.log("CONTRACT ID:", id);
+console.log("CONTRACT DATA:", contract);
+console.log("CONTRACT ERROR:", error);
 
 
 
