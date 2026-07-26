@@ -1,144 +1,124 @@
 import { redirect } from "next/navigation";
+
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
+
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 
+
 export default async function ContractViewPage({
-    params
-}:{
+    params,
+}: {
     params: Promise<{
         id:string
     }>
-}){
+}) {
 
 
 const { id } = await params;
 
 
 
-console.log("CONTRACT ID:", id);
-
-
-
 const {
-    data:contract,
+    data: contract,
     error
-}=await supabaseAdmin
+} = await supabaseAdmin
 
 .from("contracts")
 
 .select("*")
 
 .eq(
-"id",
-id
+    "id",
+    id
 )
 
 .single();
 
 
-
-console.log("CONTRACT:", contract);
-console.log("ERROR:", error);
 
 
 
 if(error || !contract){
 
-    return (
-
-        <main className="p-10">
-
-            <h1 className="text-3xl font-bold">
-                Contract Not Found
-            </h1>
-
-            <p>
-                ID: {id}
-            </p>
-
-            <pre>
-                {JSON.stringify(error,null,2)}
-            </pre>
-
-        </main>
-
+    console.error(
+        "Contract lookup failed:",
+        error
     );
 
-}
-
-
-
-return (
-
-<div>
-
-<h1>
-{contract.title}
-</h1>
-
-</div>
-
-);
-
+    redirect("/staff/contracts");
 
 }
 
 
 
 
-const employee = contract.employees;
+
+const {
+    data: employee
+} = await supabaseAdmin
+
+.from("employees")
+
+.select("*")
+
+.eq(
+    "id",
+    contract.employee_id
+)
+
+.single();
 
 
 
-let positionName = "Unknown";
-let divisionName = "Unknown";
+
+
+let position = null;
+
+let division = null;
 
 
 
+if(employee){
 
 
-if(employee?.position_id){
+const positionResponse = await supabaseAdmin
 
-
-const {data:position}=await supabaseAdmin
 .from("positions")
+
 .select("title")
+
 .eq(
 "id",
 employee.position_id
 )
+
 .single();
 
 
-
-positionName = position?.title || "Unknown";
-
-
-}
+position = positionResponse.data;
 
 
 
 
 
+const divisionResponse = await supabaseAdmin
 
-if(employee?.division_id){
-
-
-const {data:division}=await supabaseAdmin
 .from("divisions")
+
 .select("name")
+
 .eq(
 "id",
 employee.division_id
 )
+
 .single();
 
 
-
-divisionName = division?.name || "Unknown";
+division = divisionResponse.data;
 
 
 }
@@ -174,12 +154,10 @@ overflow-hidden
 ">
 
 
-
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
-
 
 
 
@@ -218,7 +196,6 @@ mt-4
 
 
 
-
 <p className="
 mt-3
 text-blue-100
@@ -229,8 +206,8 @@ Official Employment Contract Record
 </p>
 
 
-
 </div>
+
 
 
 
@@ -247,11 +224,7 @@ space-y-10
 
 
 
-
-
-
 <section>
-
 
 <h2 className="
 text-3xl
@@ -274,35 +247,20 @@ mt-6
 
 
 <Info
-
 title="Contract Number"
-
-value={
-contract.contract_number || "Not Assigned"
-}
-
+value={contract.contract_number || "Not Assigned"}
 />
 
 
 <Info
-
 title="Contract Type"
-
-value={
-contract.contract_type || "Unknown"
-}
-
+value={contract.contract_type || "Unknown"}
 />
 
 
 <Info
-
 title="Status"
-
-value={
-contract.status || "Unknown"
-}
-
+value={contract.status || "Unknown"}
 />
 
 
@@ -334,7 +292,6 @@ Employee
 
 
 
-
 <div className="
 bg-[#F5F8FB]
 border
@@ -343,17 +300,15 @@ mt-6
 ">
 
 
-
 <p className="
 text-3xl
 font-black
 text-[#003B6F]
 ">
 
-{employee?.roblox_username || "Unknown"}
+{employee?.roblox_username || "Unknown Employee"}
 
 </p>
-
 
 
 
@@ -372,7 +327,6 @@ Employee Number:
 
 
 
-
 <p className="
 mt-2
 text-gray-700
@@ -382,10 +336,9 @@ Position:
 
 {" "}
 
-{positionName}
+{position?.title || "Unknown"}
 
 </p>
-
 
 
 
@@ -398,7 +351,7 @@ Division:
 
 {" "}
 
-{divisionName}
+{division?.name || "Unknown"}
 
 </p>
 
@@ -408,6 +361,7 @@ Division:
 
 
 </section>
+
 
 
 
@@ -441,22 +395,33 @@ mt-6
 ">
 
 
-
-<SignatureBox
+<Info
 
 title="Employee Signature"
 
-signed={contract.employee_signed}
+value={
+contract.employee_signed
+?
+"Signed"
+:
+"Awaiting Signature"
+}
 
 />
 
 
 
-<SignatureBox
+<Info
 
 title="Executive Signature"
 
-signed={contract.executive_signed}
+value={
+contract.executive_signed
+?
+"Signed"
+:
+"Awaiting Signature"
+}
 
 />
 
@@ -490,6 +455,7 @@ Contract Document
 
 
 
+
 <div className="
 mt-6
 border
@@ -505,7 +471,9 @@ text-gray-700
 </div>
 
 
+
 </section>
+
 
 
 
@@ -530,79 +498,6 @@ text-gray-700
 
 
 }
-
-
-
-
-
-
-
-
-
-function SignatureBox({
-
-title,
-
-signed
-
-}:{
-
-title:string;
-
-signed:boolean;
-
-}){
-
-
-return (
-
-<div className="
-border
-p-6
-bg-[#F5F8FB]
-">
-
-
-<p className="
-uppercase
-text-xs
-tracking-widest
-font-bold
-text-gray-500
-">
-
-{title}
-
-</p>
-
-
-
-<p className="
-mt-3
-font-black
-text-[#003B6F]
-">
-
-{
-signed
-?
-"Signed"
-:
-"Awaiting Signature"
-}
-
-</p>
-
-
-</div>
-
-
-);
-
-
-}
-
-
 
 
 
@@ -660,6 +555,7 @@ text-[#003B6F]
 
 
 </div>
+
 
 );
 
