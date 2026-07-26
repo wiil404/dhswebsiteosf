@@ -75,7 +75,7 @@ export async function GET(){
         new URL(
             "/employee/dashboard",
             process.env.NEXT_PUBLIC_SITE_URL ||
-            "http://localhost:3000"
+            "https://www.osfusadhs.com"
         )
 
     );
