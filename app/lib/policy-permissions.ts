@@ -1,46 +1,72 @@
-export const POLICY_MANAGEMENT_ROLES = [
+export const POLICY_CREATORS = [
 
-    "Secretary of Homeland Security",
+"Secretary of Homeland Security",
+"Deputy Secretary of Homeland Security",
+"Chief of Staff",
+"Under Secretary",
 
-    "Deputy Secretary of Homeland Security",
+"Secret Service Director",
+"CBP Commissioner",
+"Special Response Team Commander",
+"Under Secretary for Aviation Operations",
+"Senior Flight Officer",
+"Deputy Director",
+"Assistant Director",
+"Chief of Operations",
+"CBP Deputy Commissioner",
+"Special Agent in Charge (SRT)"
 
-    "Chief of Staff",
+];
 
-    "Under Secretary",
 
-    "Secret Service Director",
+export const POLICY_APPROVERS = [
 
-    "CBP Commissioner",
-
-    "Special Response Team Commander",
-
-    "Under Secretary for Aviation Operations",
-
-    "Senior Flight Officer",
-
-    "Deputy Director",
-
-    "Assistant Director",
-
-    "Chief of Operations",
-
-    "CBP Deputy Commissioner",
-
-    "Special Agent in Charge (SRT)"
+"Secretary of Homeland Security",
+"Deputy Secretary of Homeland Security",
+"Chief of Staff",
+"Under Secretary"
 
 ];
 
 
 
-export function canManagePolicies(
-    position:string | null | undefined
+export function canCreatePolicy(
+position:string | null
 ){
 
-    if(!position){
-        return false;
-    }
+if(!position){
+    return false;
+}
+
+return POLICY_CREATORS.includes(position);
+
+}
 
 
-    return POLICY_MANAGEMENT_ROLES.includes(position);
+
+
+export function canApprovePolicy(
+position:string | null
+){
+
+if(!position){
+    return false;
+}
+
+return POLICY_APPROVERS.includes(position);
+
+}
+
+
+
+export function canManageAllPolicies(
+position:string | null
+){
+
+if(!position){
+    return false;
+}
+
+return POLICY_APPROVERS.includes(position);
 
 }
