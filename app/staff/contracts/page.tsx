@@ -252,6 +252,53 @@ mt-1
 
 </p>
 
+ {
+
+contract.employee_signed && (
+
+<div className="
+mt-3
+text-sm
+text-gray-600
+">
+
+
+<p>
+
+Signed by:
+
+{" "}
+
+<b>
+{contract.employee_signature_name}
+</b>
+
+</p>
+
+
+<p>
+
+Date:
+
+{" "}
+
+<b>
+{
+new Date(
+contract.employee_signature_date
+).toLocaleString("en-GB")
+}
+
+</b>
+
+</p>
+
+
+</div>
+
+)
+
+} 
 
 
 <div className="
@@ -270,32 +317,9 @@ font-bold
 text-sm
 ">
 
-{
-
-contract.employee_signed && contract.executive_signed
-
-?
-
-"Completed"
-
-
-:
-
-contract.employee_signed
-
-?
-
-"Awaiting Executive Signature"
-
-
-:
-
-"Pending Employee Signature"
-
-}
+{contract.status}
 
 </span>
-
 
 
 {
