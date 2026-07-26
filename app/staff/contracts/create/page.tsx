@@ -103,7 +103,27 @@ const { data: division } = await supabaseAdmin
 
 
 
+const {data:employees}=await supabaseAdmin
 
+.from("employees")
+
+.select(`
+id,
+roblox_username,
+roblox_user_id,
+employee_number,
+position_id,
+division_id
+`)
+
+.eq(
+"status",
+"Active"
+)
+
+.order(
+"roblox_username"
+);
 
 
 async function createContract(
