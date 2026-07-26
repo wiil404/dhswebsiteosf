@@ -61,7 +61,7 @@ JSON.stringify(currentEmployee, null, 2)
 
 
 const position =
-currentEmployee?.positions?.[0]?.title || "";
+currentEmployee?.positions?.title || "";
 
 
 console.log(
