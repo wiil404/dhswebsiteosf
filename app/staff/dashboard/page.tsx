@@ -92,11 +92,7 @@ if(!profile){
 
 
 
-const {
-
-data:employee
-
-}=await supabaseAdmin
+const {data:employee}=await supabaseAdmin
 
 .from("employees")
 
@@ -110,26 +106,23 @@ employee_number,
 
 status,
 
-positions(
+position_id,
 
-title
+division_id,
 
+positions!employees_position_id_fkey(
+    title
 ),
 
-divisions(
-
-name
-
+divisions!employees_division_id_fkey(
+    name
 )
 
 `)
 
 .eq(
-
 "user_id",
-
 user.id
-
 )
 
 .maybeSingle();
@@ -870,24 +863,6 @@ description="Manage divisions and department structure."
 
 
 
-
-{
-
-administrator && (
-
-<PortalCard
-
-href="/staff/organisation/positions"
-
-title="Position Management"
-
-description="Manage roles and assignments."
-
-/>
-
-)
-
-}
 
 
 
