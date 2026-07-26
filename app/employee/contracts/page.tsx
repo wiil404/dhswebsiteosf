@@ -1,178 +1,5 @@
-import { redirect } from "next/navigation";
+<section>
 
-import Link from "next/link";
-
-import { getEmployeeSession } from "@/app/lib/employee-auth";
-
-import { supabaseAdmin } from "@/app/lib/supabase-admin";
-
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-
-
-export default async function EmployeeContractsPage(){
-
-
-
-const session = await getEmployeeSession();
-
-
-
-if(!session){
-
-    redirect("/employee/login");
-
-}
-
-
-
-
-const employee = session.employees;
-
-
-
-
-
-const {
-
-data:contracts
-
-}=await supabaseAdmin
-
-.from("contracts")
-
-.select("*")
-
-.eq(
-"employee_id",
-employee.id
-)
-
-.order(
-"created_at",
-{
-ascending:false
-}
-);
-
-
-
-
-
-
-
-
-
-return (
-
-<main className="
-min-h-screen
-bg-[#F5F8FB]
-py-16
-">
-
-
-<section className="
-max-w-6xl
-mx-auto
-px-6
-">
-
-
-
-
-
-<div className="
-bg-white
-shadow-2xl
-border
-overflow-hidden
-">
-
-
-
-<div className="
-h-3
-bg-[#F2C94C]
-"/>
-
-
-
-
-
-
-<div className="
-bg-gradient-to-r
-from-[#003B6F]
-to-[#005AA7]
-text-white
-p-10
-">
-
-
-<p className="
-uppercase
-tracking-[0.35em]
-text-[#F2C94C]
-font-black
-text-sm
-">
-
-Department of Homeland Security
-
-</p>
-
-
-
-<h1 className="
-text-5xl
-font-black
-mt-4
-">
-
-My Contracts
-
-</h1>
-
-
-
-<p className="
-mt-3
-text-blue-100
-">
-
-Review and sign your official Department agreements.
-
-</p>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div className="
-p-10
-">
-
-
-
-
-
-
-<div className="
-flex
-items-center
-justify-between
-">
 
 <h2 className="
 text-3xl
@@ -180,189 +7,77 @@ font-black
 text-[#003B6F]
 ">
 
-Contract Registry
+Employee Acceptance
 
 </h2>
 
 
-</div>
 
 
-
-
-
-
-
-
-<div className="
-mt-8
-space-y-6
-">
-
-
-
-
-
-{
-
-contracts?.map((contract:any)=>(
-
-
-<div
-
-key={contract.id}
-
-className="
-border
-bg-[#F5F8FB]
-p-7
-flex
-flex-col
-md:flex-row
-md:items-center
-md:justify-between
-gap-6
-"
-
-
->
-
-
-
-<div>
-
-
-
-<h3 className="
-text-2xl
-font-black
-text-[#003B6F]
-">
-
-{contract.title}
-
-</h3>
-
-
-
-<p className="
-mt-3
-text-gray-600
-">
-
-Contract Number:
-
-{" "}
-
-{contract.contract_number}
-
-</p>
-
-
-
-<p className="
-mt-2
-text-gray-600
-">
-
-Status:
-
-{" "}
-
-<span className="
-font-bold
-">
-
-{contract.status}
-
-</span>
-
-
-</p>
-
-
-
-
-<div className="
-flex
-gap-3
-mt-4
-">
-
-
-<StatusBadge
-
-signed={contract.employee_signed}
-
-/>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<Link
-
-href={`/employee/contracts/${contract.id}`}
-
-className="
-bg-[#003B6F]
-text-white
-px-6
-py-3
-font-black
-hover:bg-[#005AA7]
-transition
-text-center
-"
-
->
-
-Review Contract
-
-</Link>
-
-
-
-
-
-</div>
-
-
-))
-
-
-}
-
-
-
-
-
-
-
-{
-
-(!contracts || contracts.length===0) && (
 
 <div className="
 border
 bg-[#F5F8FB]
 p-8
-text-gray-600
+mt-6
 ">
 
-You currently have no assigned contracts.
 
-</div>
+<p className="
+text-gray-700
+leading-relaxed
+">
+
+By signing this agreement, I acknowledge that I have read,
+understood, and agree to comply with all provisions contained
+within this Department of Homeland Security employment contract.
+
+</p>
+
+
+
+
+
+{
+
+!contract.employee_signed && (
+
+<form
+
+action={async()=>{
+
+"use server";
+
+await signEmployeeContract(contract.id);
+
+}}
+
+className="mt-8"
+
+>
+
+
+<button
+
+className="
+bg-[#003B6F]
+text-white
+px-8
+py-4
+font-black
+text-lg
+hover:bg-[#005AA7]
+transition
+"
+
+>
+
+Sign Contract
+
+</button>
+
+
+</form>
 
 )
 
@@ -372,17 +87,91 @@ You currently have no assigned contracts.
 
 
 
+{
+
+contract.employee_signed && (
+
+<div className="
+mt-6
+bg-green-100
+border
+border-green-400
+p-5
+font-bold
+text-green-800
+">
+
+
+<p>
+
+You have signed this agreement.
+
+</p>
+
+
+
+<div className="
+mt-4
+space-y-2
+text-sm
+">
+
+<p>
+
+Signed By:
+
+{" "}
+
+{contract.employee_signature_name || "Unknown"}
+
+</p>
+
+
+<p>
+
+Roblox ID:
+
+{" "}
+
+{contract.employee_signature_id || "Unknown"}
+
+</p>
+
+
+<p>
+
+Signed Date:
+
+{" "}
+
+{
+
+contract.employee_signature_date
+
+?
+
+new Date(
+contract.employee_signature_date
+).toLocaleString("en-GB")
+
+:
+
+"Unknown"
+
+}
+
+</p>
 
 
 </div>
 
 
 
-
-
-
 </div>
 
+)
+
+}
 
 
 
@@ -392,74 +181,3 @@ You currently have no assigned contracts.
 
 
 </section>
-
-
-</main>
-
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-function StatusBadge({
-
-signed
-
-}:{
-
-signed:boolean
-
-}){
-
-
-return (
-
-<span className={`
-px-4
-py-2
-font-bold
-border
-${
-signed
-
-?
-
-"bg-green-100 border-green-400 text-green-800"
-
-:
-
-"bg-yellow-100 border-yellow-400 text-yellow-800"
-
-}
-`}>
-
-{
-
-signed
-
-?
-
-"Signed"
-
-:
-
-"Awaiting Signature"
-
-}
-
-
-</span>
-
-);
-
-
-}
