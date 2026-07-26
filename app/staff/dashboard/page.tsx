@@ -92,31 +92,16 @@ if(!profile){
 
 
 
-const {data:employee}=await supabaseAdmin
+const {
+    data:employee,
+    error:employeeError
+}=await supabaseAdmin
 
 .from("employees")
 
 .select(`
 
-roblox_username,
-
-roblox_user_id,
-
-employee_number,
-
-status,
-
-position_id,
-
-division_id,
-
-positions!employees_position_id_fkey(
-    title
-),
-
-divisions!employees_division_id_fkey(
-    name
-)
+*
 
 `)
 
@@ -127,6 +112,9 @@ user.id
 
 .maybeSingle();
 
+
+console.log("EMPLOYEE:", employee);
+console.log("EMPLOYEE ERROR:", employeeError);
 
 
 
