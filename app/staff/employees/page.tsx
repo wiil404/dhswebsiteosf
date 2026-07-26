@@ -139,7 +139,7 @@ Employee Registry
 
 <Link
 
-href="/staff"
+href="/staff/dashboard"
 
 className="
 bg-[#F2C94C]
