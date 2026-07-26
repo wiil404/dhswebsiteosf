@@ -55,7 +55,7 @@ session.employees.id
 
 
 const position =
-currentEmployee?.positions?.title || "";
+currentEmployee?.positions?.[0]?.title || "";
 
 
 
