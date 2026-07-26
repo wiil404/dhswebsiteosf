@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {useState,useEffect} from "react";
+import {useRouter} from "next/navigation";
 
 import Editor from "../../../../components/Editor";
 import FileUpload from "../../../../components/FileUpload";
@@ -15,35 +15,37 @@ const router = useRouter();
 
 
 
-const [title,setTitle] = useState("");
+const [title,setTitle]=useState("");
 
-const [category,setCategory] = useState(
+const [category,setCategory]=useState(
 "Security"
 );
 
 
-const [scope,setScope] = useState(
+const [scope,setScope]=useState(
 "UNIVERSAL"
 );
 
 
-const [divisionId,setDivisionId] = useState("");
+const [divisionId,setDivisionId]=useState("");
 
 
-const [classification,setClassification] = useState(
+
+const [classification,setClassification]=useState(
 "PUBLIC"
 );
 
 
-const [content,setContent] = useState("");
+
+const [content,setContent]=useState("");
 
 
 
-const [divisions,setDivisions] = useState<any[]>([]);
+const [divisions,setDivisions]=useState<any[]>([]);
 
 
 
-const [attachments,setAttachments] = useState<
+const [attachments,setAttachments]=useState<
 {
 name:string;
 url:string;
@@ -52,7 +54,11 @@ url:string;
 
 
 
-const [loading,setLoading] = useState(false);
+const [featuredImage,setFeaturedImage]=useState("");
+
+
+
+const [loading,setLoading]=useState(false);
 
 
 
@@ -74,11 +80,12 @@ const response = await fetch(
 const data = await response.json();
 
 
-setDivisions(data.divisions || []);
+setDivisions(
+data.divisions || []
+);
 
 
 }
-
 
 
 loadDivisions();
@@ -97,7 +104,27 @@ loadDivisions();
 async function createPolicy(){
 
 
+
+if(
+scope==="DIVISIONAL"
+&&
+!divisionId
+){
+
+alert(
+"Please select a division for a divisional policy."
+);
+
+return;
+
+}
+
+
+
+
 setLoading(true);
+
+
 
 
 
@@ -127,7 +154,7 @@ scope,
 
 division_id:
 
-scope === "DIVISIONAL"
+scope==="DIVISIONAL"
 
 ?
 
@@ -142,7 +169,9 @@ classification,
 
 content,
 
-attachments
+attachments,
+
+featuredImage
 
 
 })
@@ -165,23 +194,21 @@ await response.json();
 
 
 
-
 if(!response.ok){
 
 
 alert(
-result.error || "Failed to create policy"
+result.error ||
+"Failed to create policy"
 );
 
 
 setLoading(false);
 
-
 return;
 
 
 }
-
 
 
 
@@ -203,6 +230,8 @@ router.push(
 
 
 
+
+
 return (
 
 <main className="
@@ -210,6 +239,7 @@ min-h-screen
 bg-[#F5F8FB]
 py-16
 ">
+
 
 
 <section className="
@@ -229,11 +259,12 @@ overflow-hidden
 
 
 
+
+
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
-
 
 
 
@@ -273,7 +304,6 @@ Create Policy
 </h1>
 
 
-
 <p className="
 mt-3
 text-blue-100
@@ -305,48 +335,19 @@ space-y-8
 
 
 
+<Input
 
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Policy Title
-
-</label>
-
-
-
-<input
-
-className="
-w-full
-border
-p-4
-"
-
-placeholder="
-Policy title
-"
+label="Policy Title"
 
 value={title}
 
-onChange={(e)=>
-setTitle(e.target.value)
-}
+setValue={setTitle}
+
+placeholder="Policy title"
 
 />
 
 
-</div>
-
-
 
 
 
@@ -355,7 +356,6 @@ setTitle(e.target.value)
 
 
 <div>
-
 
 <label className="
 block
@@ -367,7 +367,6 @@ mb-2
 Policy Category
 
 </label>
-
 
 
 <select
@@ -386,39 +385,14 @@ setCategory(e.target.value)
 
 >
 
-
-<option>
-Security
-</option>
-
-
-<option>
-Operations
-</option>
-
-
-<option>
-Personnel
-</option>
-
-
-<option>
-Training
-</option>
-
-
-<option>
-Aviation
-</option>
-
-
-<option>
-Administrative
-</option>
-
+<option>Security</option>
+<option>Operations</option>
+<option>Personnel</option>
+<option>Training</option>
+<option>Aviation</option>
+<option>Administrative</option>
 
 </select>
-
 
 
 </div>
@@ -431,8 +405,8 @@ Administrative
 
 
 
-<div>
 
+<div>
 
 <label className="
 block
@@ -444,7 +418,6 @@ mb-2
 Policy Scope
 
 </label>
-
 
 
 
@@ -466,16 +439,12 @@ setScope(e.target.value)
 
 
 <option value="UNIVERSAL">
-
 Department Wide Policy
-
 </option>
 
 
 <option value="DIVISIONAL">
-
 Division Specific Policy
-
 </option>
 
 
@@ -492,10 +461,10 @@ Division Specific Policy
 
 
 
+
 {
 
-scope === "DIVISIONAL" && (
-
+scope==="DIVISIONAL" && (
 
 <div>
 
@@ -507,7 +476,7 @@ text-[#003B6F]
 mb-2
 ">
 
-Applicable Division
+Division
 
 </label>
 
@@ -531,18 +500,13 @@ setDivisionId(e.target.value)
 
 
 <option value="">
-
 Select Division
-
 </option>
-
-
 
 
 {
 
-divisions.map((division)=>(
-
+divisions.map((division:any)=>(
 
 <option
 
@@ -556,20 +520,15 @@ value={division.id}
 
 </option>
 
-
 ))
 
-
 }
-
 
 
 </select>
 
 
-
 </div>
-
 
 )
 
@@ -585,7 +544,6 @@ value={division.id}
 
 <div>
 
-
 <label className="
 block
 font-black
@@ -596,7 +554,6 @@ mb-2
 Classification
 
 </label>
-
 
 
 
@@ -616,25 +573,17 @@ setClassification(e.target.value)
 
 >
 
-
 <option value="PUBLIC">
-
 Public Release
-
 </option>
-
 
 
 <option value="FOUO">
-
 For Official Use Only (FOUO)
-
 </option>
 
 
-
 </select>
-
 
 
 </div>
@@ -663,12 +612,10 @@ Policy Content
 
 
 
-
 <div className="
 border
 p-5
 ">
-
 
 <Editor
 
@@ -678,12 +625,11 @@ onChange={setContent}
 
 />
 
-
 </div>
 
 
-
 </div>
+
 
 
 
@@ -699,11 +645,55 @@ attachments={attachments}
 
 setAttachments={setAttachments}
 
-featuredImage=""
+featuredImage={featuredImage}
 
-setFeaturedImage={()=>{}}
+setFeaturedImage={setFeaturedImage}
 
 />
+
+
+
+
+
+
+
+
+{
+
+featuredImage && (
+
+<div className="
+border
+p-5
+bg-gray-50
+">
+
+<p className="
+font-bold
+mb-3
+">
+
+Featured Image Preview
+
+</p>
+
+
+<img
+
+src={featuredImage}
+
+className="
+max-h-64
+"
+
+/>
+
+
+</div>
+
+)
+
+}
 
 
 
@@ -748,28 +738,100 @@ loading
 }
 
 
-
 </button>
 
 
 
 
 
+</div>
+
+
 
 
 
 </div>
 
-
-
-</div>
 
 
 </section>
 
 
+
 </main>
 
+
+);
+
+
+}
+
+
+
+
+
+
+
+function Input({
+
+label,
+
+value,
+
+setValue,
+
+placeholder
+
+}:{
+
+label:string;
+
+value:string;
+
+setValue:(v:string)=>void;
+
+placeholder:string;
+
+}){
+
+
+return (
+
+<div>
+
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
+
+{label}
+
+</label>
+
+
+<input
+
+className="
+w-full
+border
+p-4
+"
+
+value={value}
+
+placeholder={placeholder}
+
+onChange={(e)=>
+setValue(e.target.value)
+}
+
+/>
+
+
+</div>
 
 );
 
