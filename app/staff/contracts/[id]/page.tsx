@@ -1,26 +1,27 @@
 import { redirect } from "next/navigation";
-
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 
 export default async function ContractViewPage({
-
-params
-
+    params
 }:{
-
-params: Promise<{
-id:string
-}>
-
+    params:{
+        id:string
+    }
 }){
 
 
-const { id } = await params;
+const {
 
+data:contract,
 
-const { data:contract, error } = await supabaseAdmin
+error
+
+}=await supabaseAdmin
 
 .from("contracts")
 
@@ -28,14 +29,85 @@ const { data:contract, error } = await supabaseAdmin
 
 .eq(
 "id",
-id
+params.id
 )
 
 .single();
 
-  console.log("CONTRACT ID:", id);
-console.log("CONTRACT DATA:", contract);
-console.log("CONTRACT ERROR:", error);
+
+
+if(error || !contract){
+
+redirect("/staff/contracts");
+
+}
+
+
+
+
+
+
+
+const {
+
+data:employee
+
+}=await supabaseAdmin
+
+.from("employees")
+
+.select("*")
+
+.eq(
+"id",
+contract.employee_id
+)
+
+.single();
+
+
+
+
+
+
+const {
+
+data:position
+
+}=await supabaseAdmin
+
+.from("positions")
+
+.select("title")
+
+.eq(
+"id",
+employee?.position_id
+)
+
+.single();
+
+
+
+
+
+
+const {
+
+data:division
+
+}=await supabaseAdmin
+
+.from("divisions")
+
+.select("name")
+
+.eq(
+"id",
+employee?.division_id
+)
+
+.single();
 
 
 
@@ -267,7 +339,7 @@ font-black
 text-[#003B6F]
 ">
 
-{contract.employees?.roblox_username}
+{employee?.employee_number || "Pending"}
 
 </p>
 
@@ -283,7 +355,7 @@ Employee Number:
 
 {" "}
 
-{contract.employees?.employee_number || "Pending"}
+{employee?.employee_number || "Pending"}
 
 </p>
 
@@ -300,7 +372,7 @@ Position:
 
 {" "}
 
-{contract.employees?.positions?.title || "Unknown"}
+{position?.title || "Unknown"}
 
 </p>
 
@@ -317,7 +389,7 @@ Division:
 
 {" "}
 
-{contract.employees?.divisions?.name || "Unknown"}
+{division?.name || "Unknown"}
 
 </p>
 
