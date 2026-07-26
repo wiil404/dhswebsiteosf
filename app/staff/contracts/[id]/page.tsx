@@ -15,109 +15,89 @@ export default async function ContractViewPage({
 }){
 
 
-const {
-
-data:contract,
-
-error
-
-}=await supabaseAdmin
-
+const { data: contract, error } = await supabaseAdmin
 .from("contracts")
-
-.select("*")
-
+.select(`
+    *,
+    employees(
+        employee_number,
+        roblox_username,
+        position_id,
+        division_id
+    )
+`)
 .eq(
-"id",
-params.id
+    "id",
+    params.id
 )
-
 .single();
 
 
 
 if(error || !contract){
 
-redirect("/staff/contracts");
+    redirect("/staff/contracts");
 
 }
 
 
 
 
+const employee = contract.employees;
 
 
 
-const {
-
-data:employee
-
-}=await supabaseAdmin
-
-.from("employees")
-
-.select("*")
-
-.eq(
-"id",
-contract.employee_id
-)
-
-.single();
+let positionName = "Unknown";
+let divisionName = "Unknown";
 
 
 
 
 
+if(employee?.position_id){
 
-const {
 
-data:position
-
-}=await supabaseAdmin
-
+const {data:position}=await supabaseAdmin
 .from("positions")
-
 .select("title")
-
 .eq(
 "id",
-employee?.position_id
+employee.position_id
 )
-
 .single();
 
 
 
+positionName = position?.title || "Unknown";
 
-
-
-const {
-
-data:division
-
-}=await supabaseAdmin
-
-.from("divisions")
-
-.select("name")
-
-.eq(
-"id",
-employee?.division_id
-)
-
-.single();
-
-
-
-
-
-if(error || !contract){
-
-redirect("/staff/contracts");
 
 }
+
+
+
+
+
+
+if(employee?.division_id){
+
+
+const {data:division}=await supabaseAdmin
+.from("divisions")
+.select("name")
+.eq(
+"id",
+employee.division_id
+)
+.single();
+
+
+
+divisionName = division?.name || "Unknown";
+
+
+}
+
+
 
 
 
@@ -149,14 +129,10 @@ overflow-hidden
 
 
 
-
-
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
-
-
 
 
 
@@ -216,9 +192,6 @@ Official Employment Contract Record
 
 
 
-
-
-
 <div className="
 p-10
 space-y-10
@@ -229,7 +202,6 @@ space-y-10
 
 
 
-{/* CONTRACT INFORMATION */}
 
 
 <section>
@@ -255,40 +227,37 @@ mt-6
 ">
 
 
-
 <Info
 
 title="Contract Number"
 
-value={contract.contract_number || "Not Assigned"}
+value={
+contract.contract_number || "Not Assigned"
+}
 
 />
-
-
 
 
 <Info
 
 title="Contract Type"
 
-value={contract.contract_type || "Unknown"}
+value={
+contract.contract_type || "Unknown"
+}
 
 />
-
-
-
 
 
 <Info
 
 title="Status"
 
-value={contract.status}
+value={
+contract.status || "Unknown"
+}
 
 />
-
-
-
 
 
 </div>
@@ -302,10 +271,6 @@ value={contract.status}
 
 
 
-
-
-
-{/* EMPLOYEE */}
 
 
 <section>
@@ -334,12 +299,12 @@ mt-6
 
 
 <p className="
-text-2xl
+text-3xl
 font-black
 text-[#003B6F]
 ">
 
-{employee?.employee_number || "Pending"}
+{employee?.roblox_username || "Unknown"}
 
 </p>
 
@@ -347,8 +312,8 @@ text-[#003B6F]
 
 
 <p className="
-mt-2
-text-gray-600
+mt-4
+text-gray-700
 ">
 
 Employee Number:
@@ -362,37 +327,34 @@ Employee Number:
 
 
 
-
 <p className="
 mt-2
-text-gray-600
+text-gray-700
 ">
 
 Position:
 
 {" "}
 
-{position?.title || "Unknown"}
+{positionName}
 
 </p>
-
 
 
 
 
 <p className="
 mt-2
-text-gray-600
+text-gray-700
 ">
 
 Division:
 
 {" "}
 
-{division?.name || "Unknown"}
+{divisionName}
 
 </p>
-
 
 
 
@@ -407,9 +369,6 @@ Division:
 
 
 
-
-
-{/* SIGNATURE STATUS */}
 
 
 <section>
@@ -437,105 +396,23 @@ mt-6
 
 
 
-<div className="
-border
-p-6
-bg-[#F5F8FB]
-">
+<SignatureBox
 
+title="Employee Signature"
 
-<p className="
-uppercase
-text-xs
-font-bold
-tracking-widest
-text-gray-500
-">
+signed={contract.employee_signed}
 
-Employee Signature
-
-</p>
+/>
 
 
 
-<p className="
-mt-3
-font-black
-text-[#003B6F]
-">
+<SignatureBox
 
-{
+title="Executive Signature"
 
-contract.employee_signed
+signed={contract.executive_signed}
 
-?
-
-"Signed"
-
-:
-
-"Awaiting Signature"
-
-}
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-
-<div className="
-border
-p-6
-bg-[#F5F8FB]
-">
-
-
-<p className="
-uppercase
-text-xs
-font-bold
-tracking-widest
-text-gray-500
-">
-
-Executive Signature
-
-</p>
-
-
-
-<p className="
-mt-3
-font-black
-text-[#003B6F]
-">
-
-{
-
-contract.executive_signed
-
-?
-
-"Signed"
-
-:
-
-"Awaiting Signature"
-
-}
-
-</p>
-
-
-</div>
-
-
+/>
 
 
 
@@ -552,9 +429,6 @@ contract.executive_signed
 
 
 
-{/* DOCUMENT */}
-
-
 <section>
 
 
@@ -567,7 +441,6 @@ text-[#003B6F]
 Contract Document
 
 </h2>
-
 
 
 
@@ -586,10 +459,7 @@ text-gray-700
 </div>
 
 
-
 </section>
-
-
 
 
 
@@ -614,6 +484,80 @@ text-gray-700
 
 
 }
+
+
+
+
+
+
+
+
+
+function SignatureBox({
+
+title,
+
+signed
+
+}:{
+
+title:string;
+
+signed:boolean;
+
+}){
+
+
+return (
+
+<div className="
+border
+p-6
+bg-[#F5F8FB]
+">
+
+
+<p className="
+uppercase
+text-xs
+tracking-widest
+font-bold
+text-gray-500
+">
+
+{title}
+
+</p>
+
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{
+signed
+?
+"Signed"
+:
+"Awaiting Signature"
+}
+
+</p>
+
+
+</div>
+
+
+);
+
+
+}
+
+
+
 
 
 
@@ -670,7 +614,6 @@ text-[#003B6F]
 
 
 </div>
-
 
 );
 
