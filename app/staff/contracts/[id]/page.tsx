@@ -587,19 +587,23 @@ contract.executive_signed
 
 <form
 
-action={async()=>{
-
-await signExecutiveContract(
-contract.id
-);
-
-}}
+action={signExecutiveContract}
 
 className="
 mt-5
 "
 
 >
+
+<input
+
+type="hidden"
+
+name="contractId"
+
+value={contract.id}
+
+/>
 
 
 <button
