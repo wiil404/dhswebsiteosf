@@ -63,7 +63,60 @@ if(!session){
 
 const employee = session.employees;
 
+const { data: profileData } = await supabaseAdmin
+    .from("employees")
+    .select(`
 
+        id,
+
+        promotions(
+            id,
+            created_at,
+            notes
+        ),
+
+        employee_awards(
+
+            id,
+
+            created_at,
+
+            awards(
+
+                name,
+
+                description
+
+            )
+
+        ),
+
+        employee_history(
+
+            id,
+
+            created_at,
+
+            notes
+
+        ),
+
+        employment_history(
+
+            id,
+
+            created_at,
+
+            notes
+
+        )
+
+    `)
+    .eq(
+        "id",
+        employee.id
+    )
+    .single();
 
 const avatar = await getRobloxAvatar(
 
@@ -71,7 +124,17 @@ const avatar = await getRobloxAvatar(
 
 );
 
+const promotions = profileData?.promotions || [];
 
+const awards = profileData?.employee_awards || [];
+
+const history = [
+
+    ...(profileData?.employee_history || []),
+
+    ...(profileData?.employment_history || [])
+
+];
 
 
 
@@ -589,28 +652,21 @@ Career Development
 
 
 
-
-
 <div className="
 grid
 md:grid-cols-3
-gap-6
+gap-8
 mt-8
 ">
-
-
-
 
 
 <Card
 
 title="Promotions"
 
-value="View History"
+value={`${promotions.length} Recorded`}
 
 />
-
-
 
 
 
@@ -618,23 +674,19 @@ value="View History"
 
 title="Awards"
 
-value="View Recognition"
+value={`${awards.length} Received`}
 
 />
-
-
 
 
 
 <Card
 
-title="Appointments"
+title="Assignments"
 
-value="View Record"
+value={`${history.length} Records`}
 
 />
-
-
 
 
 
@@ -645,12 +697,396 @@ value="View Record"
 </section>
 
 
+{/* PROMOTION */}
+
+
+<section className="
+mt-14
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Promotion History
+
+</h2>
+
+
+
+<div className="
+mt-8
+space-y-5
+">
+
+
+{
+
+promotions.length === 0 && (
+
+<div className="
+bg-[#F5F8FB]
+border
+p-6
+text-gray-600
+">
+
+No promotion records available.
+
+</div>
+
+)
+
+}
+
+
+
+{
+
+promotions.map((promotion:any)=>(
+
+
+<div
+
+key={promotion.id}
+
+className="
+border
+bg-white
+p-7
+shadow-sm
+"
+
+>
+
+
+<h3 className="
+text-xl
+font-black
+text-[#003B6F]
+">
+
+Promotion Record
+
+</h3>
+
+
+
+<p className="
+mt-3
+text-gray-600
+">
+
+{
+new Date(
+promotion.created_at
+)
+.toLocaleDateString()
+}
+
+</p>
 
 
 
 
+{
+
+promotion.notes && (
+
+<p className="
+mt-3
+text-gray-700
+">
+
+{promotion.notes}
+
+</p>
+
+)
+
+}
 
 
+
+</div>
+
+
+))
+
+}
+
+
+
+</div>
+
+
+</section>
+
+
+{/* AWARDS */}
+
+<section className="
+mt-14
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Awards & Recognition
+
+</h2>
+
+
+
+
+<div className="
+mt-8
+grid
+md:grid-cols-2
+gap-6
+">
+
+
+{
+
+awards.length === 0 && (
+
+<div className="
+bg-[#F5F8FB]
+border
+p-6
+text-gray-600
+">
+
+No awards recorded.
+
+</div>
+
+)
+
+}
+
+
+
+{
+
+awards.map((award:any)=>(
+
+
+<div
+
+key={award.id}
+
+className="
+border
+bg-white
+p-7
+"
+
+>
+
+
+<h3 className="
+text-2xl
+font-black
+text-[#003B6F]
+">
+
+{
+award.awards?.name ||
+"Recognition Award"
+}
+
+</h3>
+
+
+
+
+<p className="
+mt-3
+text-gray-600
+">
+
+{
+award.awards?.description ||
+"No description available."
+}
+
+</p>
+
+
+
+
+<p className="
+mt-4
+text-sm
+font-bold
+text-gray-500
+">
+
+Received:
+
+{" "}
+
+{
+new Date(
+award.created_at
+)
+.toLocaleDateString()
+}
+
+</p>
+
+
+
+</div>
+
+
+))
+
+}
+
+
+
+</div>
+
+
+
+</section>
+
+
+{/* EMPLOYMENT HISTORY */}
+
+<section className="
+mt-14
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Employment History
+
+</h2>
+
+
+
+<div className="
+mt-8
+space-y-5
+">
+
+
+{
+
+history.length === 0 && (
+
+<div className="
+bg-[#F5F8FB]
+border
+p-6
+text-gray-600
+">
+
+No previous assignments recorded.
+
+</div>
+
+)
+
+}
+
+
+
+{
+
+history.map((item:any)=>(
+
+
+<div
+
+key={item.id}
+
+className="
+border-l-4
+border-[#003B6F]
+bg-[#F5F8FB]
+p-6
+"
+
+>
+
+
+<p className="
+font-black
+text-[#003B6F]
+">
+
+Service Record
+
+</p>
+
+
+
+
+<p className="
+mt-2
+text-gray-600
+">
+
+{
+item.notes ||
+"No details provided."
+}
+
+</p>
+
+
+
+
+<p className="
+mt-3
+text-sm
+font-bold
+text-gray-500
+">
+
+{
+new Date(
+item.created_at
+)
+.toLocaleDateString()
+}
+
+</p>
+
+
+
+</div>
+
+
+))
+
+}
+
+
+
+</div>
+
+
+</section>
+
+    
 
 {/* SECURITY */}
 
