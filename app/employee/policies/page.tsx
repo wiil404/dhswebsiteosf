@@ -297,7 +297,7 @@ isExecutive
 
 :
 
-`Policies available for ${employee.divisions?.name || "your assignment"}.`
+`Policies available for ${(employee.divisions as any)?.name || "your assignment"}.`
 
 }
 
