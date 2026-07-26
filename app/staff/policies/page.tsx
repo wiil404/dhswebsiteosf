@@ -281,7 +281,7 @@ text-gray-500
 policies?.length || 0
 }
 
-Policies
+ Policies
 
 </p>
 
