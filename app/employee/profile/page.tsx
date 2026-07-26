@@ -599,7 +599,6 @@ font-bold
 
 </div>
 
-id="part2"
 <div
 
 className="
