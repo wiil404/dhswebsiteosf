@@ -1,306 +1,142 @@
 "use client";
 
 import { useState } from "react";
-import { redirect } from "next/navigation";
-import { supabaseAdmin } from "@/app/lib/supabase-admin";
-import { getEmployeeSession } from "@/app/lib/employee-auth";
-import Editor from "@/app/components/Editor";
+import { useRouter } from "next/navigation";
 
-
-const policyRoles = [
-
-"Secretary of Homeland Security",
-"Deputy Secretary of Homeland Security",
-"Chief of Staff",
-"Under Secretary",
-"Secret Service Director",
-"CBP Commissioner",
-"Special Response Team Commander",
-"Under Secretary for Aviation Operations",
-"Senior Flight Officer",
-"Deputy Director",
-"Assistant Director",
-"Chief of Operations",
-"CBP Deputy Commissioner",
-"Special Agent in Charge (SRT)"
-
-];
+import Editor from "../../../../components/Editor";
+import FileUpload from "../../../../components/FileUpload";
 
 
 
-function generatePolicyNumber(){
-
-const year = new Date().getFullYear();
-
-const random =
-Math.floor(Math.random() * 9000) + 1000;
+export default function CreatePolicy(){
 
 
-return `DHS-POL-${year}-${random}`;
-
-}
+const router = useRouter();
 
 
 
+const [title,setTitle] = useState("");
 
-export default async function CreatePolicyPage(){
-
-
-
-const session = await getEmployeeSession();
-
-
-
-if(!session){
-
-redirect("/employee/login");
-
-}
-
-
-
-
-const {data:currentEmployee}=await supabaseAdmin
-
-.from("employees")
-
-.select(`
-
-id,
-
-division_id,
-
-positions(
-
-title
-
-)
-
-`)
-
-.eq(
-"id",
-session.employees.id
-)
-
-.single();
-
-
-
-
-
-const currentPosition =
-(currentEmployee?.positions as any)?.title || "";
-
-
-
-
-
-const canCreatePolicy =
-policyRoles.some(
-
-(role)=>
-
-role.toLowerCase().trim()
-===
-currentPosition.toLowerCase().trim()
-
+const [category,setCategory] = useState(
+"Security"
 );
 
-
-
-
-
-
-if(!canCreatePolicy){
-
-
-return (
-
-<main className="min-h-screen bg-[#F5F8FB] py-16">
-
-<section className="max-w-3xl mx-auto px-6">
-
-<div className="bg-white border shadow-xl p-10">
-
-
-<h1 className="text-4xl font-black text-red-600">
-
-Access Denied
-
-</h1>
-
-
-<p className="mt-4 text-gray-700">
-
-You do not have permission to create policies.
-
-</p>
-
-
-<p className="mt-6 font-bold text-[#003B6F]">
-
-Current Position: {currentPosition || "Unknown"}
-
-</p>
-
-
-</div>
-
-</section>
-
-</main>
-
+const [scope,setScope] = useState(
+"UNIVERSAL"
 );
 
+const [divisionId,setDivisionId] = useState("");
 
-}
+const [classification,setClassification] = useState(
+"PUBLIC"
+);
 
+const [content,setContent] = useState("");
 
-
-
-
-
-
-async function createPolicy(formData:FormData){
-
-
-"use server";
-
-
-
-const title =
-String(formData.get("title"));
+const [attachments,setAttachments] = useState<
+{
+name:string;
+url:string;
+}[]
+>([]);
 
 
-
-const content =
-String(formData.get("content"));
-
-
-
-const classification =
-String(formData.get("classification"));
-
-
-
-const scope =
-String(formData.get("scope"));
-
-
-
-const category =
-String(formData.get("category"));
-
-
-
-const division =
-formData.get("division") || null;
-
-
-
-
-const isExecutive = [
-
-"Secretary of Homeland Security",
-"Deputy Secretary of Homeland Security",
-"Chief of Staff",
-"Under Secretary"
-
-].includes(currentPosition);
+const [loading,setLoading] = useState(false);
 
 
 
 
 
 
-const {error}=await supabaseAdmin
 
-.from("policies")
+async function createPolicy(){
 
-.insert({
 
-policy_number:
-generatePolicyNumber(),
+setLoading(true);
 
+
+
+
+
+const response = await fetch(
+
+"/api/policies/create",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
 
 title,
 
-
-content,
-
-
-classification,
-
+category,
 
 scope,
 
-
-category,
-
-
 division_id:
 scope === "DIVISIONAL"
-
 ?
-division || currentEmployee?.division_id
-
+divisionId
 :
-
 null,
 
+classification,
 
-created_by:
-session.employees.id,
+content,
 
+attachments
 
-status:
+})
 
-isExecutive
+}
 
-?
-
-"Approved"
-
-:
-
-"Pending Approval",
-
-
-
-approved_by:
-
-isExecutive
-
-?
-
-session.employees.id
-
-:
-
-null,
-
-
-version:1,
-
-
-image_urls:[]
-
-});
+);
 
 
 
 
 
-if(error){
 
-throw new Error(error.message);
+const result =
+await response.json();
+
+
+
+
+
+
+if(!response.ok){
+
+
+alert(
+result.error || "Failed to create policy"
+);
+
+
+setLoading(false);
+
+return;
+
 
 }
 
 
 
-redirect("/staff/policies");
+
+
+
+router.push(
+"/staff/policies"
+);
+
+
 
 }
 
@@ -329,18 +165,12 @@ px-6
 
 
 
-<form
-
-action={createPolicy}
-
-className="
+<div className="
 bg-white
 border
 shadow-2xl
 overflow-hidden
-"
-
->
+">
 
 
 
@@ -348,6 +178,7 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
+
 
 
 
@@ -386,17 +217,21 @@ Create Policy
 </h1>
 
 
+
 <p className="
 mt-3
 text-blue-100
 ">
 
-Create official DHS policies and directives.
+Create official Department policies and directives.
 
 </p>
 
 
 </div>
+
+
+
 
 
 
@@ -416,7 +251,13 @@ space-y-8
 
 <div>
 
-<label className="block font-black text-[#003B6F] mb-2">
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
 
 Policy Title
 
@@ -425,17 +266,24 @@ Policy Title
 
 <input
 
-name="title"
-
-required
-
 className="
 w-full
 border
 p-4
 "
 
+placeholder="
+Policy title
+"
+
+value={title}
+
+onChange={(e)=>
+setTitle(e.target.value)
+}
+
 />
+
 
 </div>
 
@@ -449,32 +297,66 @@ p-4
 
 <div>
 
-<label className="block font-black text-[#003B6F] mb-2">
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
 
 Category
 
 </label>
 
 
+
 <select
 
-name="category"
+className="
+w-full
+border
+p-4
+"
 
-className="w-full border p-4"
+value={category}
+
+onChange={(e)=>
+setCategory(e.target.value)
+}
 
 >
 
-<option>Security</option>
 
-<option>Operations</option>
+<option>
+Security
+</option>
 
-<option>Personnel</option>
 
-<option>Training</option>
+<option>
+Operations
+</option>
 
-<option>Aviation</option>
 
-<option>Administrative</option>
+<option>
+Personnel
+</option>
+
+
+<option>
+Training
+</option>
+
+
+<option>
+Aviation
+</option>
+
+
+<option>
+Administrative
+</option>
+
 
 </select>
 
@@ -491,18 +373,34 @@ className="w-full border p-4"
 
 <div>
 
-<label className="block font-black text-[#003B6F] mb-2">
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
 
 Policy Scope
 
 </label>
 
 
+
+
 <select
 
-name="scope"
+className="
+w-full
+border
+p-4
+"
 
-className="w-full border p-4"
+value={scope}
+
+onChange={(e)=>
+setScope(e.target.value)
+}
 
 >
 
@@ -512,7 +410,6 @@ className="w-full border p-4"
 Department Wide Policy
 
 </option>
-
 
 
 <option value="DIVISIONAL">
@@ -525,6 +422,7 @@ Divisional Policy
 </select>
 
 
+
 </div>
 
 
@@ -535,26 +433,42 @@ Divisional Policy
 
 
 
+{
+
+scope === "DIVISIONAL" && (
+
 <div>
 
-<label className="block font-black text-[#003B6F] mb-2">
 
-Division (for divisional policies)
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
+
+Division ID
 
 </label>
 
 
 <input
 
-name="division"
-
-placeholder="Division ID"
-
 className="
 w-full
 border
 p-4
 "
+
+placeholder="
+Division UUID
+"
+
+value={divisionId}
+
+onChange={(e)=>
+setDivisionId(e.target.value)
+}
 
 />
 
@@ -565,12 +479,16 @@ text-gray-500
 mt-2
 ">
 
-Leave blank for department-wide policies.
+Enter the division ID this policy applies to.
 
 </p>
 
 
 </div>
+
+)
+
+}
 
 
 
@@ -582,7 +500,13 @@ Leave blank for department-wide policies.
 
 <div>
 
-<label className="block font-black text-[#003B6F] mb-2">
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
 
 Classification
 
@@ -592,13 +516,17 @@ Classification
 
 <select
 
-name="classification"
-
 className="
 w-full
 border
 p-4
 "
+
+value={classification}
+
+onChange={(e)=>
+setClassification(e.target.value)
+}
 
 >
 
@@ -610,6 +538,7 @@ Public Release
 </option>
 
 
+
 <option value="FOUO">
 
 For Official Use Only (FOUO)
@@ -617,7 +546,9 @@ For Official Use Only (FOUO)
 </option>
 
 
+
 </select>
+
 
 
 </div>
@@ -645,36 +576,24 @@ Policy Content
 </label>
 
 
-<input
 
-type="hidden"
-
-name="content"
-
-value=""
-
-/>
-
+<div className="
+border
+p-5
+">
 
 
 <Editor
 
-value=""
+value={content}
 
-onChange={()=>{}}
+onChange={setContent}
 
 />
 
 
-<p className="
-text-sm
-text-gray-500
-mt-2
-">
+</div>
 
-Rich formatting enabled.
-
-</p>
 
 
 </div>
@@ -687,7 +606,31 @@ Rich formatting enabled.
 
 
 
+<FileUpload
+
+attachments={attachments}
+
+setAttachments={setAttachments}
+
+featuredImage={""}
+
+setFeaturedImage={()=>{}}
+
+/>
+
+
+
+
+
+
+
+
+
 <button
+
+onClick={createPolicy}
+
+disabled={loading}
 
 className="
 bg-[#003B6F]
@@ -702,7 +645,22 @@ transition
 
 >
 
-Submit Policy
+
+{
+
+loading
+
+?
+
+"Submitting..."
+
+:
+
+"Submit Policy"
+
+}
+
+
 
 </button>
 
@@ -714,13 +672,15 @@ Submit Policy
 </div>
 
 
-</form>
+
+</div>
 
 
 </section>
 
 
 </main>
+
 
 );
 
