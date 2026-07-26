@@ -604,21 +604,9 @@ View Acknowledgements
 
 
 
-<form action={deletePolicy}>
+<Link
 
-<input
-
-type="hidden"
-
-name="policyId"
-
-value={policy.id}
-
-/>
-
-
-
-<button
+href={`/staff/policies/${policy.id}/delete`}
 
 className="
 bg-red-600
@@ -632,10 +620,7 @@ font-black
 
 Delete Policy
 
-</button>
-
-
-</form>
+</Link>
 
 
 
