@@ -5,20 +5,29 @@ import { redirect } from "next/navigation";
 import { getEmployeeSession } from "@/app/lib/employee-auth";
 
 
+
 export async function signEmployeeContract(
     contractId:string
 ){
+
 
 
 const session = await getEmployeeSession();
 
 
 if(!session){
-    throw new Error("Unauthorized");
+
+    throw new Error(
+        "Unauthorized"
+    );
+
 }
 
 
+
 const employee = session.employees;
+
+
 
 
 
@@ -26,12 +35,7 @@ const {data:contract,error:contractError}=await supabaseAdmin
 
 .from("contracts")
 
-.select(
-`
-employee_signed,
-executive_signed
-`
-)
+.select("*")
 
 .eq(
 "id",
@@ -42,30 +46,29 @@ contractId
 
 
 
+
+
 if(contractError || !contract){
 
-throw new Error("Contract not found");
+    throw new Error(
+        "Contract not found"
+    );
 
 }
 
 
 
 
-let status =
-"Pending Employee Signature";
 
+if(contract.employee_signed){
 
-if(contract.executive_signed){
-
-status="Completed";
-
-}
-
-else{
-
-status="Awaiting Executive Signature";
+    throw new Error(
+        "Contract already signed"
+    );
 
 }
+
+
 
 
 
@@ -81,19 +84,26 @@ const {error}=await supabaseAdmin
 
 employee_signed:true,
 
+
 employee_signature_name:
 employee.roblox_username,
 
+
 employee_signature_id:
-employee.roblox_user_id,
+String(employee.roblox_user_id),
+
 
 employee_signature_date:
 new Date(),
 
 
-status
+
+status:
+"Employee Signed - Awaiting Executive Signature"
+
 
 })
+
 
 .eq(
 "id",
@@ -104,11 +114,18 @@ contractId
 
 
 
+
+
 if(error){
 
-throw new Error(error.message);
+    throw new Error(
+        error.message
+    );
 
 }
+
+
+
 
 
 
@@ -123,10 +140,14 @@ await supabaseAdmin
 action:
 "CONTRACT_SIGNED",
 
+
 details:
 `${employee.roblox_username} signed contract ${contractId}`
 
+
 });
+
+
 
 
 
