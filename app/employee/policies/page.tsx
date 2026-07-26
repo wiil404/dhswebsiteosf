@@ -166,6 +166,9 @@ ascending:false
 let {data:policies}=await query;
 
 
+policies = policies || [];
+
+
 
 
 
@@ -174,7 +177,7 @@ let {data:policies}=await query;
 if(!isExecutive){
 
 
-policies = policies?.filter((policy:any)=>{
+policies = policies.filter((policy:any)=>{
 
 
 return (
@@ -200,7 +203,6 @@ policy.division_id===employee.division_id
 
 
 }
-
 
 
 
