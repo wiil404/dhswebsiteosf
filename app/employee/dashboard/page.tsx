@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import { getEmployeeSession } from "@/app/lib/employee-auth";
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
+
 import Link from "next/link";
 import Image from "next/image";
 
 
 
 async function getRobloxAvatar(id:number){
-
 
     try{
 
@@ -40,8 +41,6 @@ async function getRobloxAvatar(id:number){
 
 
 
-
-
 export default async function EmployeeDashboard(){
 
 
@@ -62,10 +61,142 @@ const employee = session.employees;
 
 
 const avatar = await getRobloxAvatar(
-
     employee.roblox_user_id
+);
+
+
+
+
+
+
+//
+// REQUIRED POLICIES
+//
+
+const {data:policies}=await supabaseAdmin
+
+.from("policies")
+
+.select(`
+
+id,
+
+title,
+
+category,
+
+scope,
+
+division_id,
+
+created_at
+
+`)
+
+.eq(
+
+"status",
+
+"Approved"
+
+)
+
+.order(
+
+"created_at",
+
+{
+
+ascending:false
+
+}
 
 );
+
+
+
+
+
+
+
+const employeePolicies =
+
+policies?.filter((policy:any)=>{
+
+
+return (
+
+policy.scope==="UNIVERSAL"
+
+||
+
+policy.division_id===employee.division_id
+
+);
+
+
+}) || [];
+
+
+
+
+
+
+const {data:acknowledgements}=await supabaseAdmin
+
+.from("policy_acknowledgements")
+
+.select(`
+
+policy_id
+
+`)
+
+.eq(
+
+"employee_id",
+
+employee.id
+
+);
+
+
+
+
+
+const acknowledged = new Set(
+
+acknowledgements?.map(
+
+(item:any)=>
+
+item.policy_id
+
+)
+
+);
+
+
+
+
+
+
+const requiredPolicies = employeePolicies.filter(
+
+(policy:any)=>
+
+!acknowledged.has(policy.id)
+
+);
+
+
+
+
+
+
+
+const recentPolicies = employeePolicies.slice(0,5);
+
 
 
 
@@ -83,14 +214,11 @@ py-16
 
 
 
-
-
 <section className="
 max-w-7xl
 mx-auto
 px-6
 ">
-
 
 
 
@@ -119,9 +247,6 @@ bg-[#F2C94C]
 
 
 
-{/* HEADER */}
-
-
 <div className="
 bg-gradient-to-r
 from-[#003B6F]
@@ -130,7 +255,6 @@ text-white
 p-10
 md:p-14
 ">
-
 
 
 <p className="
@@ -148,7 +272,6 @@ Department of Homeland Security
 
 
 
-
 <h1 className="
 text-5xl
 font-black
@@ -158,7 +281,6 @@ mt-4
 Employee Portal
 
 </h1>
-
 
 
 
@@ -174,7 +296,6 @@ Official DHS workforce access portal
 </p>
 
 
-
 </div>
 
 
@@ -185,14 +306,12 @@ Official DHS workforce access portal
 
 
 
-{/* PROFILE CARD */}
-
-
-
 <div className="
 p-10
 md:p-14
 ">
+
+
 
 
 
@@ -255,8 +374,6 @@ className="object-cover"
 
 
 
-
-
 <div>
 
 
@@ -274,7 +391,6 @@ Employee Record
 
 
 
-
 <h2 className="
 text-4xl
 font-black
@@ -288,7 +404,6 @@ mt-2
 
 
 
-
 <p className="
 mt-2
 text-xl
@@ -298,7 +413,6 @@ text-blue-100
 {employee.positions?.title || "Employee"}
 
 </p>
-
 
 
 
@@ -327,7 +441,6 @@ font-bold
 
 
 
-
 <span className="
 bg-white/10
 px-5
@@ -344,22 +457,17 @@ font-bold
 </div>
 
 
+</div>
+
 
 </div>
 
 
 
-</div>
 
 
 
 
-
-
-
-
-
-{/* STATS */}
 
 
 <div className="
@@ -383,8 +491,6 @@ employee.divisions?.name || "Unknown"
 
 
 
-
-
 <Card
 
 title="Position"
@@ -397,8 +503,6 @@ employee.positions?.title || "Unknown"
 
 
 
-
-
 <Card
 
 title="Roblox ID"
@@ -408,8 +512,6 @@ String(employee.roblox_user_id)
 }
 
 />
-
-
 
 
 
@@ -435,8 +537,204 @@ employee.status
 
 
 
-{/* ACCESS */}
+{/* REQUIRED ACTIONS */}
 
+
+<section className="
+mt-14
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Required Actions
+
+</h2>
+
+
+
+
+{
+
+requiredPolicies.length > 0
+
+?
+
+<div className="
+mt-6
+bg-yellow-50
+border
+border-yellow-300
+p-6
+">
+
+
+<p className="
+font-black
+text-yellow-800
+">
+
+⚠ {requiredPolicies.length} policy acknowledgement(s) required
+
+</p>
+
+
+
+<Link
+
+href="/employee/policies"
+
+className="
+inline-block
+mt-4
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-bold
+"
+
+>
+
+Review Policies
+
+</Link>
+
+
+</div>
+
+
+:
+
+<div className="
+mt-6
+bg-green-50
+border
+border-green-300
+p-6
+font-bold
+text-green-800
+">
+
+✓ No outstanding actions
+
+</div>
+
+
+}
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+{/* RECENT POLICIES */}
+
+
+<section className="
+mt-14
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+Recent Policies
+
+</h2>
+
+
+
+<div className="
+grid
+md:grid-cols-2
+gap-6
+mt-8
+">
+
+
+{
+
+recentPolicies.map((policy:any)=>(
+
+
+<Link
+
+key={policy.id}
+
+href={`/employee/policies/${policy.id}`}
+
+className="
+border
+bg-white
+p-6
+hover:shadow-xl
+transition
+"
+
+>
+
+
+<h3 className="
+text-xl
+font-black
+text-[#003B6F]
+">
+
+{policy.title}
+
+</h3>
+
+
+
+<p className="
+mt-2
+text-gray-600
+">
+
+{policy.category || "Department Policy"}
+
+</p>
+
+
+</Link>
+
+
+))
+
+
+}
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+{/* RESOURCES */}
 
 
 <section className="
@@ -456,19 +754,6 @@ Employee Resources
 
 
 
-<p className="
-mt-3
-text-gray-600
-">
-
-Access department resources, documents, and personal records.
-
-</p>
-
-
-
-
-
 
 <div className="
 grid
@@ -479,20 +764,15 @@ mt-8
 
 
 
-
-
 <Action
 
 href="/employee/profile"
 
 title="My Profile"
 
-description="View your employee record, history, awards, and appointments."
+description="View your employee record and information."
 
 />
-
-
-
 
 
 
@@ -502,12 +782,9 @@ href="/employee/contracts"
 
 title="My Contracts"
 
-description="Review agreements, appointments, and signed documents."
+description="Review agreements and appointments."
 
 />
-
-
-
 
 
 
@@ -517,7 +794,7 @@ href="/employee/policies"
 
 title="Department Policies"
 
-description="Access policies and documents available to your division."
+description="Access policies available to you."
 
 />
 
@@ -534,75 +811,23 @@ description="Access policies and documents available to your division."
 
 
 
-
-
-{/* SECURITY NOTICE */}
-
-
-<section className="
-mt-14
-border-l-4
-border-[#F2C94C]
-bg-[#F5F8FB]
-p-8
-">
-
-
-<h3 className="
-text-2xl
-font-black
-text-[#003B6F]
-">
-
-Employee Portal Security
-
-</h3>
-
-
-
-<p className="
-mt-3
-text-gray-700
-">
-
-This portal provides access to official Department of Homeland Security employee resources. Information displayed is based on your verified Roblox identity and current employment record.
-
-</p>
-
-
-
-</section>
-
-
-
-
-
-
+</div>
 
 
 </div>
 
 
-
-</div>
-
-
-
-
-
 </section>
-
-
-
-
 
 
 </main>
+
 
 );
 
 
 }
+
 
 
 
@@ -674,6 +899,7 @@ text-[#003B6F]
 
 
 
+
 function Action({
 
 href,
@@ -706,9 +932,7 @@ shadow-sm
 p-8
 hover:shadow-xl
 transition
-group
 "
-
 
 >
 
@@ -717,7 +941,6 @@ group
 text-2xl
 font-black
 text-[#003B6F]
-group-hover:text-[#005AA7]
 ">
 
 {title}
@@ -725,18 +948,14 @@ group-hover:text-[#005AA7]
 </h3>
 
 
-
-
 <p className="
 mt-3
 text-gray-600
-leading-relaxed
 ">
 
 {description}
 
 </p>
-
 
 
 <div className="
@@ -748,7 +967,6 @@ text-[#003B6F]
 Open →
 
 </div>
-
 
 
 </Link>
