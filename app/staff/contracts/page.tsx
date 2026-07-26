@@ -270,7 +270,29 @@ font-bold
 text-sm
 ">
 
-{contract.status}
+{
+
+contract.employee_signed && contract.executive_signed
+
+?
+
+"Completed"
+
+
+:
+
+contract.employee_signed
+
+?
+
+"Awaiting Executive Signature"
+
+
+:
+
+"Pending Employee Signature"
+
+}
 
 </span>
 
