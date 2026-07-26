@@ -45,6 +45,7 @@ async function getRobloxAvatar(id:number){
 
 
 
+
 export default async function EmployeeDashboard(){
 
 
@@ -63,8 +64,45 @@ if(!session){
 
 
 
+
 const employee =
 session.employees;
+
+
+
+
+
+const staffRoles = [
+
+"Secretary of Homeland Security",
+"Deputy Secretary of Homeland Security",
+"Chief of Staff",
+"Under Secretary",
+"Secret Service Director",
+"CBP Commissioner",
+"Special Response Team Commander",
+"Under Secretary for Aviation Operations",
+"Senior Flight Officer",
+"Deputy Director",
+"Assistant Director",
+"Chief of Operations",
+"CBP Deputy Commissioner",
+"Special Agent in Charge (SRT)"
+
+];
+
+
+
+
+
+const isStaff =
+staffRoles.includes(
+    employee.positions?.title
+);
+
+
+
+
 
 
 
@@ -80,9 +118,7 @@ await getRobloxAvatar(
 
 
 
-//
-// Get approved policies
-//
+
 
 const {data:policies}=await supabaseAdmin
 
@@ -174,9 +210,6 @@ policy.division_id === employee.division_id
 
 
 
-//
-// Get acknowledgements
-//
 
 const {data:acknowledgements}=await supabaseAdmin
 
@@ -200,6 +233,8 @@ employee.id
 
 
 
+
+
 const acknowledged = new Set(
 
 acknowledgements?.map(
@@ -211,6 +246,7 @@ item.policy_id
 )
 
 );
+
 
 
 
@@ -230,9 +266,13 @@ availablePolicies.filter(
 
 
 
+
+
 const recentPolicies =
 
 availablePolicies.slice(0,6);
+
+
 
 
 
@@ -250,11 +290,14 @@ py-16
 ">
 
 
+
 <section className="
 max-w-7xl
 mx-auto
 px-6
 ">
+
+
 
 
 
@@ -266,10 +309,14 @@ overflow-hidden
 ">
 
 
+
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
+
+
+
 
 
 
@@ -282,7 +329,48 @@ to-[#005AA7]
 text-white
 p-10
 md:p-14
+relative
 ">
+
+
+
+
+
+{
+
+isStaff && (
+
+<Link
+
+href="/staff/dashboard"
+
+className="
+absolute
+top-8
+right-8
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
+py-3
+font-black
+shadow-lg
+hover:bg-white
+transition
+"
+
+>
+
+Staff Portal →
+
+</Link>
+
+)
+
+}
+
+
+
+
 
 
 <p className="
@@ -299,6 +387,8 @@ Department of Homeland Security
 
 
 
+
+
 <h1 className="
 text-5xl
 font-black
@@ -308,6 +398,8 @@ mt-4
 Employee Portal
 
 </h1>
+
+
 
 
 
@@ -323,9 +415,8 @@ Official DHS workforce access portal
 
 
 
+
 </div>
-
-
 
 
 
@@ -338,8 +429,6 @@ Official DHS workforce access portal
 p-10
 md:p-14
 ">
-
-
 
 
 
@@ -393,6 +482,7 @@ className="object-cover"
 }
 
 
+
 </div>
 
 
@@ -418,6 +508,8 @@ Employee Record
 
 
 
+
+
 <h2 className="
 text-4xl
 font-black
@@ -427,6 +519,7 @@ mt-2
 {employee.roblox_username}
 
 </h2>
+
 
 
 
@@ -490,15 +583,7 @@ font-bold
 
 </div>
 
-
-
-
-
-
-
-
-
-<div className="
+      <div className="
 grid
 md:grid-cols-4
 gap-6
@@ -553,7 +638,6 @@ employee.status
 />
 
 
-
 </div>
 
 
@@ -561,10 +645,6 @@ employee.status
 
 
 
-
-
-
-{/* ACTIONS */}
 
 
 
@@ -582,6 +662,7 @@ text-[#003B6F]
 Required Actions
 
 </h2>
+
 
 
 
@@ -647,6 +728,7 @@ Review Policies
 </Link>
 
 
+
 </div>
 
 
@@ -682,10 +764,6 @@ text-green-800
 
 
 
-{/* RECENT POLICIES */}
-
-
-
 <section className="
 mt-14
 ">
@@ -700,6 +778,7 @@ text-[#003B6F]
 Recent Policies
 
 </h2>
+
 
 
 
@@ -760,6 +839,7 @@ object-cover
 
 
 
+
 <div className="
 p-6
 ">
@@ -777,6 +857,7 @@ text-[#003B6F]
 
 
 
+
 <p className="
 mt-2
 text-gray-600
@@ -785,6 +866,8 @@ text-gray-600
 {policy.category || "Policy"}
 
 </p>
+
+
 
 
 
@@ -816,7 +899,9 @@ policy.scope==="UNIVERSAL"
 </div>
 
 
+
 </Link>
+
 
 
 ))
@@ -827,6 +912,7 @@ policy.scope==="UNIVERSAL"
 
 
 </div>
+
 
 
 </section>
@@ -856,6 +942,22 @@ Employee Resources
 
 
 
+
+
+<p className="
+mt-3
+text-gray-600
+">
+
+Access department resources, documents, and workforce systems.
+
+</p>
+
+
+
+
+
+
 <div className="
 grid
 md:grid-cols-3
@@ -878,6 +980,8 @@ description="View your employee record and personal information."
 
 
 
+
+
 <Action
 
 href="/employee/contracts"
@@ -887,6 +991,8 @@ title="My Contracts"
 description="Review agreements and signed documents."
 
 />
+
+
 
 
 
@@ -903,7 +1009,35 @@ description="Access policies available to your position and division."
 
 
 
+
+
+
+
+
+{
+
+isStaff && (
+
+<Action
+
+href="/staff/dashboard"
+
+title="Staff Portal"
+
+description="Access staff management tools, policy approvals, employee administration, and department operations."
+
+/>
+
+)
+
+}
+
+
+
+
+
 </div>
+
 
 
 </section>
@@ -914,6 +1048,50 @@ description="Access policies available to your position and division."
 
 
 
+
+
+<section className="
+mt-14
+border-l-4
+border-[#F2C94C]
+bg-[#F5F8FB]
+p-8
+">
+
+
+<h3 className="
+text-2xl
+font-black
+text-[#003B6F]
+">
+
+Employee Portal Security
+
+</h3>
+
+
+
+
+<p className="
+mt-3
+text-gray-700
+">
+
+This portal provides access to official Department of Homeland Security employee resources. Information displayed is based on your verified Roblox identity and current employment record.
+
+</p>
+
+
+
+</section>
+
+
+
+
+
+
+
+
 </div>
 
 
@@ -923,12 +1101,15 @@ description="Access policies available to your position and division."
 
 
 </section>
+
 
 
 </main>
 
 
+
 );
+
 
 }
 
@@ -978,6 +1159,7 @@ text-gray-500
 
 
 
+
 <p className="
 mt-3
 text-xl
@@ -997,6 +1179,7 @@ text-[#003B6F]
 
 
 }
+
 
 
 
@@ -1039,6 +1222,7 @@ hover:shadow-xl
 transition
 "
 
+
 >
 
 
@@ -1054,6 +1238,7 @@ text-[#003B6F]
 
 
 
+
 <p className="
 mt-3
 text-gray-600
@@ -1062,6 +1247,8 @@ text-gray-600
 {description}
 
 </p>
+
+
 
 
 
@@ -1076,7 +1263,9 @@ Open →
 </div>
 
 
+
 </Link>
+
 
 
 );
