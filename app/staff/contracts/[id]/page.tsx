@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-
+import { signExecutiveContract } from "../actions";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 
@@ -413,6 +413,9 @@ Division:
 
 
 
+{/* SIGNATURE STATUS */}
+
+
 <section>
 
 
@@ -438,54 +441,202 @@ mt-6
 
 
 
-<Info
 
-title="Employee Signature"
 
-value={
+<div className="
+border
+p-6
+bg-[#F5F8FB]
+">
+
+
+<p className="
+uppercase
+text-xs
+font-bold
+tracking-widest
+text-gray-500
+">
+
+Employee Signature
+
+</p>
+
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{
 
 contract.employee_signed
 
 ?
 
-"Signed"
+`Signed by ${contract.employee_signature_name || "Employee"}`
 
 :
 
-"Awaiting Signature"
+"Awaiting Employee Signature"
 
 }
 
-/>
+
+</p>
+
+
+</div>
 
 
 
 
 
-<Info
 
-title="Executive Signature"
 
-value={
+
+
+<div className="
+border
+p-6
+bg-[#F5F8FB]
+">
+
+
+<p className="
+uppercase
+text-xs
+font-bold
+tracking-widest
+text-gray-500
+">
+
+Executive Signature
+
+</p>
+
+
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{
 
 contract.executive_signed
 
 ?
 
-"Signed"
+`Signed by ${contract.executive_signature_name || "Executive"}`
 
 :
 
-"Awaiting Signature"
+"Awaiting Executive Signature"
 
 }
 
-/>
+
+</p>
+
 
 
 
 
 </div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+{
+
+contract.employee_signed && !contract.executive_signed && (
+
+
+<form
+action={async()=>{
+
+"use server";
+
+await signExecutiveContract(contract.id);
+
+}}
+
+className="
+mt-8
+"
+>
+
+
+<button
+
+className="
+bg-[#F2C94C]
+text-[#003B6F]
+px-8
+py-4
+font-black
+text-lg
+hover:scale-105
+transition
+"
+
+>
+
+Sign Contract as Executive
+
+</button>
+
+
+</form>
+
+
+)
+
+}
+
+
+
+
+
+{
+
+contract.employee_signed && contract.executive_signed && (
+
+
+<div className="
+mt-8
+bg-green-100
+border
+border-green-400
+p-6
+font-black
+text-green-700
+">
+
+✓ Contract Completed
+
+</div>
+
+
+)
+
+}
+
 
 
 </section>
