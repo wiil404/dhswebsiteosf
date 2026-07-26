@@ -1101,15 +1101,23 @@ mt-8
 
 
 
-function PortalCard(
+function PortalCard({
 
-href:string,
+href,
 
-title:string,
+title,
 
-description:string
+description
 
-){
+}:{
+
+href:string;
+
+title:string;
+
+description:string;
+
+}){
 
 
 return (
@@ -1151,6 +1159,7 @@ transition
 <div className="
 relative
 ">
+
 
 
 <div className="
