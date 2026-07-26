@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-
+import { signExecutiveContract } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -433,6 +433,7 @@ Signature Status
 
 
 
+
 <div className="
 grid
 md:grid-cols-2
@@ -441,20 +442,28 @@ mt-6
 ">
 
 
+
+
+
 <div className="
 border
-bg-[#F5F8FB]
 p-6
+bg-[#F5F8FB]
 ">
 
 
 <p className="
+uppercase
+text-xs
 font-bold
+tracking-widest
+text-gray-500
 ">
 
 Employee Signature
 
 </p>
+
 
 
 <p className="
@@ -464,11 +473,12 @@ text-[#003B6F]
 ">
 
 {
+
 contract.employee_signed
 
 ?
 
-`Signed by ${contract.employee_signature_name || "Employee"}`
+"Signed"
 
 :
 
@@ -476,8 +486,42 @@ contract.employee_signed
 
 }
 
-
 </p>
+
+
+
+{
+
+contract.employee_signed && (
+
+<div className="
+mt-4
+text-sm
+">
+
+<p>
+Signed By: {contract.employee_signature_name}
+</p>
+
+<p>
+Roblox ID: {contract.employee_signature_id}
+</p>
+
+<p>
+Date: {
+new Date(
+contract.employee_signature_date
+)
+.toLocaleString("en-GB")
+}
+</p>
+
+</div>
+
+)
+
+}
+
 
 
 </div>
@@ -486,20 +530,29 @@ contract.employee_signed
 
 
 
+
+
+
+
 <div className="
 border
-bg-[#F5F8FB]
 p-6
+bg-[#F5F8FB]
 ">
 
 
 <p className="
+uppercase
+text-xs
 font-bold
+tracking-widest
+text-gray-500
 ">
 
 Executive Signature
 
 </p>
+
 
 
 <p className="
@@ -508,8 +561,8 @@ font-black
 text-[#003B6F]
 ">
 
-
 {
+
 contract.executive_signed
 
 ?
@@ -522,11 +575,107 @@ contract.executive_signed
 
 }
 
+</p>
+
+
+
+
+
+{
+
+!contract.executive_signed && (
+
+<form
+
+action={async()=>{
+
+await signExecutiveContract(
+contract.id
+);
+
+}}
+
+className="
+mt-5
+"
+
+>
+
+
+<button
+
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-black
+"
+
+>
+
+Sign as Executive
+
+</button>
+
+
+</form>
+
+)
+
+}
+
+
+
+
+
+
+{
+
+contract.executive_signed && (
+
+<div className="
+mt-4
+text-sm
+">
+
+<p>
+Signed By: {contract.executive_signature_name}
+</p>
+
+<p>
+Roblox ID: {contract.executive_signature_id}
+</p>
+
+
+<p>
+
+Date:
+
+{" "}
+
+{
+new Date(
+contract.executive_signature_date
+)
+.toLocaleString("en-GB")
+}
 
 </p>
 
 
 </div>
+
+)
+
+}
+
+
+
+</div>
+
+
+
 
 
 </div>
