@@ -430,7 +430,8 @@ overflow-y-auto
 
 
 <MenuLink href="/staff/dashboard" text="Staff Portal"/>
-    <MenuLink href="/employee/dashboard" text="Employee Portal"/>
+    
+<MenuLink href="/employee/dashboard" text="Employee Portal"/>
 
 
 </MenuSection>
