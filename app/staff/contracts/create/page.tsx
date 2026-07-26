@@ -23,7 +23,6 @@ function generateContractNumber(){
 
 
 
-
 function replaceVariables(
     content:string,
     values:any
@@ -35,11 +34,8 @@ function replaceVariables(
     Object.keys(values).forEach(key=>{
 
         output = output.replaceAll(
-
             `{{${key}}}`,
-
-            values[key] ?? ""
-
+            String(values[key] ?? "")
         );
 
     });
@@ -58,6 +54,8 @@ function replaceVariables(
 
 
 export default async function CreateContractPage(){
+
+
 
 
 
@@ -81,26 +79,6 @@ true
 
 
 
-const { data: employee, error: employeeError } = await supabaseAdmin
-.from("employees")
-.select("*")
-.eq("id", employee_id)
-.single();
-
-
-const { data: position } = await supabaseAdmin
-.from("positions")
-.select("title")
-.eq("id", employee.position_id)
-.single();
-
-
-const { data: division } = await supabaseAdmin
-.from("divisions")
-.select("name")
-.eq("id", employee.division_id)
-.single();
-
 
 
 const {data:employees}=await supabaseAdmin
@@ -108,12 +86,19 @@ const {data:employees}=await supabaseAdmin
 .from("employees")
 
 .select(`
+
 id,
+
 roblox_username,
+
 roblox_user_id,
+
 employee_number,
+
 position_id,
+
 division_id
+
 `)
 
 .eq(
@@ -126,11 +111,21 @@ division_id
 );
 
 
+
+
+
+
+
+
+
 async function createContract(
-    formData:FormData
+formData:FormData
 ){
 
 "use server";
+
+
+
 
 
 const employee_id =
@@ -139,10 +134,14 @@ String(
 );
 
 
+
+
 const template_id =
 String(
     formData.get("template")
 );
+
+
 
 
 const public_visible =
@@ -151,6 +150,11 @@ formData.get("public") === "on";
 
 
 
+
+
+
+
+// GET TEMPLATE
 
 const {data:template,error:templateError}=await supabaseAdmin
 
@@ -168,6 +172,7 @@ template_id
 
 
 
+
 if(templateError || !template){
 
     throw new Error(
@@ -181,9 +186,12 @@ if(templateError || !template){
 
 
 
+
+
+
 // GET EMPLOYEE
 
-const { data: employee, error: employeeError } = await supabaseAdmin
+const {data:employee,error:employeeError}=await supabaseAdmin
 
 .from("employees")
 
@@ -213,9 +221,12 @@ if(employeeError || !employee){
 
 
 
+
+
+
 // GET POSITION
 
-const { data: position } = await supabaseAdmin
+const {data:position}=await supabaseAdmin
 
 .from("positions")
 
@@ -233,9 +244,12 @@ employee.position_id
 
 
 
+
+
+
 // GET DIVISION
 
-const { data: division } = await supabaseAdmin
+const {data:division}=await supabaseAdmin
 
 .from("divisions")
 
@@ -247,6 +261,8 @@ employee.division_id
 )
 
 .single();
+
+
 
 
 
@@ -266,7 +282,7 @@ employee.roblox_username || "",
 
 
 roblox_id:
-String(employee.roblox_user_id || ""),
+employee.roblox_user_id || "",
 
 
 employee_number:
@@ -286,6 +302,8 @@ new Date().toLocaleDateString("en-GB"),
 
 
 
+
+
 executive_name:
 "WiIl404",
 
@@ -299,12 +317,16 @@ executive_roblox_id:
 
 
 
+
+
 employee_signature:
 employee.roblox_username || "",
 
 
 employee_signature_date:
 new Date().toLocaleDateString("en-GB"),
+
+
 
 
 
@@ -324,13 +346,15 @@ new Date().toLocaleDateString("en-GB")
 
 
 
+
 const generatedContent = replaceVariables(
 
-String(template.content),
+template.content,
 
 variables
 
 );
+
 
 
 
@@ -386,6 +410,7 @@ created_by:null
 
 
 
+
 if(error){
 
     console.error(error);
@@ -398,16 +423,13 @@ if(error){
 
 
 
+
 redirect(
 "/staff/contracts"
 );
 
 
 }
-
-
-
-
 
 
 
@@ -651,6 +673,7 @@ Select Employee
 
 
 
+
 {
 
 employees?.map((employee:any)=>(
@@ -669,11 +692,7 @@ value={employee.id}
 
 {" - "}
 
-{employee.positions?.title || "Employee"}
-
-{" - "}
-
-{employee.divisions?.name || "DHS"}
+{employee.employee_number || "No Number"}
 
 
 
