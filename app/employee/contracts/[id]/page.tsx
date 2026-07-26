@@ -131,7 +131,7 @@ mt-6
 
 <Link
 
-href="/employee"
+href="/employee/dashboard"
 
 className="
 inline-block
