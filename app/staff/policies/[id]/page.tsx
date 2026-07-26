@@ -515,7 +515,6 @@ Approved By:
 
 <section>
 
-
 <h2 className="
 text-3xl
 font-black
@@ -541,19 +540,19 @@ max-w-none
 
 dangerouslySetInnerHTML={{
 
-__html:policy.content
+__html: policy.content || ""
 
 }}
 
-/>
+>
+
+</div>
 
 
 </div>
 
 
-
 </section>
-
 
 
 
