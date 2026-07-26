@@ -113,17 +113,24 @@ Department of Homeland Security
 </p>
 
 
+<div className="
+flex
+justify-between
+items-center
+mt-4
+">
+
+
+<div>
 
 <h1 className="
 text-5xl
 font-black
-mt-4
 ">
 
-My Contracts
+{contract.title}
 
 </h1>
-
 
 
 <p className="
@@ -131,9 +138,13 @@ mt-3
 text-blue-100
 ">
 
-Review and sign your assigned Department agreements.
+Employee Contract Review
 
 </p>
+
+</div>
+
+
 
 <Link
 
@@ -154,6 +165,10 @@ transition
 ← Dashboard
 
 </Link>
+
+
+</div>
+
 
 </div>
 
