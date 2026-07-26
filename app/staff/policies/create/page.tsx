@@ -1,14 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-
 import { getEmployeeSession } from "@/app/lib/employee-auth";
-
-import {
-    canCreatePolicy,
-    canManageAllPolicies
-} from "@/app/lib/policy-permissions";
-
 
 
 export const dynamic = "force-dynamic";
@@ -16,23 +9,40 @@ export const revalidate = 0;
 
 
 
+const policyRoles = [
+
+"Secretary of Homeland Security",
+"Deputy Secretary of Homeland Security",
+"Chief of Staff",
+"Under Secretary",
+"Secret Service Director",
+"CBP Commissioner",
+"Special Response Team Commander",
+"Under Secretary for Aviation Operations",
+"Senior Flight Officer",
+"Deputy Director",
+"Assistant Director",
+"Chief of Operations",
+"CBP Deputy Commissioner",
+"Special Agent in Charge (SRT)"
+
+];
+
+
+
+
 
 function generatePolicyNumber(){
 
-    const year = new Date()
-    .getFullYear();
+const year = new Date().getFullYear();
+
+const random =
+Math.floor(Math.random() * 9000) + 1000;
 
 
-    const random =
-    Math.floor(
-        Math.random() * 9000
-    ) + 1000;
-
-
-    return `DHS-POL-${year}-${random}`;
+return `DHS-POL-${year}-${random}`;
 
 }
-
 
 
 
@@ -50,27 +60,38 @@ const session = await getEmployeeSession();
 
 if(!session){
 
-redirect("/staff");
+redirect("/employee/login");
 
 }
 
 
 
-const employee = session.employees;
 
 
 
+const {data:currentEmployee}=await supabaseAdmin
 
+.from("employees")
 
-const {data:position}=await supabaseAdmin
+.select(`
 
-.from("positions")
+id,
 
-.select("title")
+roblox_username,
+
+division_id,
+
+positions(
+
+title
+
+)
+
+`)
 
 .eq(
 "id",
-employee.position_id
+session.employees.id
 )
 
 .single();
@@ -79,25 +100,70 @@ employee.position_id
 
 
 
-if(
-!canCreatePolicy(
-position?.title
-)
-){
+
+
+const currentPosition =
+
+(currentEmployee?.positions as any)?.title || "";
+
+
+
+
+
+
+
+const canCreatePolicy =
+
+policyRoles.some(
+
+(role)=>
+
+role.toLowerCase().trim()
+
+===
+
+currentPosition.toLowerCase().trim()
+
+);
+
+
+
+
+
+
+
+
+if(!canCreatePolicy){
+
 
 return (
 
 <main className="
 min-h-screen
 bg-[#F5F8FB]
-p-16
+py-16
+">
+
+
+<section className="
+max-w-3xl
+mx-auto
+px-6
+">
+
+
+<div className="
+bg-white
+border
+shadow-xl
+p-10
 ">
 
 
 <h1 className="
 text-4xl
 font-black
-text-red-700
+text-red-600
 ">
 
 Access Denied
@@ -105,8 +171,10 @@ Access Denied
 </h1>
 
 
+
 <p className="
 mt-4
+text-gray-700
 ">
 
 You do not have permission to create policies.
@@ -114,9 +182,33 @@ You do not have permission to create policies.
 </p>
 
 
+
+<p className="
+mt-6
+font-bold
+text-[#003B6F]
+">
+
+Current Position:
+
+{" "}
+
+{currentPosition || "Unknown"}
+
+</p>
+
+
+
+</div>
+
+
+</section>
+
+
 </main>
 
 );
+
 
 }
 
@@ -126,30 +218,10 @@ You do not have permission to create policies.
 
 
 
-const {data:divisions}=await supabaseAdmin
 
-.from("divisions")
-
-.select("*")
-
-.order(
-"name"
-);
-
-
-
-
-
-
-
-
-async function createPolicy(
-formData:FormData
-){
+async function createPolicy(formData:FormData){
 
 "use server";
-
-
 
 
 
@@ -160,12 +232,10 @@ formData.get("title")
 
 
 
-
 const content =
 String(
 formData.get("content")
 );
-
 
 
 
@@ -176,31 +246,8 @@ formData.get("classification")
 
 
 
-
-const division_id =
-String(
-formData.get("division")
-);
-
-
-
-
-
-const effective_date =
-String(
-formData.get("effective_date")
-);
-
-
-
-
-const review_date =
-String(
-formData.get("review_date")
-);
-
-
-
+const division =
+formData.get("division") || null;
 
 
 
@@ -215,60 +262,41 @@ const {error}=await supabaseAdmin
 policy_number:
 generatePolicyNumber(),
 
-
 title,
-
 
 content,
 
-
 classification,
 
-
 division_id:
-division_id || null,
-
+division || currentEmployee?.division_id || null,
 
 created_by:
-employee.id,
-
+session.employees.id,
 
 status:
 "Pending Approval",
 
-
 effective_date:
-effective_date || null,
-
+null,
 
 review_date:
-review_date || null
-
+null
 
 });
 
 
 
 
-
-
 if(error){
 
-console.error(error);
-
-throw new Error(
-error.message
-);
+throw new Error(error.message);
 
 }
 
 
 
-
-redirect(
-"/staff/policies"
-);
-
+redirect("/staff/policies");
 
 
 }
@@ -304,13 +332,13 @@ action={createPolicy}
 
 className="
 bg-white
-shadow-2xl
 border
+shadow-2xl
 overflow-hidden
 "
 
->
 
+>
 
 
 <div className="
@@ -356,19 +384,18 @@ Create Policy
 </h1>
 
 
+
 <p className="
 mt-3
 text-blue-100
 ">
 
-Submit an official Department policy.
+Submit official Department policies for approval.
 
 </p>
 
 
-
 </div>
-
 
 
 
@@ -387,8 +414,8 @@ space-y-8
 
 
 
-
 <div>
+
 
 <label className="
 block
@@ -414,78 +441,9 @@ border
 p-4
 "
 
+placeholder="Policy Name"
+
 />
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Division
-
-</label>
-
-
-
-<select
-
-name="division"
-
-className="
-w-full
-border
-p-4
-"
-
->
-
-
-<option value="">
-
-Department Wide
-
-</option>
-
-
-
-{
-
-divisions?.map((division:any)=>(
-
-<option
-
-key={division.id}
-
-value={division.id}
-
->
-
-{division.name}
-
-</option>
-
-))
-
-}
-
-
-
-</select>
 
 
 </div>
@@ -514,7 +472,6 @@ Classification
 
 
 
-
 <select
 
 name="classification"
@@ -528,105 +485,22 @@ p-4
 >
 
 
-<option value="Public">
+<option>
 
 Public
 
 </option>
 
 
-
-<option value="FOUO">
+<option>
 
 For Official Use Only
 
 </option>
 
 
+
 </select>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Effective Date
-
-</label>
-
-
-
-<input
-
-type="date"
-
-name="effective_date"
-
-className="
-w-full
-border
-p-4
-"
-
-/>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Review Date
-
-</label>
-
-
-
-<input
-
-type="date"
-
-name="review_date"
-
-className="
-w-full
-border
-p-4
-"
-
-/>
 
 
 </div>
@@ -655,14 +529,13 @@ Policy Content
 
 
 
-
 <textarea
 
 name="content"
 
 required
 
-rows={15}
+rows={12}
 
 className="
 w-full
@@ -670,8 +543,12 @@ border
 p-4
 "
 
-/>
+placeholder="Write policy contents here..."
 
+>
+
+
+</textarea>
 
 
 </div>
@@ -693,6 +570,8 @@ px-8
 py-4
 font-black
 text-lg
+hover:bg-[#005AA7]
+transition
 "
 
 >
@@ -706,12 +585,7 @@ Submit Policy
 
 
 
-
-
 </div>
-
-
-
 
 
 </form>
@@ -721,6 +595,7 @@ Submit Policy
 
 
 </main>
+
 
 );
 
