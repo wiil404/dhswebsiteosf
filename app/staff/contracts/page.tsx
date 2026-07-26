@@ -3,16 +3,10 @@ import Link from "next/link";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 
-
 export default async function StaffContractsPage(){
 
 
-
-const {
-
-data:contracts
-
-}= await supabaseAdmin
+const { data: contracts } = await supabaseAdmin
 
 .from("contracts")
 
@@ -24,24 +18,30 @@ employees(
 
 roblox_username,
 
-employee_number
+employee_number,
+
+divisions(
+
+name
+
+),
+
+positions(
+
+title
+
+)
 
 )
 
 `)
 
 .order(
-
 "created_at",
-
 {
-
 ascending:false
-
 }
-
 );
-
 
 
 
@@ -74,8 +74,6 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
-
-
 
 
 
@@ -142,8 +140,9 @@ Create Contract
 </Link>
 
 
-
 </div>
+
+
 
 
 <p className="
@@ -151,15 +150,12 @@ mt-4
 text-blue-100
 ">
 
-Manage employee agreements, signatures, and official records.
+Manage employee agreements and official records.
 
 </p>
 
 
 </div>
-
-
-
 
 
 
@@ -183,7 +179,6 @@ Contract Registry
 
 
 
-
 <div className="
 mt-8
 space-y-6
@@ -191,7 +186,6 @@ space-y-6
 
 
 {
-
 contracts?.map((contract:any)=>(
 
 
@@ -207,7 +201,6 @@ flex
 justify-between
 items-center
 "
-
 
 >
 
@@ -229,33 +222,84 @@ text-[#003B6F]
 
 <p className="
 mt-2
-text-gray-600
+text-gray-700
 ">
 
 Employee:
 
 {" "}
 
-{contract.employees?.roblox_username || "Unknown"}
+{contract.employees?.roblox_username}
 
 </p>
+
 
 
 
 <p className="
-mt-2
 text-sm
-font-bold
 text-gray-500
+mt-1
 ">
 
-Status:
+{contract.employees?.positions?.title}
+
+•
 
 {" "}
 
-{contract.status}
+{contract.employees?.divisions?.name}
 
 </p>
+
+
+
+<div className="
+mt-3
+flex
+gap-3
+">
+
+
+<span className="
+bg-white
+border
+px-4
+py-2
+font-bold
+text-sm
+">
+
+{contract.status}
+
+</span>
+
+
+
+{
+contract.public_view && (
+
+<span className="
+bg-green-100
+border
+border-green-400
+px-4
+py-2
+font-bold
+text-sm
+">
+
+Public
+
+</span>
+
+)
+
+}
+
+
+
+</div>
 
 
 
@@ -264,13 +308,6 @@ Status:
 
 
 
-
-
-
-<div className="
-flex
-gap-3
-">
 
 
 <Link
@@ -296,10 +333,6 @@ View
 </div>
 
 
-
-</div>
-
-
 ))
 
 
@@ -307,10 +340,7 @@ View
 
 
 
-
-
 {
-
 (!contracts || contracts.length === 0) && (
 
 <p className="
@@ -328,6 +358,7 @@ No contracts created.
 
 
 </div>
+
 
 
 </div>
