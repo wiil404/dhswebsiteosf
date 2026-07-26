@@ -1,5 +1,13 @@
 import Link from "next/link";
+
+import { redirect } from "next/navigation";
+
 import { supabaseAdmin } from "../../../lib/supabase-admin";
+
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 
 
 async function getRobloxAvatar(userId:string){
@@ -31,6 +39,8 @@ async function getRobloxAvatar(userId:string){
 
 
 
+
+
 export default async function EmployeeProfile({
 
 params
@@ -38,13 +48,14 @@ params
 }:{
 
 params:Promise<{
-    id:string
+id:string
 }>
 
 }){
 
 
-const {id} = await params;
+const {id}=await params;
+
 
 
 
@@ -54,7 +65,7 @@ data:employee,
 
 error
 
-} = await supabaseAdmin
+}=await supabaseAdmin
 
 .from("employees")
 
@@ -65,66 +76,74 @@ error
 ,
 
 positions(
-    title
+title
 )
 
 ,
 
 divisions(
-    name
+name
 )
 
 ,
 
 employee_awards(
-    id,
-    award_name,
-    description,
-    awarded_date
+id,
+award_name,
+description,
+awarded_date
 )
 
 ,
 
 employment_history!employment_history_employee_id_fkey(
 
-    id,
+id,
 
-    action,
+action,
 
-    notes,
+notes,
 
-    effective_date,
+effective_date,
 
-    created_at,
+created_at,
 
-    old_position:positions!employment_history_old_position_fkey(
-        title
-    ),
+old_position:positions!employment_history_old_position_fkey(
+title
+),
 
-    new_position:positions!employment_history_new_position_fkey(
-        title
-    ),
+new_position:positions!employment_history_new_position_fkey(
+title
+),
 
-    old_division:divisions!employment_history_old_division_fkey(
-        name
-    ),
+old_division:divisions!employment_history_old_division_fkey(
+name
+),
 
-    new_division:divisions!employment_history_new_division_fkey(
-        name
-    ),
-
-    changed_by_employee:employees!employment_history_changed_by_fkey(
-        roblox_username
-    )
+new_division:divisions!employment_history_new_division_fkey(
+name
+)
 
 )
 
 ,
 
 disciplinary_records(
-    id,
-    description,
-    created_at
+id,
+description,
+created_at
+)
+
+,
+
+contracts(
+id,
+title,
+contract_number,
+status,
+employee_signed,
+executive_signed,
+created_at
 )
 
 `)
@@ -140,6 +159,7 @@ id
 
 
 
+
 if(error || !employee){
 
 
@@ -148,19 +168,15 @@ return (
 <main className="p-12">
 
 <h1 className="text-3xl font-bold">
+
 Employee Not Found
+
 </h1>
 
-<pre className="mt-5 bg-gray-100 p-4">
-
-{JSON.stringify(error,null,2)}
-
-</pre>
 
 </main>
 
 );
-
 
 }
 
@@ -168,11 +184,7 @@ Employee Not Found
 
 
 
-
-
-const avatar =
-
-employee.roblox_user_id
+const avatar = employee.roblox_user_id
 
 ?
 
@@ -183,6 +195,7 @@ employee.roblox_user_id
 :
 
 null;
+
 
 
 
@@ -200,6 +213,8 @@ py-12
 
 
 
+
+
 <section className="
 bg-[#003B6F]
 text-white
@@ -209,11 +224,44 @@ p-8
 ">
 
 
+
+
+
+<Link
+
+href="/staff/employees"
+
+className="
+inline-block
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
+py-3
+rounded
+font-black
+hover:scale-105
+transition
+"
+
+>
+
+← Return to Employee Registry
+
+</Link>
+
+
+
+
+
+
 <div className="
 flex
 items-center
 gap-8
+mt-8
 ">
+
+
 
 
 
@@ -266,6 +314,9 @@ font-bold
 
 
 
+
+
+
 <div>
 
 
@@ -281,6 +332,7 @@ Department of Homeland Security
 </p>
 
 
+
 <h1 className="
 text-5xl
 font-bold
@@ -290,6 +342,7 @@ mt-2
 {employee.roblox_username}
 
 </h1>
+
 
 
 <h2 className="
@@ -302,6 +355,8 @@ mt-2
 </h2>
 
 
+
+
 <p>
 
 {employee.divisions?.name || "No Division Assigned"}
@@ -309,10 +364,32 @@ mt-2
 </p>
 
 
+
+<p className="
+mt-2
+text-blue-100
+font-bold
+">
+
+Employee Number:
+
+{" "}
+
+{employee.employee_number || "Pending"}
+
+</p>
+
+
+
 </div>
 
 
 </div>
+
+
+
+
+
 
 
 <div className="
@@ -321,6 +398,7 @@ flex
 gap-4
 flex-wrap
 ">
+
 
 
 <Link
@@ -345,7 +423,6 @@ Edit Profile
 
 
 
-
 <Link
 
 href={`/staff/employees/${id}/promote`}
@@ -364,7 +441,6 @@ font-bold
 Promote
 
 </Link>
-
 
 
 
@@ -392,92 +468,10 @@ Demote
 
 
 
-
-
-<form
-
-action={`/api/staff/employees/${id}/disable`}
-
-method="POST"
-
->
-
-<button
-
-className="
-bg-red-600
-text-white
-px-5
-py-3
-rounded
-font-bold
-"
-
->
-
-Deactivate Employee
-
-</button>
-
-</form>
-
-
-
-
-
-
 </div>
 
 
 </section>
-
-
-
-
-
-
-
-
-
-{
-
-employee.status !== "Active" && (
-
-<section className="
-mt-6
-bg-red-50
-border
-border-red-300
-rounded-lg
-p-6
-text-red-800
-">
-
-
-<h2 className="
-text-2xl
-font-bold
-">
-
-⚠ Employee Inactive
-
-</h2>
-
-
-<p className="
-mt-2
-">
-
-This employee has been deactivated and is no longer displayed in the active employee directory.
-
-</p>
-
-
-</section>
-
-)
-
-}
 
 
 
@@ -502,8 +496,6 @@ title="Identity"
 
 items={[
 
-`Email: ${employee.email || "N/A"}`,
-
 `Roblox ID: ${employee.roblox_user_id || "N/A"}`,
 
 `Employee Number: ${employee.employee_number || "N/A"}`
@@ -511,9 +503,6 @@ items={[
 ]}
 
 />
-
-
-
 
 
 
@@ -537,22 +526,16 @@ items={[
 
 
 
-
-
-
 <InfoCard
 
 title="Account"
 
 items={[
 
-`User ID: ${employee.user_id || "Not Linked"}`,
-
 `Joined: ${
 employee.created_at
 ?
-new Date(employee.created_at)
-.toLocaleDateString()
+new Date(employee.created_at).toLocaleDateString()
 :
 "N/A"
 }`
@@ -573,302 +556,6 @@ new Date(employee.created_at)
 
 
 
-<section className="
-mt-10
-border
-rounded-lg
-bg-white
-shadow-sm
-p-6
-">
-
-
-<h2 className="
-text-2xl
-font-bold
-text-[#003B6F]
-">
-
-Career History
-
-</h2>
-
-
-
-
-
-<div className="
-mt-6
-space-y-6
-">
-
-
-{
-
-employee.employment_history?.length ?
-
-employee.employment_history.map((history:any)=>(
-
-
-<div
-
-key={history.id}
-
-className="
-border-l-4
-border-[#003B6F]
-pl-6
-"
-
->
-
-
-<h3 className="
-text-xl
-font-bold
-uppercase
-">
-
-{history.action || "Career Update"}
-
-</h3>
-
-
-
-<p className="
-text-sm
-text-gray-500
-mt-2
-">
-
-Effective:
-
-{" "}
-
-{
-history.effective_date
-?
-new Date(history.effective_date)
-.toLocaleDateString()
-:
-"N/A"
-}
-
-</p>
-
-
-
-
-
-<div className="
-mt-5
-grid
-md:grid-cols-2
-gap-4
-">
-
-
-
-<div className="
-bg-red-50
-border
-rounded
-p-4
-">
-
-
-<p className="
-text-sm
-text-gray-500
-">
-
-Previous Assignment
-
-</p>
-
-
-<h4 className="
-font-bold
-text-lg
-">
-
-{
-history.old_position?.title ||
-"No Position"
-}
-
-</h4>
-
-
-<p>
-
-{
-history.old_division?.name ||
-"No Division"
-}
-
-</p>
-
-
-</div>
-
-
-
-
-
-<div className="
-bg-green-50
-border
-rounded
-p-4
-">
-
-
-<p className="
-text-sm
-text-gray-500
-">
-
-New Assignment
-
-</p>
-
-
-<h4 className="
-font-bold
-text-lg
-">
-
-{
-history.new_position?.title ||
-"No Position"
-}
-
-</h4>
-
-
-<p>
-
-{
-history.new_division?.name ||
-"No Division"
-}
-
-</p>
-
-
-</div>
-
-
-</div>
-
-<div className="
-mt-5
-bg-gray-50
-rounded
-p-4
-">
-
-<p className="
-font-semibold
-">
-
-Reason
-
-</p>
-
-
-<p>
-
-{
-history.notes ||
-"No reason provided"
-}
-
-</p>
-
-
-</div>
-
-
-
-
-
-<p className="
-mt-4
-text-sm
-text-gray-500
-">
-
-Approved / Recorded By:
-
-{" "}
-
-<span className="font-semibold">
-
-{
-history.changed_by_employee?.roblox_username ||
-"System"
-}
-
-</span>
-
-
-</p>
-
-
-
-<p className="
-text-xs
-text-gray-400
-mt-2
-">
-
-Recorded:
-
-{" "}
-
-{
-new Date(history.created_at)
-.toLocaleDateString()
-}
-
-</p>
-
-
-
-</div>
-
-
-))
-
-
-:
-
-<p className="
-text-gray-500
-">
-
-No career history recorded.
-
-</p>
-
-
-}
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-
-
 
 <section className="
 mt-10
@@ -886,7 +573,7 @@ font-bold
 text-[#003B6F]
 ">
 
-Awards & Decorations
+Employment Contracts
 
 </h2>
 
@@ -902,152 +589,114 @@ space-y-4
 
 {
 
-employee.employee_awards?.length ?
+employee.contracts?.length ?
 
-
-employee.employee_awards.map((award:any)=>(
+employee.contracts.map((contract:any)=>(
 
 
 <div
 
-key={award.id}
+key={contract.id}
 
 className="
-border-l-4
-border-yellow-500
-bg-gray-50
-p-4
+border
+bg-[#F5F8FB]
+p-5
+flex
+justify-between
+items-center
 "
 
 >
 
 
+<div>
+
+
 <h3 className="
 font-bold
 text-lg
+text-[#003B6F]
 ">
 
-🏅 {award.award_name}
+{contract.title}
 
 </h3>
 
 
 
 <p className="
-mt-2
-text-gray-700
-">
-
-{award.description}
-
-</p>
-
-
-
-<p className="
 text-sm
 text-gray-500
-mt-3
 ">
 
-Awarded:
-
-{" "}
-
-{
-new Date(
-award.awarded_date
-)
-.toLocaleDateString()
-}
+{contract.contract_number}
 
 </p>
 
 
-</div>
 
+<span className="
+inline-block
+mt-3
+bg-white
+border
+px-3
+py-1
+font-bold
+text-sm
+">
 
-))
+{
 
+contract.employee_signed && contract.executive_signed
+
+?
+
+"Completed"
 
 :
 
-<p className="
-text-gray-500
-">
+contract.employee_signed
 
-No awards recorded.
+?
 
-</p>
+"Awaiting Executive Signature"
 
+:
+
+"Pending Employee Signature"
 
 }
+
+</span>
 
 
 </div>
 
 
-</section>
 
 
 
 
+<Link
 
-
-
-
-
-<section className="
-mt-10
-border
-rounded-lg
-bg-white
-shadow-sm
-p-6
-">
-
-
-<h2 className="
-text-2xl
-font-bold
-text-[#003B6F]
-">
-
-Disciplinary Record
-
-</h2>
-
-
-
-
-
-{
-
-employee.disciplinary_records?.length ?
-
-
-employee.disciplinary_records.map((record:any)=>(
-
-
-<div
-
-key={record.id}
+href={`/staff/contracts/${contract.id}`}
 
 className="
-border-l-4
-border-red-600
-pl-5
-mt-5
+bg-[#003B6F]
+text-white
+px-5
+py-3
+font-bold
 "
 
 >
 
+View Contract
 
-<p>
+</Link>
 
-{record.description}
-
-</p>
 
 
 </div>
@@ -1059,12 +708,10 @@ mt-5
 :
 
 <p className="
-text-green-600
-font-semibold
-mt-5
+text-gray-500
 ">
 
-✓ No disciplinary actions recorded.
+No contracts assigned.
 
 </p>
 
@@ -1072,7 +719,11 @@ mt-5
 }
 
 
+</div>
+
+
 </section>
+
 
 
 
@@ -1084,9 +735,7 @@ mt-5
 
 );
 
-
 }
-
 
 
 
@@ -1138,29 +787,19 @@ space-y-2
 text-gray-600
 ">
 
-
 {
 
-items.map(
+items.map((item,index)=>(
 
-(item,index)=>(
-
-<p
-
-key={index}
-
->
+<p key={index}>
 
 {item}
 
 </p>
 
-)
-
-)
+))
 
 }
-
 
 </div>
 
@@ -1168,6 +807,5 @@ key={index}
 </div>
 
 );
-
 
 }
