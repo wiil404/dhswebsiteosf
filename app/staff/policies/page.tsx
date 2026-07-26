@@ -7,7 +7,6 @@ import { getEmployeeSession } from "@/app/lib/employee-auth";
 import { canCreatePolicy } from "@/app/lib/policy-permissions";
 
 
-
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -16,14 +15,12 @@ export const revalidate = 0;
 export default async function StaffPoliciesPage(){
 
 
-
 const session = await getEmployeeSession();
-
 
 
 if(!session){
 
-    return null;
+return null;
 
 }
 
@@ -49,12 +46,10 @@ employee.position_id
 
 
 
-
 const canCreate =
 canCreatePolicy(
 position?.title
 );
-
 
 
 
@@ -72,12 +67,6 @@ const {data:policies,error}=await supabaseAdmin
 divisions(
 
 name
-
-),
-
-employees!policies_created_by_fkey(
-
-roblox_username
 
 )
 
@@ -123,6 +112,7 @@ px-6
 ">
 
 
+
 <div className="
 bg-white
 shadow-2xl
@@ -132,10 +122,14 @@ overflow-hidden
 
 
 
+
+
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
+
+
 
 
 
@@ -166,12 +160,18 @@ Department of Homeland Security
 
 
 
+
+
 <div className="
 flex
 justify-between
 items-center
-mt-4
+mt-5
+gap-5
 ">
+
+
+<div>
 
 
 <h1 className="
@@ -179,9 +179,24 @@ text-5xl
 font-black
 ">
 
-Policy Registry
+Policy Management
 
 </h1>
+
+
+
+<p className="
+mt-3
+text-blue-100
+">
+
+Create, review and manage Department policies.
+
+</p>
+
+
+
+</div>
 
 
 
@@ -198,16 +213,17 @@ href="/staff/policies/create"
 className="
 bg-[#F2C94C]
 text-[#003B6F]
-px-6
-py-3
+px-7
+py-4
 font-black
+text-lg
 hover:scale-105
 transition
 "
 
 >
 
-Create Policy
++ Create Policy
 
 </Link>
 
@@ -217,19 +233,9 @@ Create Policy
 
 
 
+
+
 </div>
-
-
-
-
-<p className="
-mt-4
-text-blue-100
-">
-
-Manage Department policies and official documentation.
-
-</p>
 
 
 
@@ -249,15 +255,39 @@ p-10
 ">
 
 
+
+<div className="
+flex
+justify-between
+items-center
+">
+
 <h2 className="
 text-3xl
 font-black
 text-[#003B6F]
 ">
 
-Policies
+Policy Registry
 
 </h2>
+
+
+<p className="
+text-gray-500
+">
+
+{
+policies?.length || 0
+}
+
+Policies
+
+</p>
+
+
+</div>
+
 
 
 
@@ -266,8 +296,11 @@ Policies
 
 <div className="
 mt-8
-space-y-6
+grid
+md:grid-cols-2
+gap-6
 ">
+
 
 
 
@@ -286,17 +319,24 @@ className="
 border
 bg-[#F5F8FB]
 p-7
-flex
-justify-between
-items-center
+shadow-sm
+hover:shadow-lg
+transition
 "
 
 >
 
 
 
-<div>
+<div className="
+flex
+justify-between
+gap-4
+">
 
+
+
+<div>
 
 
 <h3 className="
@@ -311,11 +351,10 @@ text-[#003B6F]
 
 
 
-
-
 <p className="
 mt-2
-text-gray-700
+text-sm
+text-gray-500
 ">
 
 {policy.policy_number}
@@ -324,13 +363,48 @@ text-gray-700
 
 
 
+</div>
 
 
-<p className="
-text-sm
-text-gray-500
-mt-1
+
+
+<span className="
+bg-white
+border
+px-3
+py-2
+text-xs
+font-black
+h-fit
 ">
+
+{policy.status}
+
+</span>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<div className="
+mt-5
+space-y-2
+text-gray-700
+">
+
+
+<p>
+
+<b>Division:</b>
+
+{" "}
 
 {
 
@@ -344,72 +418,16 @@ policy.divisions?.name ||
 
 
 
+<p>
 
-
-<div className="
-mt-4
-flex
-gap-3
-flex-wrap
-">
-
-
-
-
-
-<span className="
-bg-white
-border
-px-4
-py-2
-font-bold
-text-sm
-">
-
-{policy.status}
-
-</span>
-
-
-
-
-
-<span className="
-bg-white
-border
-px-4
-py-2
-font-bold
-text-sm
-">
-
-{policy.classification}
-
-</span>
-
-
-
-
-
-</div>
-
-
-
-
-
-<p className="
-text-xs
-text-gray-500
-mt-4
-">
-
-Created by:
+<b>Classification:</b>
 
 {" "}
 
 {
-policy.employees?.roblox_username ||
-"Unknown"
+
+policy.classification
+
 }
 
 </p>
@@ -417,11 +435,111 @@ policy.employees?.roblox_username ||
 
 
 
+<p>
+
+<b>Created:</b>
+
+{" "}
+
+{
+
+policy.created_at
+
+?
+
+new Date(
+policy.created_at
+)
+.toLocaleDateString("en-GB")
+
+:
+
+"N/A"
+
+}
+
+</p>
+
+
+
 
 </div>
 
 
 
+
+
+
+
+
+<div className="
+mt-6
+flex
+justify-between
+items-center
+">
+
+
+<div className="
+flex
+gap-3
+">
+
+
+
+{
+
+policy.classification === "FOUO" && (
+
+<span className="
+bg-red-100
+border
+border-red-300
+text-red-700
+px-3
+py-1
+text-xs
+font-black
+">
+
+FOUO
+
+</span>
+
+)
+
+}
+
+
+
+
+{
+
+policy.status === "Published" && (
+
+<span className="
+bg-green-100
+border
+border-green-300
+text-green-700
+px-3
+py-1
+text-xs
+font-black
+">
+
+Published
+
+</span>
+
+)
+
+}
+
+
+
+
+</div>
 
 
 
@@ -441,9 +559,13 @@ font-bold
 
 >
 
-View
+View Policy
 
 </Link>
+
+
+
+</div>
 
 
 
@@ -456,11 +578,7 @@ View
 
 ))
 
-
-
 }
-
-
 
 
 
@@ -469,13 +587,17 @@ View
 
 (!policies || policies.length === 0) && (
 
-<p className="
+<div className="
+border
+p-10
+text-center
 text-gray-500
+col-span-2
 ">
 
-No policies created.
+No policies have been created yet.
 
-</p>
+</div>
 
 )
 
@@ -483,13 +605,13 @@ No policies created.
 
 
 
-
-
 </div>
 
 
 
+
 </div>
+
 
 
 
