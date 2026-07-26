@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getRobloxLoginURL } from "@/lib/roblox-auth";
+import { getRobloxLoginURL } from "@/lib/../app/lib/roblox-auth";
 
 
 export default function EmployeeLogin(){
