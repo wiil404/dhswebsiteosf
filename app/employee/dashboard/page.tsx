@@ -9,6 +9,7 @@ import Image from "next/image";
 
 async function getRobloxAvatar(id:number){
 
+
     try{
 
         const response = await fetch(
@@ -41,10 +42,15 @@ async function getRobloxAvatar(id:number){
 
 
 
+
+
+
 export default async function EmployeeDashboard(){
 
 
-const session = await getEmployeeSession();
+
+const session =
+await getEmployeeSession();
 
 
 
@@ -56,11 +62,15 @@ if(!session){
 
 
 
-const employee = session.employees;
+
+const employee =
+session.employees;
 
 
 
-const avatar = await getRobloxAvatar(
+
+const avatar =
+await getRobloxAvatar(
     employee.roblox_user_id
 );
 
@@ -69,8 +79,9 @@ const avatar = await getRobloxAvatar(
 
 
 
+
 //
-// REQUIRED POLICIES
+// Get approved policies
 //
 
 const {data:policies}=await supabaseAdmin
@@ -81,6 +92,8 @@ const {data:policies}=await supabaseAdmin
 
 id,
 
+policy_number,
+
 title,
 
 category,
@@ -88,6 +101,10 @@ category,
 scope,
 
 division_id,
+
+classification,
+
+featured_image,
 
 created_at
 
@@ -119,28 +136,47 @@ ascending:false
 
 
 
-const employeePolicies =
 
-policies?.filter((policy:any)=>{
+const availablePolicies =
+
+(policies || []).filter(
+
+(policy:any)=>{
 
 
 return (
 
-policy.scope==="UNIVERSAL"
+policy.scope === "UNIVERSAL"
 
 ||
 
-policy.division_id===employee.division_id
+(
+
+policy.scope === "DIVISIONAL"
+
+&&
+
+policy.division_id === employee.division_id
+
+)
 
 );
 
 
-}) || [];
+}
+
+);
 
 
 
 
 
+
+
+
+//
+// Get acknowledgements
+//
 
 const {data:acknowledgements}=await supabaseAdmin
 
@@ -180,8 +216,9 @@ item.policy_id
 
 
 
+const pendingAcknowledgements =
 
-const requiredPolicies = employeePolicies.filter(
+availablePolicies.filter(
 
 (policy:any)=>
 
@@ -193,10 +230,9 @@ const requiredPolicies = employeePolicies.filter(
 
 
 
+const recentPolicies =
 
-
-const recentPolicies = employeePolicies.slice(0,5);
-
+availablePolicies.slice(0,6);
 
 
 
@@ -206,6 +242,7 @@ const recentPolicies = employeePolicies.slice(0,5);
 
 return (
 
+
 <main className="
 min-h-screen
 bg-[#F5F8FB]
@@ -213,15 +250,11 @@ py-16
 ">
 
 
-
 <section className="
 max-w-7xl
 mx-auto
 px-6
 ">
-
-
-
 
 
 
@@ -233,15 +266,10 @@ overflow-hidden
 ">
 
 
-
-
-
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
-
-
 
 
 
@@ -271,7 +299,6 @@ Department of Homeland Security
 
 
 
-
 <h1 className="
 text-5xl
 font-black
@@ -281,7 +308,6 @@ mt-4
 Employee Portal
 
 </h1>
-
 
 
 
@@ -296,7 +322,9 @@ Official DHS workforce access portal
 </p>
 
 
+
 </div>
+
 
 
 
@@ -347,7 +375,7 @@ bg-white/20
 
 {
 
-avatar && (
+avatar &&
 
 <Image
 
@@ -361,7 +389,6 @@ className="object-cover"
 
 />
 
-)
 
 }
 
@@ -453,11 +480,12 @@ font-bold
 </span>
 
 
-
 </div>
 
 
+
 </div>
+
 
 
 </div>
@@ -476,7 +504,6 @@ md:grid-cols-4
 gap-6
 mt-10
 ">
-
 
 
 <Card
@@ -537,7 +564,8 @@ employee.status
 
 
 
-{/* REQUIRED ACTIONS */}
+{/* ACTIONS */}
+
 
 
 <section className="
@@ -558,9 +586,10 @@ Required Actions
 
 
 
+
 {
 
-requiredPolicies.length > 0
+pendingAcknowledgements.length > 0
 
 ?
 
@@ -573,14 +602,27 @@ p-6
 ">
 
 
-<p className="
+<h3 className="
 font-black
 text-yellow-800
+text-xl
 ">
 
-⚠ {requiredPolicies.length} policy acknowledgement(s) required
+⚠ Policy Acknowledgements Required
+
+</h3>
+
+
+
+<p className="
+mt-2
+text-yellow-900
+">
+
+You have {pendingAcknowledgements.length} policy document(s) requiring review.
 
 </p>
+
 
 
 
@@ -590,12 +632,12 @@ href="/employee/policies"
 
 className="
 inline-block
-mt-4
+mt-5
 bg-[#003B6F]
 text-white
 px-6
 py-3
-font-bold
+font-black
 "
 
 >
@@ -606,6 +648,7 @@ Review Policies
 
 
 </div>
+
 
 
 :
@@ -642,6 +685,7 @@ text-green-800
 {/* RECENT POLICIES */}
 
 
+
 <section className="
 mt-14
 ">
@@ -659,12 +703,14 @@ Recent Policies
 
 
 
+
 <div className="
 grid
-md:grid-cols-2
+md:grid-cols-3
 gap-6
 mt-8
 ">
+
 
 
 {
@@ -681,12 +727,42 @@ href={`/employee/policies/${policy.id}`}
 className="
 border
 bg-white
-p-6
+shadow-sm
+overflow-hidden
 hover:shadow-xl
 transition
 "
 
 >
+
+
+
+{
+
+policy.featured_image && (
+
+<img
+
+src={policy.featured_image}
+
+className="
+h-40
+w-full
+object-cover
+"
+
+/>
+
+)
+
+}
+
+
+
+
+<div className="
+p-6
+">
 
 
 <h3 className="
@@ -706,9 +782,38 @@ mt-2
 text-gray-600
 ">
 
-{policy.category || "Department Policy"}
+{policy.category || "Policy"}
 
 </p>
+
+
+
+<p className="
+mt-2
+text-sm
+font-bold
+text-gray-500
+">
+
+{
+
+policy.scope==="UNIVERSAL"
+
+?
+
+"Department Wide"
+
+:
+
+"Division Specific"
+
+}
+
+</p>
+
+
+
+</div>
 
 
 </Link>
@@ -734,9 +839,6 @@ text-gray-600
 
 
 
-{/* RESOURCES */}
-
-
 <section className="
 mt-14
 ">
@@ -751,7 +853,6 @@ text-[#003B6F]
 Employee Resources
 
 </h2>
-
 
 
 
@@ -770,9 +871,10 @@ href="/employee/profile"
 
 title="My Profile"
 
-description="View your employee record and information."
+description="View your employee record and personal information."
 
 />
+
 
 
 
@@ -782,9 +884,10 @@ href="/employee/contracts"
 
 title="My Contracts"
 
-description="Review agreements and appointments."
+description="Review agreements and signed documents."
 
 />
+
 
 
 
@@ -794,7 +897,7 @@ href="/employee/policies"
 
 title="Department Policies"
 
-description="Access policies available to you."
+description="Access policies available to your position and division."
 
 />
 
@@ -814,7 +917,9 @@ description="Access policies available to you."
 </div>
 
 
+
 </div>
+
 
 
 </section>
@@ -824,7 +929,6 @@ description="Access policies available to you."
 
 
 );
-
 
 }
 
@@ -886,12 +990,13 @@ text-[#003B6F]
 </p>
 
 
+
 </div>
 
 );
 
-}
 
+}
 
 
 
@@ -948,6 +1053,7 @@ text-[#003B6F]
 </h3>
 
 
+
 <p className="
 mt-3
 text-gray-600
@@ -956,6 +1062,7 @@ text-gray-600
 {description}
 
 </p>
+
 
 
 <div className="
@@ -970,6 +1077,7 @@ Open →
 
 
 </Link>
+
 
 );
 
