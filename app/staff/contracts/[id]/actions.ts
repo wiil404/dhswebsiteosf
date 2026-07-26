@@ -5,8 +5,9 @@ import { redirect } from "next/navigation";
 
 
 export async function signExecutiveContract(
-    formData: FormData
+formData:FormData
 ){
+
 
 const contractId =
 String(
@@ -16,11 +17,14 @@ formData.get("contractId")
 
 
 const executiveName = "WiIl404";
+
 const executiveRobloxId = "333195903";
 
 
 
-const {error}=await supabaseAdmin
+
+
+const {error:updateError}=await supabaseAdmin
 
 .from("contracts")
 
@@ -35,58 +39,7 @@ executive_signature_id:
 executiveRobloxId,
 
 executive_signature_date:
-new Date()
-
-})
-
-.eq(
-"id",
-contractId
-);
-
-
-
-
-if(error){
-
-throw new Error(error.message);
-
-}
-
-
-
-
-const {data:contract}=await supabaseAdmin
-
-.from("contracts")
-
-.select(
-`
-employee_signed,
-executive_signed
-`
-)
-
-.eq(
-"id",
-contractId
-)
-
-.single();
-
-
-
-
-if(
-contract?.employee_signed &&
-contract?.executive_signed
-){
-
-await supabaseAdmin
-
-.from("contracts")
-
-.update({
+new Date(),
 
 status:"Completed"
 
@@ -98,28 +51,20 @@ contractId
 );
 
 
-}
 
-else if(
-contract?.employee_signed
-){
 
-await supabaseAdmin
 
-.from("contracts")
+if(updateError){
 
-.update({
+console.error(updateError);
 
-status:"Awaiting Executive Signature"
-
-})
-
-.eq(
-"id",
-contractId
+throw new Error(
+updateError.message
 );
 
 }
+
+
 
 
 
