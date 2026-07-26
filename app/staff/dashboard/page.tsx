@@ -47,7 +47,6 @@ if(!profile){
 
 
 
-
 const {data:employee}=await supabaseAdmin
 
 .from("employees")
@@ -82,7 +81,6 @@ user.id
 
 
 
-
 const createNews =
 await canCreateNews();
 
@@ -109,10 +107,6 @@ const manageClearance =
 await canManageClearance();
 
 
-const administrator =
-profile.role === "Administrator";
-
-
 
 const policyCreate =
 await hasPermission(
@@ -130,6 +124,12 @@ const contractsManage =
 await hasPermission(
 "contracts.manage"
 );
+
+
+
+const manageOrganisation =
+profile.role === "Administrator";
+
 
 
 
@@ -155,8 +155,6 @@ px-6
 
 
 
-
-
 <div className="
 bg-white
 shadow-2xl
@@ -170,9 +168,6 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
-
-
-
 
 
 
@@ -269,7 +264,6 @@ items-center
 
 
 
-
 <div className="
 w-32
 h-32
@@ -357,6 +351,7 @@ employee?.positions?.[0]?.title
 
 
 
+
 <p className="
 text-blue-200
 ">
@@ -435,7 +430,6 @@ font-bold
 
 
 
-
 <div className="
 grid
 md:grid-cols-3
@@ -491,7 +485,6 @@ employee?.status ||
 
 
 
-
 <PortalSection
 
 title="Communications"
@@ -505,15 +498,15 @@ description="Manage official Department announcements and public messaging."
 
 createNews && (
 
-PortalCard(
+<PortalCard
 
-"/staff/news/create",
+href="/staff/news/create"
 
-"Create Press Release",
+title="Create Press Release"
 
-"Publish official DHS statements and releases."
+description="Publish official DHS statements and releases."
 
-)
+/>
 
 )
 
@@ -521,20 +514,19 @@ PortalCard(
 
 
 
-
 {
 
 (editNews || deleteNews) && (
 
-PortalCard(
+<PortalCard
 
-"/staff/news",
+href="/staff/news"
 
-"Manage News Releases",
+title="Manage News Releases"
 
-"Edit, publish and maintain existing communications."
+description="Edit, publish and maintain existing communications."
 
-)
+/>
 
 )
 
@@ -564,15 +556,15 @@ description="Create, review and maintain Department policies."
 
 policyCreate && (
 
-PortalCard(
+<PortalCard
 
-"/staff/policies/create",
+href="/staff/policies/create"
 
-"Create Policy",
+title="Create Policy"
 
-"Draft and submit new DHS directives."
+description="Draft and submit new DHS directives."
 
-)
+/>
 
 )
 
@@ -580,19 +572,20 @@ PortalCard(
 
 
 
+
 {
 
 policyManage && (
 
-PortalCard(
+<PortalCard
 
-"/staff/policies",
+href="/staff/policies"
 
-"Manage Policies",
+title="Manage Policies"
 
-"Review, approve and maintain policy records."
+description="Review, approve and maintain policy records."
 
-)
+/>
 
 )
 
@@ -615,15 +608,15 @@ description="Manage employees, contracts and workforce records."
 
 manageUsers && (
 
-PortalCard(
+<PortalCard
 
-"/staff/employees",
+href="/staff/employees"
 
-"Employee Directory",
+title="Employee Directory"
 
-"View and manage DHS employee records."
+description="View and manage DHS employee records."
 
-)
+/>
 
 )
 
@@ -637,15 +630,15 @@ PortalCard(
 
 manageUsers && (
 
-PortalCard(
+<PortalCard
 
-"/staff/users",
+href="/staff/users"
 
-"Staff Management",
+title="Staff Management"
 
-"Manage accounts, permissions and access."
+description="Manage accounts, permissions and access."
 
-)
+/>
 
 )
 
@@ -655,20 +648,19 @@ PortalCard(
 
 
 
-
 {
 
 contractsManage && (
 
-PortalCard(
+<PortalCard
 
-"/staff/contracts",
+href="/staff/contracts"
 
-"Contract Management",
+title="Contract Management"
 
-"Create and manage employee agreements."
+description="Create and manage employee agreements."
 
-)
+/>
 
 )
 
@@ -700,15 +692,15 @@ description="Manage restricted systems, clearance and security access."
 
 manageClearance && (
 
-PortalCard(
+<PortalCard
 
-"/staff/clearance",
+href="/staff/clearance"
 
-"Security Clearance Registry",
+title="Security Clearance Registry"
 
-"Manage clearance levels and restricted access."
+description="Manage clearance levels and restricted access."
 
-)
+/>
 
 )
 
@@ -716,19 +708,21 @@ PortalCard(
 
 
 
+
+
 {
 
-administrator && (
+manageClearance && (
 
-PortalCard(
+<PortalCard
 
-"/staff/clearance/create",
+href="/staff/clearance/create"
 
-"Create Clearance",
+title="Create Clearance"
 
-"Issue new clearance records."
+description="Issue new clearance records."
 
-)
+/>
 
 )
 
@@ -758,17 +752,17 @@ description="Maintain the DHS organisational structure."
 
 {
 
-administrator && (
+manageOrganisation && (
 
-PortalCard(
+<PortalCard
 
-"/staff/organisation",
+href="/staff/organisation"
 
-"Organisation Settings",
+title="Organisation Settings"
 
-"Manage divisions and department structure."
+description="Manage divisions and department structure."
 
-)
+/>
 
 )
 
@@ -776,19 +770,21 @@ PortalCard(
 
 
 
+
+
 {
 
-administrator && (
+manageOrganisation && (
 
-PortalCard(
+<PortalCard
 
-"/staff/positions",
+href="/staff/positions"
 
-"Position Management",
+title="Position Management"
 
-"Manage roles and assignments."
+description="Manage roles and assignments."
 
-)
+/>
 
 )
 
@@ -820,15 +816,15 @@ description="Administrative tools and monitoring systems."
 
 viewAudit && (
 
-PortalCard(
+<PortalCard
 
-"/staff/audit",
+href="/staff/audit"
 
-"Audit Logs",
+title="Audit Logs"
 
-"Review system activity and staff actions."
+description="Review system activity and staff actions."
 
-)
+/>
 
 )
 
@@ -847,6 +843,9 @@ title="Public Website"
 description="View public DHS communications."
 
 />
+
+
+
 
 
 
@@ -937,6 +936,7 @@ This portal provides authorised DHS staff with access to internal management sys
 
 
 
+
 function InfoCard({
 
 title,
@@ -962,9 +962,9 @@ p-6
 
 
 <p className="
+text-xs
 uppercase
 tracking-widest
-text-xs
 font-bold
 text-gray-500
 ">
@@ -1029,15 +1029,6 @@ mt-14
 ">
 
 
-<div className="
-flex
-items-end
-justify-between
-flex-wrap
-gap-4
-">
-
-
 <div>
 
 
@@ -1060,9 +1051,6 @@ text-gray-600
 {description}
 
 </p>
-
-
-</div>
 
 
 </div>
@@ -1156,10 +1144,10 @@ transition
 
 
 
+
 <div className="
 relative
 ">
-
 
 
 <div className="
