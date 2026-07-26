@@ -1,10 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-
 import { getEmployeeSession } from "@/app/lib/employee-auth";
-
-import { canCreatePolicy } from "@/app/lib/policy-permissions";
 
 
 export const dynamic = "force-dynamic";
@@ -15,30 +13,39 @@ export const revalidate = 0;
 export default async function StaffPoliciesPage(){
 
 
+
 const session = await getEmployeeSession();
+
 
 
 if(!session){
 
-return null;
+    redirect("/employee/login");
 
 }
 
 
 
-const employee = session.employees;
 
+const {data:currentEmployee}=await supabaseAdmin
 
+.from("employees")
 
-const {data:position}=await supabaseAdmin
+.select(`
 
-.from("positions")
+id,
 
-.select("title")
+positions(
+
+title
+
+)
+
+`)
 
 .eq(
 "id",
-employee.position_id
+session.employees.id
 )
 
 .single();
@@ -46,41 +53,79 @@ employee.position_id
 
 
 
+
+const position =
+currentEmployee?.positions?.title || "";
+
+
+
+
+
+console.log(
+"CURRENT POSITION:",
+position
+);
+
+
+
+
+
+
 const policyRoles = [
 
 "Secretary of Homeland Security",
+
 "Deputy Secretary of Homeland Security",
+
 "Chief of Staff",
+
 "Under Secretary",
 
 "Secret Service Director",
+
 "CBP Commissioner",
+
 "Special Response Team Commander",
+
 "Under Secretary for Aviation Operations",
+
 "Senior Flight Officer",
+
 "Deputy Director",
+
 "Assistant Director",
+
 "Chief of Operations",
+
 "CBP Deputy Commissioner",
+
 "Special Agent in Charge (SRT)"
 
 ];
 
 
+
+
+
+
 const canCreate =
 policyRoles.includes(
-position?.title?.trim()
-);
-
-console.log(
-"CURRENT POSITION:",
-position?.title
+position.trim()
 );
 
 
 
 
-const {data:policies,error}=await supabaseAdmin
+
+
+
+
+
+const {
+
+data:policies
+
+}=await supabaseAdmin
 
 .from("policies")
 
@@ -108,14 +153,6 @@ ascending:false
 
 
 
-if(error){
-
-console.error(error);
-
-}
-
-
-
 
 
 
@@ -139,8 +176,8 @@ px-6
 
 <div className="
 bg-white
-shadow-2xl
 border
+shadow-2xl
 overflow-hidden
 ">
 
@@ -185,25 +222,22 @@ Department of Homeland Security
 
 
 
-
 <div className="
 flex
 justify-between
 items-center
-mt-5
-gap-5
+mt-4
 ">
 
 
 <div>
-
 
 <h1 className="
 text-5xl
 font-black
 ">
 
-Policy Management
+Policies
 
 </h1>
 
@@ -214,10 +248,9 @@ mt-3
 text-blue-100
 ">
 
-Create, review and manage Department policies.
+Department policy management and official guidance.
 
 </p>
-
 
 
 </div>
@@ -237,10 +270,9 @@ href="/staff/policies/create"
 className="
 bg-[#F2C94C]
 text-[#003B6F]
-px-7
-py-4
+px-6
+py-3
 font-black
-text-lg
 hover:scale-105
 transition
 "
@@ -257,11 +289,7 @@ transition
 
 
 
-
-
 </div>
-
-
 
 
 </div>
@@ -279,13 +307,6 @@ p-10
 ">
 
 
-
-<div className="
-flex
-justify-between
-items-center
-">
-
 <h2 className="
 text-3xl
 font-black
@@ -297,34 +318,13 @@ Policy Registry
 </h2>
 
 
-<p className="
-text-gray-500
-">
-
-{
-policies?.length || 0
-}
-
- Policies
-
-</p>
-
-
-</div>
-
-
-
-
 
 
 
 <div className="
 mt-8
-grid
-md:grid-cols-2
-gap-6
+space-y-6
 ">
-
 
 
 
@@ -335,6 +335,7 @@ gap-6
 policies?.map((policy:any)=>(
 
 
+
 <div
 
 key={policy.id}
@@ -343,24 +344,17 @@ className="
 border
 bg-[#F5F8FB]
 p-7
-shadow-sm
-hover:shadow-lg
-transition
+flex
+justify-between
+items-center
 "
 
 >
 
 
 
-<div className="
-flex
-justify-between
-gap-4
-">
-
-
-
 <div>
+
 
 
 <h3 className="
@@ -375,19 +369,67 @@ text-[#003B6F]
 
 
 
+
+
 <p className="
 mt-2
-text-sm
-text-gray-500
+text-gray-600
 ">
 
-{policy.policy_number}
+Policy Number:
+
+{" "}
+
+{policy.policy_number || "Pending"}
 
 </p>
 
 
 
-</div>
+
+
+
+<p className="
+mt-1
+text-sm
+text-gray-500
+">
+
+Division:
+
+{" "}
+
+{policy.divisions?.name || "Department Wide"}
+
+</p>
+
+
+
+
+
+
+<div className="
+mt-4
+flex
+gap-3
+flex-wrap
+">
+
+
+
+<span className="
+bg-white
+border
+px-4
+py-2
+font-bold
+text-sm
+">
+
+{policy.classification || "Public"}
+
+</span>
+
 
 
 
@@ -395,14 +437,13 @@ text-gray-500
 <span className="
 bg-white
 border
-px-3
+px-4
 py-2
-text-xs
-font-black
-h-fit
+font-bold
+text-sm
 ">
 
-{policy.status}
+{policy.status || "Draft"}
 
 </span>
 
@@ -413,157 +454,9 @@ h-fit
 
 
 
-
-
-
-
-<div className="
-mt-5
-space-y-2
-text-gray-700
-">
-
-
-<p>
-
-<b>Division:</b>
-
-{" "}
-
-{
-
-policy.divisions?.name ||
-
-"Department Wide"
-
-}
-
-</p>
-
-
-
-<p>
-
-<b>Classification:</b>
-
-{" "}
-
-{
-
-policy.classification
-
-}
-
-</p>
-
-
-
-
-<p>
-
-<b>Created:</b>
-
-{" "}
-
-{
-
-policy.created_at
-
-?
-
-new Date(
-policy.created_at
-)
-.toLocaleDateString("en-GB")
-
-:
-
-"N/A"
-
-}
-
-</p>
-
-
-
-
 </div>
 
 
-
-
-
-
-
-
-<div className="
-mt-6
-flex
-justify-between
-items-center
-">
-
-
-<div className="
-flex
-gap-3
-">
-
-
-
-{
-
-policy.classification === "FOUO" && (
-
-<span className="
-bg-red-100
-border
-border-red-300
-text-red-700
-px-3
-py-1
-text-xs
-font-black
-">
-
-FOUO
-
-</span>
-
-)
-
-}
-
-
-
-
-{
-
-policy.status === "Published" && (
-
-<span className="
-bg-green-100
-border
-border-green-300
-text-green-700
-px-3
-py-1
-text-xs
-font-black
-">
-
-Published
-
-</span>
-
-)
-
-}
-
-
-
-
-</div>
 
 
 
@@ -583,14 +476,9 @@ font-bold
 
 >
 
-View Policy
+View
 
 </Link>
-
-
-
-</div>
-
 
 
 
@@ -602,7 +490,11 @@ View Policy
 
 ))
 
+
 }
+
+
+
 
 
 
@@ -611,17 +503,15 @@ View Policy
 
 (!policies || policies.length === 0) && (
 
-<div className="
-border
-p-10
-text-center
+
+<p className="
 text-gray-500
-col-span-2
 ">
 
-No policies have been created yet.
+No policies created.
 
-</div>
+</p>
+
 
 )
 
@@ -629,12 +519,13 @@ No policies have been created yet.
 
 
 
-</div>
-
-
-
 
 </div>
+
+
+
+</div>
+
 
 
 
@@ -646,6 +537,7 @@ No policies have been created yet.
 
 
 </main>
+
 
 );
 
