@@ -5,8 +5,14 @@ import { redirect } from "next/navigation";
 
 
 export async function signExecutiveContract(
-    contractId:string
+    formData: FormData
 ){
+
+const contractId =
+String(
+formData.get("contractId")
+);
+
 
 
 const executiveName = "WiIl404";
@@ -31,7 +37,6 @@ executiveRobloxId,
 executive_signature_date:
 new Date()
 
-
 })
 
 .eq(
@@ -51,9 +56,6 @@ throw new Error(error.message);
 
 
 
-
-// Update status
-
 const {data:contract}=await supabaseAdmin
 
 .from("contracts")
@@ -71,7 +73,6 @@ contractId
 )
 
 .single();
-
 
 
 
@@ -97,7 +98,6 @@ contractId
 );
 
 
-
 }
 
 else if(
@@ -119,9 +119,7 @@ status:"Awaiting Executive Signature"
 contractId
 );
 
-
 }
-
 
 
 
