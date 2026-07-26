@@ -320,22 +320,20 @@ executive_roblox_id:
 
 
 employee_signature:
-employee.roblox_username || "",
+"",
 
 
 employee_signature_date:
-new Date().toLocaleDateString("en-GB"),
-
-
+"",
 
 
 
 executive_signature:
-"WiIl404",
+"",
 
 
 executive_signature_date:
-new Date().toLocaleDateString("en-GB")
+""
 
 };
 
