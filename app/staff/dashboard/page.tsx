@@ -351,22 +351,51 @@ administrative operations.
 <button
 
 className="
-bg-red-600
-hover:bg-red-700
-transition
-text-white
-px-6
+relative
+overflow-hidden
+px-7
 py-3
+rounded-lg
 font-black
+text-white
+bg-gradient-to-r
+from-red-600
+via-red-700
+to-[#003B6F]
 shadow-lg
+hover:shadow-red-500/30
+transition
+duration-300
+group
 "
 
 >
 
+<span className="
+relative
+z-10
+">
+
 Logout
 
-</button>
+</span>
 
+
+<div className="
+absolute
+inset-0
+bg-gradient-to-r
+from-[#003B6F]
+via-red-700
+to-red-600
+opacity-0
+group-hover:opacity-100
+transition
+duration-500
+"/>
+
+
+</button>
 
 </form>
 
