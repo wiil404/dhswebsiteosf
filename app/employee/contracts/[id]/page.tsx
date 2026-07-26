@@ -124,7 +124,34 @@ text-white
 p-10
 ">
 
+<div className="
+mt-6
+">
 
+<Link
+
+href="/employee"
+
+className="
+inline-block
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
+py-3
+font-black
+hover:scale-105
+transition
+"
+
+>
+
+← Return to Employee Dashboard
+
+</Link>
+
+</div>
+
+    
 <p className="
 uppercase
 tracking-[0.35em]
