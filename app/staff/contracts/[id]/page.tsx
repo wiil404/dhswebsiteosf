@@ -1,38 +1,61 @@
 import { redirect } from "next/navigation";
-
+import { signExecutiveContract } from "./sign-action";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 
 
 export default async function ContractViewPage({
-    params,
-}: {
-    params: Promise<{
-        id:string
-    }>
-}) {
+
+params
+
+}:{
+
+params:{
+id:string
+}
+
+}){
 
 
-const { id } = await params;
 
-
-
-const {
-    data: contract,
-    error
-} = await supabaseAdmin
+const { data:contract, error } = await supabaseAdmin
 
 .from("contracts")
 
-.select("*")
+.select(`
+
+*,
+
+employees(
+
+roblox_username,
+
+employee_number,
+
+roblox_user_id,
+
+positions(
+
+title
+
+),
+
+divisions(
+
+name
+
+)
+
+)
+
+`)
 
 .eq(
-    "id",
-    id
+
+"id",
+
+params.id
+
 )
 
 .single();
@@ -43,87 +66,9 @@ const {
 
 if(error || !contract){
 
-    console.error(
-        "Contract lookup failed:",
-        error
-    );
-
-    redirect("/staff/contracts");
+redirect("/staff/contracts");
 
 }
-
-
-
-
-
-const {
-    data: employee
-} = await supabaseAdmin
-
-.from("employees")
-
-.select("*")
-
-.eq(
-    "id",
-    contract.employee_id
-)
-
-.single();
-
-
-
-
-
-let position = null;
-
-let division = null;
-
-
-
-if(employee){
-
-
-const positionResponse = await supabaseAdmin
-
-.from("positions")
-
-.select("title")
-
-.eq(
-"id",
-employee.position_id
-)
-
-.single();
-
-
-position = positionResponse.data;
-
-
-
-
-
-const divisionResponse = await supabaseAdmin
-
-.from("divisions")
-
-.select("name")
-
-.eq(
-"id",
-employee.division_id
-)
-
-.single();
-
-
-division = divisionResponse.data;
-
-
-}
-
-
 
 
 
@@ -154,10 +99,16 @@ overflow-hidden
 ">
 
 
+
+
+
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
+
+
+
 
 
 
@@ -196,6 +147,7 @@ mt-4
 
 
 
+
 <p className="
 mt-3
 text-blue-100
@@ -206,7 +158,10 @@ Official Employment Contract Record
 </p>
 
 
+
 </div>
+
+
 
 
 
@@ -224,7 +179,12 @@ space-y-10
 
 
 
+
+{/* CONTRACT INFORMATION */}
+
+
 <section>
+
 
 <h2 className="
 text-3xl
@@ -246,22 +206,40 @@ mt-6
 ">
 
 
+
 <Info
+
 title="Contract Number"
+
 value={contract.contract_number || "Not Assigned"}
+
 />
 
 
+
+
 <Info
+
 title="Contract Type"
+
 value={contract.contract_type || "Unknown"}
+
 />
+
+
+
 
 
 <Info
+
 title="Status"
-value={contract.status || "Unknown"}
+
+value={contract.status}
+
 />
+
+
+
 
 
 </div>
@@ -275,6 +253,10 @@ value={contract.status || "Unknown"}
 
 
 
+
+
+
+{/* EMPLOYEE */}
 
 
 <section>
@@ -292,6 +274,7 @@ Employee
 
 
 
+
 <div className="
 bg-[#F5F8FB]
 border
@@ -300,60 +283,67 @@ mt-6
 ">
 
 
+
 <p className="
-text-3xl
+text-2xl
 font-black
 text-[#003B6F]
 ">
 
-{employee?.roblox_username || "Unknown Employee"}
+{contract.employees?.roblox_username}
 
 </p>
 
 
 
+
 <p className="
-mt-4
-text-gray-700
+mt-2
+text-gray-600
 ">
 
 Employee Number:
 
 {" "}
 
-{employee?.employee_number || "Pending"}
+{contract.employees?.employee_number || "Pending"}
 
 </p>
 
 
 
+
+
 <p className="
 mt-2
-text-gray-700
+text-gray-600
 ">
 
 Position:
 
 {" "}
 
-{position?.title || "Unknown"}
+{contract.employees?.positions?.title || "Unknown"}
 
 </p>
 
 
 
+
+
 <p className="
 mt-2
-text-gray-700
+text-gray-600
 ">
 
 Division:
 
 {" "}
 
-{division?.name || "Unknown"}
+{contract.employees?.divisions?.name || "Unknown"}
 
 </p>
+
 
 
 
@@ -369,6 +359,8 @@ Division:
 
 
 
+
+{/* SIGNATURE STATUS */}
 
 
 <section>
@@ -395,39 +387,196 @@ mt-6
 ">
 
 
-<Info
 
-title="Employee Signature"
 
-value={
+
+
+<div className="
+border
+bg-[#F5F8FB]
+p-6
+">
+
+
+<p className="
+uppercase
+text-xs
+tracking-widest
+font-bold
+text-gray-500
+">
+
+Employee Signature
+
+</p>
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{
+
 contract.employee_signed
+
 ?
-"Signed"
+
+"✓ Signed"
+
 :
+
 "Awaiting Signature"
+
 }
 
-/>
-
-
-
-<Info
-
-title="Executive Signature"
-
-value={
-contract.executive_signed
-?
-"Signed"
-:
-"Awaiting Signature"
-}
-
-/>
+</p>
 
 
 
 </div>
+
+
+
+
+
+
+
+
+
+<div className="
+border
+bg-[#F5F8FB]
+p-6
+">
+
+
+<p className="
+uppercase
+text-xs
+tracking-widest
+font-bold
+text-gray-500
+">
+
+Executive Signature
+
+</p>
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{
+
+contract.executive_signed
+
+?
+
+"✓ Signed"
+
+:
+
+"Awaiting Signature"
+
+}
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+{
+
+contract.employee_signed && !contract.executive_signed && (
+
+<form
+
+action={async()=>{
+
+"use server";
+
+await signExecutiveContract(contract.id);
+
+}}
+
+className="mt-8"
+
+>
+
+
+<button
+
+className="
+bg-[#003B6F]
+text-white
+px-8
+py-4
+font-black
+text-lg
+hover:bg-[#005AA7]
+transition
+"
+
+>
+
+Sign as Department Representative
+
+</button>
+
+
+
+</form>
+
+)
+
+}
+
+
+
+
+
+
+{
+
+contract.executive_signed && (
+
+<div className="
+mt-8
+bg-green-100
+border
+border-green-400
+p-6
+font-bold
+text-green-800
+">
+
+This contract has been fully executed.
+
+</div>
+
+)
+
+}
+
 
 
 </section>
@@ -438,6 +587,9 @@ contract.executive_signed
 
 
 
+
+
+{/* DOCUMENT */}
 
 
 <section>
@@ -482,6 +634,7 @@ text-gray-700
 
 
 
+
 </div>
 
 
@@ -498,7 +651,6 @@ text-gray-700
 
 
 }
-
 
 
 
