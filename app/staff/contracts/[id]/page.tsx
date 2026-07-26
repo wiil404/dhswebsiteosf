@@ -14,19 +14,6 @@ export default async function ContractViewPage({
 
    
 
-console.log("CONTRACT ID:", id);
-
-
-
-if(!id){
-
-    throw new Error(
-        "Missing contract ID"
-    );
-
-}
-
-
 
 
 
