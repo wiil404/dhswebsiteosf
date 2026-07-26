@@ -418,6 +418,26 @@ if(error){
 }
 
 
+// CREATE AUDIT LOG
+
+await supabaseAdmin
+
+.from("audit_logs")
+
+.insert({
+
+action:
+"CONTRACT_CREATED",
+
+details:
+`${employee.roblox_username} contract created: ${template.title}`,
+
+created_at:
+new Date()
+
+});
+
+
 
 
 
