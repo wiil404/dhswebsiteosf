@@ -226,6 +226,17 @@ md:p-14
 ">
 
 
+<div className="
+flex
+justify-between
+items-start
+gap-6
+flex-wrap
+">
+
+
+<div>
+
 <p className="
 uppercase
 tracking-[0.35em]
@@ -240,6 +251,7 @@ Department of Homeland Security
 
 
 
+
 <h1 className="
 text-5xl
 font-black
@@ -249,6 +261,7 @@ mt-4
 Staff Operations Portal
 
 </h1>
+
 
 
 
@@ -266,8 +279,42 @@ administrative operations.
 </p>
 
 
-</header>
+</div>
 
+
+
+
+
+<form action={logout}>
+
+<button
+
+className="
+bg-red-600
+hover:bg-red-700
+transition
+text-white
+px-6
+py-3
+font-black
+shadow-lg
+"
+
+>
+
+Logout
+
+</button>
+
+
+</form>
+
+
+
+</div>
+
+
+</header>
 
 
 
