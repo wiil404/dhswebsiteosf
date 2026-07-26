@@ -19,6 +19,7 @@ export const POLICY_CREATORS = [
 ];
 
 
+
 export const POLICY_APPROVERS = [
 
 "Secretary of Homeland Security",
@@ -30,43 +31,63 @@ export const POLICY_APPROVERS = [
 
 
 
+
+
 export function canCreatePolicy(
-position:string | null
+position?:string | null
 ){
 
 if(!position){
-    return false;
-}
 
-return POLICY_CREATORS.includes(position);
+return false;
 
 }
+
+
+return POLICY_CREATORS.includes(
+position.trim()
+);
+
+}
+
 
 
 
 
 export function canApprovePolicy(
-position:string | null
+position?:string | null
 ){
 
 if(!position){
-    return false;
-}
 
-return POLICY_APPROVERS.includes(position);
+return false;
 
 }
+
+
+return POLICY_APPROVERS.includes(
+position.trim()
+);
+
+}
+
+
 
 
 
 export function canManageAllPolicies(
-position:string | null
+position?:string | null
 ){
 
 if(!position){
-    return false;
+
+return false;
+
 }
 
-return POLICY_APPROVERS.includes(position);
+
+return POLICY_APPROVERS.includes(
+position.trim()
+);
 
 }
