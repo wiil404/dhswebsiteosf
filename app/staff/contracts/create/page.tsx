@@ -4,34 +4,17 @@ import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 
 
+function generateContractNumber(){
 
-function replaceVariables(
-    content:string,
-    values:any
-){
+    const year = new Date().getFullYear();
 
-    let output = content;
-
-
-    Object.keys(values).forEach(key=>{
+    const random =
+        Math.floor(Math.random()*9000)+1000;
 
 
-        output = output.replaceAll(
-
-            `{{${key}}}`,
-
-            values[key] ?? ""
-
-        );
-
-
-    });
-
-
-    return output;
+    return `DHS-CON-${year}-${random}`;
 
 }
-
 
 
 
@@ -62,6 +45,7 @@ true
 
 
 
+
 const {data:employees}=await supabaseAdmin
 
 .from("employees")
@@ -77,15 +61,11 @@ roblox_user_id,
 employee_number,
 
 positions(
-
 title
-
 ),
 
 divisions(
-
 name
-
 )
 
 `)
@@ -98,7 +78,6 @@ name
 .order(
 "roblox_username"
 );
-
 
 
 
@@ -123,7 +102,6 @@ formData.get("employee")
 
 
 
-
 const template_id =
 String(
 formData.get("template")
@@ -131,16 +109,14 @@ formData.get("template")
 
 
 
-
-
-const public_view =
+const public_visible =
 formData.get("public") === "on";
 
 
 
 
 
-const {data:template}=await supabaseAdmin
+const {data:template,error:templateError}=await supabaseAdmin
 
 .from("contract_templates")
 
@@ -156,82 +132,77 @@ template_id
 
 
 
+if(templateError || !template){
 
-const { error } = await supabaseAdmin
+    throw new Error(
+        "Template not found"
+    );
+
+}
+
+
+
+
+
+
+
+
+const {error}=await supabaseAdmin
 
 .from("contracts")
 
 .insert({
 
-contract_number: generateContractNumber(),
+contract_number:
+generateContractNumber(),
+
 
 employee_id,
 
-title: template.title,
 
-contract_type: template.contract_type,
+title:
+template.title,
 
-content,
 
-status: "Pending Employee Signature",
+contract_type:
+template.contract_type,
 
-public_visible: publicVisible,
 
-employee_signed: false,
+content:
+template.content,
 
-executive_signed: false,
 
-created_by: null
+status:
+"Pending Employee Signature",
+
+
+public_visible,
+
+
+employee_signed:false,
+
+
+executive_signed:false,
+
+
+created_by:null
+
 
 });
+
+
+
 
 
 if(error){
 
     console.error(error);
 
-    throw new Error(error.message);
+    throw new Error(
+        error.message
+    );
 
 }
-
-
-
-
-
-
-
-
-const { error: contractError } = await supabaseAdmin
-
-.from("contracts")
-
-.insert({
-
-template_id,
-
-employee_id,
-
-title: template.title,
-
-content,
-
-status: "Pending Employee Signature",
-
-public_view,
-
-});
-
-
-
-if(contractError){
-
-    console.error(contractError);
-
-    throw new Error(contractError.message);
-
-}
-
-
 
 
 
@@ -261,14 +232,11 @@ py-16
 ">
 
 
-
 <section className="
 max-w-5xl
 mx-auto
 px-6
 ">
-
-
 
 
 
@@ -284,7 +252,6 @@ overflow-hidden
 "
 
 >
-
 
 
 <div className="
@@ -341,7 +308,6 @@ Generate official employee agreements from approved templates.
 </p>
 
 
-
 </div>
 
 
@@ -362,7 +328,6 @@ space-y-8
 
 
 
-
 <div>
 
 <label className="
@@ -375,6 +340,7 @@ mb-2
 Contract Template
 
 </label>
+
 
 
 <select
@@ -393,13 +359,17 @@ p-4
 
 
 <option value="">
+
 Select Template
+
 </option>
 
 
 
 {
+
 templates?.map((template:any)=>(
+
 
 <option
 
@@ -413,10 +383,10 @@ value={template.id}
 
 </option>
 
+
 ))
 
 }
-
 
 
 </select>
@@ -433,6 +403,7 @@ value={template.id}
 
 
 <div>
+
 
 <label className="
 block
@@ -463,12 +434,15 @@ p-4
 
 
 <option value="">
+
 Select Employee
+
 </option>
 
 
 
 {
+
 employees?.map((employee:any)=>(
 
 
@@ -497,6 +471,7 @@ value={employee.id}
 
 ))
 
+
 }
 
 
@@ -504,6 +479,7 @@ value={employee.id}
 
 
 </div>
+
 
 
 
@@ -523,8 +499,8 @@ p-6
 <label className="
 flex
 gap-3
-font-bold
 items-center
+font-bold
 ">
 
 
@@ -544,13 +520,14 @@ Allow public viewing of contract
 
 
 
+
 <p className="
 text-sm
 text-gray-500
 mt-2
 ">
 
-Public users will only see the released contract and signatures.
+Public viewers will only see the contract and completed signatures.
 
 </p>
 
@@ -595,9 +572,7 @@ Create Contract
 
 
 
-
 </section>
-
 
 
 
