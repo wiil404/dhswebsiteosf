@@ -251,7 +251,7 @@ new Date()
 
 
 
-await supabaseAdmin
+const { error: contractError } = await supabaseAdmin
 
 .from("contracts")
 
@@ -261,22 +261,25 @@ template_id,
 
 employee_id,
 
-
-title:
-template.title,
-
+title: template.title,
 
 content,
 
-
-status:
-"Pending Employee Signature",
-
+status: "Pending Employee Signature",
 
 public_view,
 
-
 });
+
+
+
+if(contractError){
+
+    console.error(contractError);
+
+    throw new Error(contractError.message);
+
+}
 
 
 
