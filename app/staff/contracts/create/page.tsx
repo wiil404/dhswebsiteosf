@@ -4,17 +4,53 @@ import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 
 
+
+
 function generateContractNumber(){
 
     const year = new Date().getFullYear();
 
     const random =
-        Math.floor(Math.random()*9000)+1000;
+        Math.floor(Math.random() * 9000) + 1000;
 
 
     return `DHS-CON-${year}-${random}`;
 
 }
+
+
+
+
+
+
+
+function replaceVariables(
+    content:string,
+    values:any
+){
+
+    let output = content;
+
+
+    Object.keys(values).forEach(key=>{
+
+        output = output.replaceAll(
+
+            `{{${key}}}`,
+
+            values[key] ?? ""
+
+        );
+
+    });
+
+
+    return output;
+
+}
+
+
+
 
 
 
@@ -45,7 +81,6 @@ true
 
 
 
-
 const {data:employees}=await supabaseAdmin
 
 .from("employees")
@@ -61,11 +96,15 @@ roblox_user_id,
 employee_number,
 
 positions(
+
 title
+
 ),
 
 divisions(
+
 name
+
 )
 
 `)
@@ -95,6 +134,7 @@ formData:FormData
 
 
 
+
 const employee_id =
 String(
 formData.get("employee")
@@ -111,6 +151,8 @@ formData.get("template")
 
 const public_visible =
 formData.get("public") === "on";
+
+
 
 
 
@@ -146,6 +188,141 @@ if(templateError || !template){
 
 
 
+const {data:employee,error:employeeError}=await supabaseAdmin
+
+.from("employees")
+
+.select(`
+
+*,
+
+positions(
+
+title
+
+),
+
+divisions(
+
+name
+
+)
+
+`)
+
+.eq(
+"id",
+employee_id
+)
+
+.single();
+
+
+
+
+
+if(employeeError || !employee){
+
+    throw new Error(
+        "Employee not found"
+    );
+
+}
+
+
+
+
+
+
+
+
+
+const variables = {
+
+
+employee_name:
+employee.roblox_username,
+
+
+roblox_username:
+employee.roblox_username,
+
+
+roblox_id:
+employee.roblox_user_id,
+
+
+employee_number:
+employee.employee_number || "Pending",
+
+
+division:
+employee.divisions?.name || "Department of Homeland Security",
+
+
+position:
+employee.positions?.title || "Employee",
+
+
+effective_date:
+new Date().toLocaleDateString(),
+
+
+executive_name:
+"WiIl404",
+
+
+executive_position:
+"Secretary of Homeland Security",
+
+
+executive_roblox_id:
+"333195903",
+
+
+employee_signature:
+employee.roblox_username,
+
+
+employee_signature_date:
+new Date().toLocaleDateString(),
+
+
+executive_signature:
+"WiIl404",
+
+
+executive_signature_date:
+new Date().toLocaleDateString()
+
+
+};
+
+
+
+
+
+
+
+
+
+const generatedContent = replaceVariables(
+
+template.content,
+
+variables
+
+);
+
+
+
+
+
+
+
+
+
+
 
 const {error}=await supabaseAdmin
 
@@ -169,7 +346,7 @@ template.contract_type,
 
 
 content:
-template.content,
+generatedContent,
 
 
 status:
@@ -187,8 +364,8 @@ executive_signed:false,
 
 created_by:null
 
-
 });
+
 
 
 
@@ -198,11 +375,10 @@ if(error){
 
     console.error(error);
 
-    throw new Error(
-        error.message
-    );
+    throw new Error(error.message);
 
 }
+
 
 
 
@@ -223,6 +399,10 @@ redirect(
 
 
 
+
+
+
+
 return (
 
 <main className="
@@ -232,11 +412,14 @@ py-16
 ">
 
 
+
 <section className="
 max-w-5xl
 mx-auto
 px-6
 ">
+
+
 
 
 
@@ -254,10 +437,13 @@ overflow-hidden
 >
 
 
+
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
+
+
 
 
 
@@ -286,6 +472,8 @@ Department of Homeland Security
 
 
 
+
+
 <h1 className="
 text-5xl
 font-black
@@ -295,6 +483,7 @@ mt-4
 Create Contract
 
 </h1>
+
 
 
 
@@ -328,7 +517,9 @@ space-y-8
 
 
 
+
 <div>
+
 
 <label className="
 block
@@ -340,6 +531,7 @@ mb-2
 Contract Template
 
 </label>
+
 
 
 
@@ -392,6 +584,7 @@ value={template.id}
 </select>
 
 
+
 </div>
 
 
@@ -418,6 +611,8 @@ Employee
 
 
 
+
+
 <select
 
 name="employee"
@@ -438,6 +633,7 @@ p-4
 Select Employee
 
 </option>
+
 
 
 
@@ -466,6 +662,7 @@ value={employee.id}
 {employee.divisions?.name || "DHS"}
 
 
+
 </option>
 
 
@@ -475,11 +672,12 @@ value={employee.id}
 }
 
 
+
 </select>
 
 
-</div>
 
+</div>
 
 
 
@@ -499,8 +697,8 @@ p-6
 <label className="
 flex
 gap-3
-items-center
 font-bold
+items-center
 ">
 
 
@@ -513,7 +711,9 @@ name="public"
 />
 
 
+
 Allow public viewing of contract
+
 
 
 </label>
@@ -527,7 +727,7 @@ text-gray-500
 mt-2
 ">
 
-Public viewers will only see the contract and completed signatures.
+Public users will only see released contracts and signatures.
 
 </p>
 
@@ -564,7 +764,11 @@ Create Contract
 
 
 
+
+
 </div>
+
+
 
 
 
@@ -572,7 +776,13 @@ Create Contract
 
 
 
+
+
+
 </section>
+
+
+
 
 
 
