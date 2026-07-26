@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 
 import { getEmployeeSession } from "@/app/lib/employee-auth";
 
-import Image from "next/image";
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
+import Image from "next/image";
 
 
 
