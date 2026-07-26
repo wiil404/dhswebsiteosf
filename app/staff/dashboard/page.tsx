@@ -778,7 +778,7 @@ manageOrganisation && (
 
 <PortalCard
 
-href="/staff/positions"
+href="/staff/organisation/positions"
 
 title="Position Management"
 
