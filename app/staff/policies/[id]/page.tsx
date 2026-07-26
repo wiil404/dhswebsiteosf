@@ -7,7 +7,6 @@ import { getEmployeeSession } from "@/app/lib/employee-auth";
 import {
 approvePolicy,
 rejectPolicy,
-deletePolicy
 } from "./actions";
 
 
