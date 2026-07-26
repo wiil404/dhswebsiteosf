@@ -6,89 +6,107 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 
-
-export default async function ContractViewPage(
-{
+export default async function ContractViewPage({
     params
 }:{
-    params:{
-        id:string
-    }
+    params: Promise<{id:string}>
+}){
+
+
+const { id } = await params;
+
+
+console.log("CONTRACT ID:", id);
+
+
+
+if(!id){
+
+    throw new Error(
+        "Missing contract ID"
+    );
+
 }
-){
 
 
-const contractId = params.id;
 
 
 
 const {
     data:contract,
-    error
+    error:contractError
+
 }=await supabaseAdmin
 
 .from("contracts")
 
-.select(`
-    *,
-    employees(
-        id,
-        roblox_username,
-        employee_number,
-        position_id,
-        division_id
-    )
-`)
+.select("*")
 
 .eq(
-    "id",
-    contractId
+"id",
+id
 )
 
-.maybeSingle();
+.single();
 
 
 
 
 
-console.log(
-"CONTRACT:",
-{
-    contractId,
-    contract,
-    error
-}
-);
+console.log("CONTRACT:", contract);
+console.log("ERROR:", contractError);
 
 
 
 
 
-if(!contract){
+if(contractError || !contract){
 
-throw new Error(
-`Contract does not exist: ${contractId}`
-);
+    throw new Error(
+        `Contract does not exist: ${id}`
+    );
 
 }
+
+
+
+
+
+
+
+
+
+const {
+    data:employee
+
+}=await supabaseAdmin
+
+.from("employees")
+
+.select("*")
+
+.eq(
+"id",
+contract.employee_id
+)
+
+.single();
+
 
 
 
 
 
 let position = null;
+
 let division = null;
 
 
 
+if(employee?.position_id){
 
 
-if(contract.employees){
-
-
-
-const positionResult =
-await supabaseAdmin
+const {data}=await supabaseAdmin
 
 .from("positions")
 
@@ -96,23 +114,25 @@ await supabaseAdmin
 
 .eq(
 "id",
-contract.employees.position_id
+employee.position_id
 )
 
-.maybeSingle();
+.single();
+
+
+position=data;
+
+
+}
 
 
 
-position =
-positionResult.data;
 
 
+if(employee?.division_id){
 
 
-
-
-const divisionResult =
-await supabaseAdmin
+const {data}=await supabaseAdmin
 
 .from("divisions")
 
@@ -120,22 +140,16 @@ await supabaseAdmin
 
 .eq(
 "id",
-contract.employees.division_id
+employee.division_id
 )
 
-.maybeSingle();
+.single();
 
 
-
-division =
-divisionResult.data;
-
+division=data;
 
 
 }
-
-
-
 
 
 
@@ -160,8 +174,8 @@ px-6
 
 <div className="
 bg-white
-shadow-2xl
 border
+shadow-2xl
 overflow-hidden
 ">
 
@@ -210,7 +224,6 @@ mt-4
 </h1>
 
 
-
 <p className="
 mt-3
 text-blue-100
@@ -221,9 +234,8 @@ Official Employment Contract Record
 </p>
 
 
+
 </div>
-
-
 
 
 
@@ -240,10 +252,8 @@ space-y-10
 
 
 
-
-
-
 <section>
+
 
 <h2 className="
 text-3xl
@@ -257,12 +267,14 @@ Contract Information
 
 
 
+
 <div className="
 grid
 md:grid-cols-3
 gap-6
 mt-6
 ">
+
 
 
 <Info
@@ -323,6 +335,7 @@ Employee
 
 
 
+
 <div className="
 bg-[#F5F8FB]
 border
@@ -331,32 +344,29 @@ mt-6
 ">
 
 
+
 <p className="
 text-2xl
 font-black
 text-[#003B6F]
 ">
 
-{
-contract.employees?.roblox_username || "Unknown Employee"
-}
+{employee?.roblox_username || "Unknown"}
 
 </p>
 
 
 
 <p className="
-mt-3
-text-gray-700
+mt-2
+text-gray-600
 ">
 
 Employee Number:
 
 {" "}
 
-{
-contract.employees?.employee_number || "Pending"
-}
+{employee?.employee_number || "Pending"}
 
 </p>
 
@@ -365,16 +375,14 @@ contract.employees?.employee_number || "Pending"
 
 <p className="
 mt-2
-text-gray-700
+text-gray-600
 ">
 
 Position:
 
 {" "}
 
-{
-position?.title || "Unknown"
-}
+{position?.title || "Unknown"}
 
 </p>
 
@@ -383,18 +391,17 @@ position?.title || "Unknown"
 
 <p className="
 mt-2
-text-gray-700
+text-gray-600
 ">
 
 Division:
 
 {" "}
 
-{
-division?.name || "Unknown"
-}
+{division?.name || "Unknown"}
 
 </p>
+
 
 
 
@@ -426,7 +433,6 @@ Signature Status
 
 
 
-
 <div className="
 grid
 md:grid-cols-2
@@ -435,36 +441,92 @@ mt-6
 ">
 
 
-<Info
+<div className="
+border
+bg-[#F5F8FB]
+p-6
+">
 
-title="Employee Signature"
 
-value={
+<p className="
+font-bold
+">
+
+Employee Signature
+
+</p>
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+{
 contract.employee_signed
+
 ?
-"Signed"
+
+`Signed by ${contract.employee_signature_name || "Employee"}`
+
 :
+
 "Awaiting Signature"
+
 }
 
-/>
+
+</p>
+
+
+</div>
 
 
 
-<Info
 
-title="Executive Signature"
 
-value={
+<div className="
+border
+bg-[#F5F8FB]
+p-6
+">
+
+
+<p className="
+font-bold
+">
+
+Executive Signature
+
+</p>
+
+
+<p className="
+mt-3
+font-black
+text-[#003B6F]
+">
+
+
+{
 contract.executive_signed
+
 ?
+
 "Signed"
+
 :
+
 "Awaiting Signature"
+
 }
 
-/>
 
+</p>
+
+
+</div>
 
 
 </div>
@@ -498,21 +560,17 @@ Contract Document
 <div className="
 mt-6
 border
-bg-white
 p-8
 whitespace-pre-wrap
-leading-relaxed
 ">
 
 {contract.content}
 
-
 </div>
 
 
+
 </section>
-
-
 
 
 
@@ -530,6 +588,7 @@ leading-relaxed
 
 </main>
 
+
 );
 
 
@@ -539,16 +598,14 @@ leading-relaxed
 
 
 
-
-function Info(
-{
+function Info({
 title,
 value
 }:{
 title:string,
 value:string
-}
-){
+}){
+
 
 return (
 
@@ -572,7 +629,6 @@ text-gray-500
 </p>
 
 
-
 <p className="
 mt-3
 font-black
@@ -588,5 +644,6 @@ text-[#003B6F]
 
 
 );
+
 
 }
