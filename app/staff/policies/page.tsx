@@ -46,9 +46,30 @@ employee.position_id
 
 
 
+const policyRoles = [
+
+"Secretary of Homeland Security",
+"Deputy Secretary of Homeland Security",
+"Chief of Staff",
+"Under Secretary",
+
+"Secret Service Director",
+"CBP Commissioner",
+"Special Response Team Commander",
+"Under Secretary for Aviation Operations",
+"Senior Flight Officer",
+"Deputy Director",
+"Assistant Director",
+"Chief of Operations",
+"CBP Deputy Commissioner",
+"Special Agent in Charge (SRT)"
+
+];
+
+
 const canCreate =
-canCreatePolicy(
-position?.title
+policyRoles.includes(
+position?.title?.trim()
 );
 
 
