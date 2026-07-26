@@ -92,16 +92,25 @@ if(!profile){
 
 
 
-const {data:employee}=await supabaseAdmin
+const { 
+    data: employee,
+    error: employeeError
+} = await supabaseAdmin
 
 .from("employees")
 
 .select(`
 
+id,
+
 roblox_username,
+
 employee_number,
+
 status,
+
 division_id,
+
 position_id
 
 `)
@@ -112,7 +121,6 @@ user.id
 )
 
 .maybeSingle();
-
 
 
 let positionTitle = "Staff Member";
