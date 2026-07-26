@@ -36,21 +36,29 @@ export async function getEmployeeSession(){
 
             employees(
 
-                id,
-                roblox_username,
-                roblox_user_id,
-                employee_number,
-                status,
+    id,
+    roblox_username,
+    roblox_user_id,
+    employee_number,
+    status,
 
-                divisions(
-                    name
-                ),
+    hire_date,
+    appointment_date,
+    created_at,
+    termination_date,
 
-                positions(
-                    title
-                )
+    email,
+    display_name,
 
-            )
+    divisions(
+        name
+    ),
+
+    positions(
+        title
+    )
+
+)
 
         `)
 
