@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-import { getEmployeeSession } from "@/app/lib/employee-auth";
 
 
 export const dynamic = "force-dynamic";
@@ -14,120 +12,7 @@ export default async function StaffPoliciesPage(){
 
 
 
-const session = await getEmployeeSession();
-
-
-
-if(!session){
-
-    redirect("/employee/login");
-
-}
-
-
-
-
-const {data:currentEmployee}=await supabaseAdmin
-
-.from("employees")
-
-.select(`
-
-id,
-
-positions(
-
-title
-
-)
-
-`)
-
-.eq(
-"id",
-session.employees.id
-)
-
-.single();
-
-
-
-
-
-console.log(
-"CURRENT EMPLOYEE:",
-JSON.stringify(currentEmployee, null, 2)
-);
-
-
-const position =
-(currentEmployee?.positions as any)?.title || "";
-
-
-console.log(
-"CURRENT POSITION:",
-position
-);
-
-
-
-
-
-const policyRoles = [
-
-"Secretary of Homeland Security",
-
-"Deputy Secretary of Homeland Security",
-
-"Chief of Staff",
-
-"Under Secretary",
-
-"Secret Service Director",
-
-"CBP Commissioner",
-
-"Special Response Team Commander",
-
-"Under Secretary for Aviation Operations",
-
-"Senior Flight Officer",
-
-"Deputy Director",
-
-"Assistant Director",
-
-"Chief of Operations",
-
-"CBP Deputy Commissioner",
-
-"Special Agent in Charge (SRT)"
-
-];
-
-
-
-
-
-
-const canCreate =
-policyRoles.includes(
-position.trim()
-);
-
-
-
-
-
-
-
-
-
-const {
-
-data:policies
-
-}=await supabaseAdmin
+const {data:policies,error}=await supabaseAdmin
 
 .from("policies")
 
@@ -139,18 +24,41 @@ divisions(
 
 name
 
+),
+
+created_employee:employees!policies_created_by_fkey(
+
+roblox_username
+
+),
+
+approved_employee:employees!policies_approved_by_fkey(
+
+roblox_username
+
 )
 
 `)
 
 .order(
+
 "created_at",
+
 {
 ascending:false
 }
+
 );
 
 
+
+
+
+if(error){
+
+console.error(error);
+
+}
 
 
 
@@ -168,11 +76,14 @@ py-16
 ">
 
 
+
 <section className="
 max-w-7xl
 mx-auto
 px-6
 ">
+
+
 
 
 
@@ -182,8 +93,6 @@ border
 shadow-2xl
 overflow-hidden
 ">
-
-
 
 
 
@@ -223,47 +132,29 @@ Department of Homeland Security
 
 
 
-
 <div className="
 flex
 justify-between
 items-center
 mt-4
+gap-4
+flex-wrap
 ">
 
 
-<div>
 
 <h1 className="
 text-5xl
 font-black
 ">
 
-Policies
+Policy Registry
 
 </h1>
 
 
 
-<p className="
-mt-3
-text-blue-100
-">
 
-Department policy management and official guidance.
-
-</p>
-
-
-</div>
-
-
-
-
-
-{
-
-canCreate && (
 
 <Link
 
@@ -281,17 +172,27 @@ transition
 
 >
 
-+ Create Policy
+Create Policy
 
 </Link>
-
-)
-
-}
 
 
 
 </div>
+
+
+
+
+
+<p className="
+mt-4
+text-blue-100
+">
+
+Manage Department directives, policies, and official guidance.
+
+</p>
+
 
 
 </div>
@@ -309,15 +210,19 @@ p-10
 ">
 
 
+
+
+
 <h2 className="
 text-3xl
 font-black
 text-[#003B6F]
 ">
 
-Policy Registry
+Policies
 
 </h2>
+
 
 
 
@@ -346,21 +251,30 @@ className="
 border
 bg-[#F5F8FB]
 p-7
-flex
-justify-between
-items-center
 "
 
 >
 
 
 
+
+<div className="
+flex
+justify-between
+gap-6
+items-start
+flex-wrap
+">
+
+
+
+
+
 <div>
 
 
-
 <h3 className="
-text-xl
+text-2xl
 font-black
 text-[#003B6F]
 ">
@@ -371,18 +285,29 @@ text-[#003B6F]
 
 
 
-
-
 <p className="
 mt-2
 text-gray-600
+font-semibold
 ">
 
-Policy Number:
+{policy.policy_number}
+
+</p>
+
+
+
+
+<p className="
+mt-3
+text-gray-700
+">
+
+Created By:
 
 {" "}
 
-{policy.policy_number || "Pending"}
+{policy.created_employee?.roblox_username || "Unknown"}
 
 </p>
 
@@ -390,11 +315,8 @@ Policy Number:
 
 
 
-
 <p className="
-mt-1
-text-sm
-text-gray-500
+text-gray-700
 ">
 
 Division:
@@ -409,54 +331,9 @@ Division:
 
 
 
-
-<div className="
-mt-4
-flex
-gap-3
-flex-wrap
-">
-
-
-
-<span className="
-bg-white
-border
-px-4
-py-2
-font-bold
-text-sm
-">
-
-{policy.classification || "Public"}
-
-</span>
-
-
-
-
-
-<span className="
-bg-white
-border
-px-4
-py-2
-font-bold
-text-sm
-">
-
-{policy.status || "Draft"}
-
-</span>
-
-
-
-
 </div>
 
 
-
-</div>
 
 
 
@@ -478,9 +355,151 @@ font-bold
 
 >
 
-View
+View Policy
 
 </Link>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="
+mt-5
+flex
+gap-3
+flex-wrap
+">
+
+
+
+
+
+<span className="
+bg-white
+border
+px-4
+py-2
+font-bold
+text-sm
+">
+
+{
+
+policy.classification === "FOUO"
+
+?
+
+"🔒 FOUO"
+
+:
+
+"Public"
+
+}
+
+</span>
+
+
+
+
+
+
+
+<span className="
+bg-white
+border
+px-4
+py-2
+font-bold
+text-sm
+">
+
+{
+
+policy.status || "Unknown"
+
+}
+
+</span>
+
+
+
+
+
+
+<span className="
+bg-white
+border
+px-4
+py-2
+font-bold
+text-sm
+">
+
+{
+
+policy.division_id
+
+?
+
+"Divisional Policy"
+
+:
+
+"Universal Policy"
+
+}
+
+</span>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{
+
+policy.approved_employee && (
+
+<p className="
+mt-5
+text-sm
+text-gray-500
+">
+
+Approved By:
+
+{" "}
+
+{policy.approved_employee.roblox_username}
+
+</p>
+
+)
+
+
+
+}
 
 
 
@@ -493,7 +512,10 @@ View
 ))
 
 
+
 }
+
+
 
 
 
@@ -503,7 +525,7 @@ View
 
 {
 
-(!policies || policies.length === 0) && (
+(!policies || policies.length===0) && (
 
 
 <p className="
@@ -517,31 +539,43 @@ No policies created.
 
 )
 
+
+
 }
 
 
 
 
+
+
+</div>
+
+
+
+
+
 </div>
 
 
 
+
+
+
+
 </div>
 
-
-
-
-
-</div>
 
 
 </section>
 
 
+
 </main>
 
 
+
 );
+
 
 
 }
