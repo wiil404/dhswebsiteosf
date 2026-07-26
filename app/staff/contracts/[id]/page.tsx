@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
-
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -9,34 +8,81 @@ export const revalidate = 0;
 export default async function ContractViewPage({
     params
 }:{
-    params:{
+    params: Promise<{
         id:string
-    }
+    }>
 }){
 
 
-const { data: contract, error } = await supabaseAdmin
+const { id } = await params;
+
+
+
+console.log("CONTRACT ID:", id);
+
+
+
+const {
+    data:contract,
+    error
+}=await supabaseAdmin
+
 .from("contracts")
-.select(`
-    *,
-    employees(
-        employee_number,
-        roblox_username,
-        position_id,
-        division_id
-    )
-`)
+
+.select("*")
+
 .eq(
-    "id",
-    params.id
+"id",
+id
 )
+
 .single();
+
+
+
+console.log("CONTRACT:", contract);
+console.log("ERROR:", error);
 
 
 
 if(error || !contract){
 
-    redirect("/staff/contracts");
+    return (
+
+        <main className="p-10">
+
+            <h1 className="text-3xl font-bold">
+                Contract Not Found
+            </h1>
+
+            <p>
+                ID: {id}
+            </p>
+
+            <pre>
+                {JSON.stringify(error,null,2)}
+            </pre>
+
+        </main>
+
+    );
+
+}
+
+
+
+return (
+
+<div>
+
+<h1>
+{contract.title}
+</h1>
+
+</div>
+
+);
+
 
 }
 
