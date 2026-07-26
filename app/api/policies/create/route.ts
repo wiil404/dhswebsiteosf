@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/app/lib/supabase-admin";
 import { getEmployeeSession } from "@/app/lib/employee-auth";
 
 
+
 const executiveRoles = [
 
 "Secretary of Homeland Security",
@@ -12,6 +13,8 @@ const executiveRoles = [
 "Under Secretary"
 
 ];
+
+
 
 
 
@@ -31,6 +34,8 @@ return `DHS-POL-${year}-${random}`;
 
 
 
+
+
 export async function POST(
 request:Request
 ){
@@ -39,8 +44,10 @@ request:Request
 try{
 
 
+
 const session =
 await getEmployeeSession();
+
 
 
 
@@ -59,6 +66,7 @@ status:401
 );
 
 }
+
 
 
 
@@ -83,7 +91,9 @@ classification,
 
 content,
 
-attachments
+attachments,
+
+featuredImage
 
 }=body;
 
@@ -93,7 +103,13 @@ attachments
 
 
 
-const {data:employee,error}=await supabaseAdmin
+const {
+
+data:employee,
+
+error
+
+}=await supabaseAdmin
 
 .from("employees")
 
@@ -110,15 +126,11 @@ title
 `)
 
 .eq(
-
 "id",
-
 session.employees.id
-
 )
 
 .single();
-
 
 
 
@@ -146,8 +158,8 @@ status:404
 
 
 
-
 const position =
+
 (employee.positions as any)?.title || "";
 
 
@@ -181,9 +193,9 @@ const allowedRoles=[
 
 
 
-
-
-if(!allowedRoles.includes(position)){
+if(
+!allowedRoles.includes(position)
+){
 
 
 return NextResponse.json(
@@ -198,10 +210,7 @@ status:403
 
 );
 
-
 }
-
-
 
 
 
@@ -218,34 +227,26 @@ executiveRoles.includes(position);
 
 
 
-
-
 const {error:insertError}=await supabaseAdmin
 
 .from("policies")
 
 .insert({
 
-
 policy_number:
 generatePolicyNumber(),
-
 
 
 title,
 
 
-
 category,
-
 
 
 content,
 
 
-
 classification,
-
 
 
 scope,
@@ -253,10 +254,15 @@ scope,
 
 
 division_id:
-scope==="DIVISIONAL"
+
+scope === "DIVISIONAL"
+
 ?
+
 division_id
+
 :
+
 null,
 
 
@@ -267,28 +273,45 @@ employee.id,
 
 
 approved_by:
+
 autoApprove
+
 ?
+
 employee.id
+
 :
+
 null,
 
 
 
 status:
+
 autoApprove
+
 ?
+
 "Approved"
+
 :
+
 "Pending Approval",
 
 
 
 effective_date:
+
 autoApprove
+
 ?
+
 new Date()
+.toISOString()
+.split("T")[0]
+
 :
+
 null,
 
 
@@ -297,12 +320,16 @@ review_date:null,
 
 
 
-image_urls:
-attachments || []
+attachments:
+attachments || [],
+
+
+
+featured_image:
+featuredImage || null
+
 
 });
-
-
 
 
 
@@ -329,7 +356,6 @@ status:500
 
 );
 
-
 }
 
 
@@ -338,18 +364,20 @@ status:500
 
 
 
+return NextResponse.json({
 
-
-return NextResponse.json(
-
-{
 success:true
-}
 
-);
+});
+
+
+
+
+
 
 
 }catch(error:any){
+
 
 
 return NextResponse.json(
