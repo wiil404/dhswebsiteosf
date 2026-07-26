@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
 
+import Image from "next/image";
+
 import { getEmployeeSession } from "@/app/lib/employee-auth";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
-import Image from "next/image";
 
 
 
@@ -12,6 +13,7 @@ async function getRobloxAvatar(id:number){
 
 
     try{
+
 
         const response = await fetch(
 
@@ -34,9 +36,12 @@ async function getRobloxAvatar(id:number){
 
     catch{
 
+
         return null;
 
+
     }
+
 
 }
 
@@ -46,7 +51,9 @@ async function getRobloxAvatar(id:number){
 
 
 
+
 export default async function EmployeeProfile(){
+
 
 
 const session = await getEmployeeSession();
@@ -61,63 +68,11 @@ if(!session){
 
 
 
-
 const employee = session.employees;
 
-const { data: profileData } = await supabaseAdmin
-    .from("employees")
-    .select(`
 
-        id,
 
-        promotions(
-            id,
-            created_at,
-            notes
-        ),
 
-        employee_awards(
-
-            id,
-
-            created_at,
-
-            awards(
-
-                name,
-
-                description
-
-            )
-
-        ),
-
-        employee_history(
-
-            id,
-
-            created_at,
-
-            notes
-
-        ),
-
-        employment_history(
-
-            id,
-
-            created_at,
-
-            notes
-
-        )
-
-    `)
-    .eq(
-        "id",
-        employee.id
-    )
-    .single();
 
 const avatar = await getRobloxAvatar(
 
@@ -125,17 +80,156 @@ const avatar = await getRobloxAvatar(
 
 );
 
-const promotions = profileData?.promotions || [];
 
-const awards = profileData?.employee_awards || [];
 
-const history = [
 
-    ...(profileData?.employee_history || []),
 
-    ...(profileData?.employment_history || [])
 
-];
+
+const {
+
+    data: awards
+
+} = await supabaseAdmin
+
+.from("employee_awards")
+
+.select("*")
+
+.eq(
+
+"employee_id",
+
+employee.id
+
+)
+
+.order(
+
+"created_at",
+
+{
+
+ascending:false
+
+}
+
+);
+
+
+
+
+
+
+
+
+const {
+
+    data: promotions
+
+} = await supabaseAdmin
+
+.from("promotions")
+
+.select("*")
+
+.eq(
+
+"employee_id",
+
+employee.id
+
+)
+
+.order(
+
+"created_at",
+
+{
+
+ascending:false
+
+}
+
+);
+
+
+
+
+
+
+
+
+const {
+
+    data: history
+
+} = await supabaseAdmin
+
+.from("employee_history")
+
+.select("*")
+
+.eq(
+
+"employee_id",
+
+employee.id
+
+)
+
+.order(
+
+"created_at",
+
+{
+
+ascending:false
+
+}
+
+);
+
+
+
+
+
+
+
+
+const {
+
+    data: employmentHistory
+
+} = await supabaseAdmin
+
+.from("employment_history")
+
+.select("*")
+
+.eq(
+
+"employee_id",
+
+employee.id
+
+)
+
+.order(
+
+"created_at",
+
+{
+
+ascending:false
+
+}
+
+);
+
+
+
+
 
 
 
@@ -143,65 +237,86 @@ const history = [
 
 return (
 
-<main className="
+<main
+
+className="
 min-h-screen
 bg-[#F5F8FB]
 py-16
-">
+"
 
 
+>
 
 
+<section
 
-<section className="
+className="
 max-w-7xl
 mx-auto
 px-6
-">
+"
 
 
+>
 
 
+<div
 
-<div className="
+className="
 bg-white
-border
 shadow-2xl
+border
 overflow-hidden
-">
+"
 
 
+>
 
 
+<div
 
-<div className="
+className="
 h-3
 bg-[#F2C94C]
-"/>
+"
+
+/>
 
 
 
 
 
 
-<div className="
+
+
+<div
+
+className="
 bg-gradient-to-r
 from-[#003B6F]
 to-[#005AA7]
 text-white
 p-10
 md:p-14
-">
+"
 
 
+>
 
-<p className="
+
+<p
+
+className="
 uppercase
 tracking-[0.35em]
 text-[#F2C94C]
 font-black
 text-sm
-">
+"
+
+
+>
 
 Department of Homeland Security
 
@@ -209,11 +324,20 @@ Department of Homeland Security
 
 
 
-<h1 className="
+
+
+
+
+<h1
+
+className="
 text-5xl
 font-black
 mt-4
-">
+"
+
+
+>
 
 Employee Profile
 
@@ -222,10 +346,18 @@ Employee Profile
 
 
 
-<p className="
+
+
+
+<p
+
+className="
 mt-3
 text-blue-100
-">
+"
+
+
+>
 
 Official personnel record
 
@@ -243,10 +375,15 @@ Official personnel record
 
 
 
-<div className="
+<div
+
+className="
 p-10
 md:p-14
-">
+"
+
+
+>
 
 
 
@@ -254,11 +391,11 @@ md:p-14
 
 
 
-{/* ID CARD */}
 
 
+<div
 
-<div className="
+className="
 bg-[#003B6F]
 text-white
 p-10
@@ -266,15 +403,22 @@ shadow-xl
 flex
 flex-col
 md:flex-row
-gap-10
 items-center
-">
+gap-10
+"
+
+
+>
 
 
 
 
 
-<div className="
+
+
+<div
+
+className="
 relative
 w-44
 h-44
@@ -283,12 +427,16 @@ overflow-hidden
 border-4
 border-[#F2C94C]
 bg-white/20
-">
+"
+
+
+>
 
 
 {
 
 avatar && (
+
 
 <Image
 
@@ -298,13 +446,17 @@ alt="Employee Avatar"
 
 fill
 
-className="object-cover"
+className="
+object-cover
+"
 
 />
+
 
 )
 
 }
+
 
 
 </div>
@@ -320,13 +472,18 @@ className="object-cover"
 <div>
 
 
-<p className="
+<p
+
+className="
 uppercase
 tracking-widest
 text-sm
 text-blue-200
 font-bold
-">
+"
+
+
+>
 
 Employee Identification
 
@@ -336,11 +493,18 @@ Employee Identification
 
 
 
-<h2 className="
+
+
+<h2
+
+className="
 text-4xl
 font-black
 mt-3
-">
+"
+
+
+>
 
 {employee.roblox_username}
 
@@ -349,11 +513,19 @@ mt-3
 
 
 
-<p className="
+
+
+
+<p
+
+className="
 text-xl
 text-blue-100
 mt-2
-">
+"
+
+
+>
 
 {employee.positions?.title || "Employee"}
 
@@ -363,22 +535,34 @@ mt-2
 
 
 
-<div className="
+
+
+<div
+
+className="
 mt-6
 flex
-flex-wrap
 gap-4
-">
+flex-wrap
+"
 
 
-<span className="
+>
+
+
+<span
+
+className="
 bg-green-500/20
 border
 border-green-300
 px-5
 py-2
 font-bold
-">
+"
+
+
+>
 
 ACTIVE
 
@@ -387,14 +571,19 @@ ACTIVE
 
 
 
-<span className="
+<span
+
+className="
 bg-white/10
 px-5
 py-2
 font-bold
-">
+"
 
-{employee.employee_number || "No Number"}
+
+>
+
+{employee.employee_number || "Pending"}
 
 </span>
 
@@ -408,31 +597,27 @@ font-bold
 
 
 
-
 </div>
 
+id="part2"
+<div
 
-
-
-
-
-
-
-
-{/* INFORMATION */}
-
-
-
-<section className="
+className="
 mt-14
-">
+"
+
+>
 
 
-<h2 className="
+<h2
+
+className="
 text-4xl
 font-black
 text-[#003B6F]
-">
+"
+
+>
 
 Personal Information
 
@@ -442,13 +627,16 @@ Personal Information
 
 
 
-<div className="
+<div
+
+className="
 grid
 md:grid-cols-3
 gap-6
 mt-8
-">
+"
 
+>
 
 
 <Info
@@ -463,7 +651,7 @@ value={employee.roblox_username}
 
 <Info
 
-title="Roblox ID"
+title="Roblox User ID"
 
 value={String(employee.roblox_user_id)}
 
@@ -503,9 +691,9 @@ value={employee.positions?.title || "Unknown"}
 
 <Info
 
-title="Employment Status"
+title="Status"
 
-value={employee.status}
+value={employee.status || "Unknown"}
 
 />
 
@@ -514,7 +702,7 @@ value={employee.status}
 </div>
 
 
-</section>
+</div>
 
 
 
@@ -524,20 +712,24 @@ value={employee.status}
 
 
 
-{/* SERVICE HISTORY */}
+<section
 
-
-
-<section className="
+className="
 mt-14
-">
+"
+
+>
 
 
-<h2 className="
+<h2
+
+className="
 text-4xl
 font-black
 text-[#003B6F]
-">
+"
+
+>
 
 Service History
 
@@ -547,19 +739,17 @@ Service History
 
 
 
-<div className="
-mt-8
-border
-bg-[#F5F8FB]
-p-8
-">
 
+<div
 
-<div className="
+className="
 grid
 md:grid-cols-2
 gap-6
-">
+mt-8
+"
+
+>
 
 
 
@@ -589,7 +779,6 @@ new Date(employee.created_at)
 
 
 
-
 <Info
 
 title="Appointment Date"
@@ -605,7 +794,7 @@ new Date(employee.appointment_date)
 
 :
 
-"Not recorded"
+"Not Recorded"
 
 }
 
@@ -614,12 +803,7 @@ new Date(employee.appointment_date)
 
 
 
-
 </div>
-
-
-</div>
-
 
 
 </section>
@@ -632,386 +816,51 @@ new Date(employee.appointment_date)
 
 
 
-{/* CAREER */}
-
-
-
-<section className="
-mt-14
-">
-
-
-<h2 className="
-text-4xl
-font-black
-text-[#003B6F]
-">
-
-Career Development
-
-</h2>
-
-
-
-<div className="
-grid
-md:grid-cols-3
-gap-8
-mt-8
-">
-
-
-<Card
-
-title="Promotions"
-
-value={`${promotions.length} Recorded`}
-
-/>
-
-
-
-<Card
-
-title="Awards"
-
-value={`${awards.length} Received`}
-
-/>
-
-
-
-<Card
-
-title="Assignments"
-
-value={`${history.length} Records`}
-
-/>
-
-
-
-</div>
-
-
-
-</section>
-
-
-{/* PROMOTION */}
-
-
-<section className="
-mt-14
-">
-
-
-<h2 className="
-text-4xl
-font-black
-text-[#003B6F]
-">
-
-Promotion History
-
-</h2>
-
-
-
-<div className="
-mt-8
-space-y-5
-">
-
-
-{
-
-promotions.length === 0 && (
-
-<div className="
-bg-[#F5F8FB]
-border
-p-6
-text-gray-600
-">
-
-No promotion records available.
-
-</div>
-
-)
-
-}
-
-
-
-{
-
-promotions.map((promotion:any)=>(
-
-
-<div
-
-key={promotion.id}
+<section
 
 className="
-border
-bg-white
-p-7
-shadow-sm
+mt-14
 "
 
 >
 
 
-<h3 className="
-text-xl
-font-black
-text-[#003B6F]
-">
+<h2
 
-Promotion Record
-
-</h3>
-
-
-
-<p className="
-mt-3
-text-gray-600
-">
-
-{
-new Date(
-promotion.created_at
-)
-.toLocaleDateString()
-}
-
-</p>
-
-
-
-
-{
-
-promotion.notes && (
-
-<p className="
-mt-3
-text-gray-700
-">
-
-{promotion.notes}
-
-</p>
-
-)
-
-}
-
-
-
-</div>
-
-
-))
-
-}
-
-
-
-</div>
-
-
-</section>
-
-
-{/* AWARDS */}
-
-<section className="
-mt-14
-">
-
-
-<h2 className="
+className="
 text-4xl
 font-black
 text-[#003B6F]
-">
+"
 
-Awards & Recognition
+>
+
+Career History
 
 </h2>
 
 
 
 
-<div className="
-mt-8
-grid
-md:grid-cols-2
-gap-6
-">
 
-
-{
-
-awards.length === 0 && (
-
-<div className="
-bg-[#F5F8FB]
-border
-p-6
-text-gray-600
-">
-
-No awards recorded.
-
-</div>
-
-)
-
-}
-
-
-
-{
-
-awards.map((award:any)=>(
 
 
 <div
 
-key={award.id}
-
 className="
-border
-bg-white
-p-7
+mt-8
+space-y-6
 "
 
 >
 
 
-<h3 className="
-text-2xl
-font-black
-text-[#003B6F]
-">
-
-{
-award.awards?.name ||
-"Recognition Award"
-}
-
-</h3>
-
-
-
-
-<p className="
-mt-3
-text-gray-600
-">
-
-{
-award.awards?.description ||
-"No description available."
-}
-
-</p>
-
-
-
-
-<p className="
-mt-4
-text-sm
-font-bold
-text-gray-500
-">
-
-Received:
-
-{" "}
-
-{
-new Date(
-award.created_at
-)
-.toLocaleDateString()
-}
-
-</p>
-
-
-
-</div>
-
-
-))
-
-}
-
-
-
-</div>
-
-
-
-</section>
-
-
-{/* EMPLOYMENT HISTORY */}
-
-<section className="
-mt-14
-">
-
-
-<h2 className="
-text-4xl
-font-black
-text-[#003B6F]
-">
-
-Employment History
-
-</h2>
-
-
-
-<div className="
-mt-8
-space-y-5
-">
-
-
-{
-
-history.length === 0 && (
-
-<div className="
-bg-[#F5F8FB]
-border
-p-6
-text-gray-600
-">
-
-No previous assignments recorded.
-
-</div>
-
-)
-
-}
 
 
 
 {
 
-history.map((item:any)=>(
+promotions?.map((item:any)=>(
 
 
 <div
@@ -1021,6 +870,7 @@ key={item.id}
 className="
 border-l-4
 border-[#003B6F]
+pl-6
 bg-[#F5F8FB]
 p-6
 "
@@ -1028,45 +878,65 @@ p-6
 >
 
 
-<p className="
+<h3
+
+className="
+text-xl
 font-black
 text-[#003B6F]
-">
+"
 
-Service Record
+>
 
-</p>
+{item.action || "Career Update"}
+
+</h3>
 
 
 
+<p
 
-<p className="
+className="
 mt-2
-text-gray-600
-">
+text-gray-700
+"
 
-{
-item.notes ||
-"No details provided."
-}
+>
+
+{item.notes || "No additional information recorded."}
 
 </p>
 
 
 
+<p
 
-<p className="
+className="
 mt-3
 text-sm
 font-bold
 text-gray-500
-">
+"
+
+>
+
+Effective:
+
+{" "}
 
 {
-new Date(
-item.created_at
-)
+
+item.effective_date
+
+?
+
+new Date(item.effective_date)
 .toLocaleDateString()
+
+:
+
+"Unknown"
+
 }
 
 </p>
@@ -1082,31 +952,515 @@ item.created_at
 
 
 
+
+{
+
+(!promotions || promotions.length === 0) && (
+
+
+<p className="
+text-gray-500
+"
+
+>
+
+No promotion records available.
+
+</p>
+
+
+)
+
+}
+
+
+
 </div>
 
 
 </section>
 
-    
-
-{/* SECURITY */}
 
 
 
-<section className="
+
+
+
+
+
+<section
+
+className="
+mt-14
+"
+
+>
+
+
+<h2
+
+className="
+text-4xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+Awards & Recognition
+
+</h2>
+
+
+
+
+
+
+<div
+
+className="
+grid
+md:grid-cols-2
+gap-6
+mt-8
+"
+
+>
+
+
+
+{
+
+awards?.map((award:any)=>(
+
+
+<div
+
+key={award.id}
+
+className="
+border
+bg-white
+shadow-sm
+p-7
+"
+
+>
+
+
+<h3
+
+className="
+text-xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+{award.award_name}
+
+</h3>
+
+
+
+<p
+
+className="
+mt-3
+text-gray-700
+"
+
+>
+
+{award.description || "Recognition awarded for outstanding service."}
+
+</p>
+
+
+
+<p
+
+className="
+mt-4
+text-sm
+font-bold
+text-gray-500
+"
+
+>
+
+Awarded by:
+
+{" "}
+
+{award.awarded_by || "Department"}
+
+<br />
+
+{
+
+award.awarded_date
+
+?
+
+new Date(award.awarded_date)
+.toLocaleDateString()
+
+:
+
+""
+
+}
+
+</p>
+
+
+
+</div>
+
+
+))
+
+
+}
+
+
+
+
+
+{
+
+(!awards || awards.length === 0) && (
+
+<p className="
+text-gray-500
+"
+
+>
+
+No awards recorded.
+
+</p>
+
+)
+
+}
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+className="
+mt-14
+"
+
+>
+
+
+<h2
+
+className="
+text-4xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+Employment Record
+
+</h2>
+
+
+
+
+
+
+<div
+
+className="
+mt-8
+space-y-6
+"
+
+>
+
+
+{
+
+
+employmentHistory?.map((item:any)=>(
+
+
+<div
+
+key={item.id}
+
+className="
+border
+p-6
+bg-[#F5F8FB]
+"
+
+>
+
+
+<h3
+
+className="
+text-xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+{item.action || "Employment Action"}
+
+</h3>
+
+
+
+<p
+
+className="
+mt-3
+text-gray-700
+"
+
+>
+
+{item.notes || "No notes recorded."}
+
+</p>
+
+
+
+<p
+
+className="
+mt-3
+text-sm
+font-bold
+text-gray-500
+"
+
+>
+
+Effective Date:
+
+{" "}
+
+{
+
+item.effective_date
+
+?
+
+new Date(item.effective_date)
+.toLocaleDateString()
+
+:
+
+"Unknown"
+
+}
+
+</p>
+
+
+</div>
+
+
+))
+
+
+}
+
+
+
+
+
+{
+
+(!employmentHistory || employmentHistory.length === 0) && (
+
+<p className="
+text-gray-500
+"
+
+>
+
+No employment history available.
+
+</p>
+
+)
+
+}
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+className="
+mt-14
+"
+
+>
+
+
+<h2
+
+className="
+text-4xl
+font-black
+text-[#003B6F]
+"
+
+>
+
+Department History
+
+</h2>
+
+
+
+
+
+<div
+
+className="
+mt-8
+space-y-6
+"
+
+>
+
+
+
+{
+
+
+history?.map((item:any)=>(
+
+
+<div
+
+key={item.id}
+
+className="
+border-l-4
+border-[#F2C94C]
+bg-[#F5F8FB]
+p-6
+"
+
+>
+
+
+<h3
+
+className="
+font-black
+text-[#003B6F]
+"
+
+>
+
+Personnel Change
+
+</h3>
+
+
+
+<p
+
+className="
+mt-2
+text-gray-700
+"
+
+>
+
+{item.reason || "No reason provided."}
+
+</p>
+
+
+
+</div>
+
+
+))
+
+
+}
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section
+
+className="
 mt-14
 border-l-4
 border-[#F2C94C]
 bg-[#F5F8FB]
 p-8
-">
+"
+
+>
 
 
-<h3 className="
+<h3
+
+className="
 text-2xl
 font-black
 text-[#003B6F]
-">
+"
+
+>
 
 Personnel Record Notice
 
@@ -1114,19 +1468,23 @@ Personnel Record Notice
 
 
 
-<p className="
+<p
+
+className="
 mt-3
 text-gray-700
 leading-relaxed
-">
+"
 
-This profile is generated from official Department of Homeland Security employment records. Information displayed is limited to the authenticated employee and approved personnel information.
+>
+
+This profile is generated from official Department of Homeland Security employment records. Information displayed is restricted to the authenticated employee and approved personnel data.
 
 </p>
 
 
-
 </section>
+
 
 
 
@@ -1140,15 +1498,14 @@ This profile is generated from official Department of Homeland Security employme
 </div>
 
 
-
 </section>
-
 
 
 </main>
 
 
 );
+
 
 }
 
@@ -1177,20 +1534,28 @@ value:string;
 
 return (
 
-<div className="
+<div
+
+className="
 bg-white
 border
 p-6
-">
+"
+
+>
 
 
-<p className="
+<p
+
+className="
 uppercase
 tracking-widest
 text-xs
 font-bold
 text-gray-500
-">
+"
+
+>
 
 {title}
 
@@ -1198,11 +1563,15 @@ text-gray-500
 
 
 
-<p className="
+<p
+
+className="
 mt-3
 font-black
 text-[#003B6F]
-">
+"
+
+>
 
 {value}
 
@@ -1210,68 +1579,6 @@ text-[#003B6F]
 
 
 </div>
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-function Card({
-
-title,
-
-value
-
-}:{
-
-title:string;
-
-value:string;
-
-}){
-
-
-return (
-
-<div className="
-border
-bg-[#F5F8FB]
-p-7
-">
-
-
-<h3 className="
-text-xl
-font-black
-text-[#003B6F]
-">
-
-{title}
-
-</h3>
-
-
-<p className="
-mt-3
-text-gray-700
-font-bold
-">
-
-{value}
-
-</p>
-
-
-</div>
-
 
 );
 
