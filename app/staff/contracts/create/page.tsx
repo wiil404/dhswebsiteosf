@@ -4,19 +4,35 @@ import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 
 
-function generateContractNumber(){
 
-    const year = new Date().getFullYear();
+function replaceVariables(
+    content:string,
+    values:any
+){
 
-    const random =
-        Math.floor(
-            Math.random()*9000
-        ) + 1000;
+    let output = content;
 
 
-    return `DHS-CON-${year}-${random}`;
+    Object.keys(values).forEach(key=>{
+
+
+        output = output.replaceAll(
+
+            `{{${key}}}`,
+
+            values[key] ?? ""
+
+        );
+
+
+    });
+
+
+    return output;
 
 }
+
+
 
 
 
@@ -26,11 +42,27 @@ export default async function CreateContractPage(){
 
 
 
-const {
+const {data:templates}=await supabaseAdmin
 
-data:employees
+.from("contract_templates")
 
-}= await supabaseAdmin
+.select("*")
+
+.eq(
+"active",
+true
+)
+
+.order(
+"title"
+);
+
+
+
+
+
+
+const {data:employees}=await supabaseAdmin
 
 .from("employees")
 
@@ -39,6 +71,8 @@ data:employees
 id,
 
 roblox_username,
+
+roblox_user_id,
 
 employee_number,
 
@@ -71,10 +105,12 @@ name
 
 
 
+
+
+
 async function createContract(
 formData:FormData
 ){
-
 
 "use server";
 
@@ -88,32 +124,128 @@ formData.get("employee")
 
 
 
-const title =
+const template_id =
 String(
-formData.get("title")
+formData.get("template")
 );
 
 
 
 
-const type =
-String(
-formData.get("type")
-);
+
+const public_view =
+formData.get("public") === "on";
+
+
+
+
+
+const {data:template}=await supabaseAdmin
+
+.from("contract_templates")
+
+.select("*")
+
+.eq(
+"id",
+template_id
+)
+
+.single();
+
+
+
+
+
+const {data:employee}=await supabaseAdmin
+
+.from("employees")
+
+.select(`
+
+*,
+
+positions(
+
+title
+
+),
+
+divisions(
+
+name
+
+)
+
+`)
+
+.eq(
+"id",
+employee_id
+)
+
+.single();
+
+
+
+
+
+
+if(!template || !employee){
+
+    throw new Error(
+        "Invalid contract data"
+    );
+
+}
+
 
 
 
 
 const content =
-String(
-formData.get("content")
+replaceVariables(
+
+template.content,
+
+{
+
+employee_name:
+employee.roblox_username,
+
+
+roblox_username:
+employee.roblox_username,
+
+
+roblox_id:
+employee.roblox_user_id,
+
+
+employee_number:
+employee.employee_number || "Pending",
+
+
+division:
+employee.divisions?.name || "Unknown",
+
+
+position:
+employee.positions?.title || "Employee",
+
+
+effective_date:
+new Date()
+.toLocaleDateString(),
+
+
+}
+
 );
 
 
 
 
-const publicVisible =
-formData.get("public") === "on";
 
 
 
@@ -125,29 +257,28 @@ await supabaseAdmin
 
 .insert({
 
-contract_number:
-generateContractNumber(),
+template_id,
 
 employee_id,
 
-title,
 
-contract_type:
-type,
+title:
+template.title,
+
 
 content,
 
-public_visible:
-publicVisible,
 
 status:
 "Pending Employee Signature",
 
-employee_signed:false,
 
-executive_signed:false
+public_view,
+
 
 });
+
+
 
 
 
@@ -177,6 +308,7 @@ py-16
 ">
 
 
+
 <section className="
 max-w-5xl
 mx-auto
@@ -185,15 +317,21 @@ px-6
 
 
 
+
+
 <form
+
 action={createContract}
+
 className="
 bg-white
 shadow-2xl
 border
 overflow-hidden
 "
+
 >
+
 
 
 <div className="
@@ -228,7 +366,6 @@ Department of Homeland Security
 
 
 
-
 <h1 className="
 text-5xl
 font-black
@@ -246,9 +383,10 @@ mt-3
 text-blue-100
 ">
 
-Generate an official employee agreement.
+Generate official employee agreements from approved templates.
 
 </p>
+
 
 
 </div>
@@ -281,9 +419,79 @@ text-[#003B6F]
 mb-2
 ">
 
+Contract Template
+
+</label>
+
+
+<select
+
+name="template"
+
+required
+
+className="
+w-full
+border
+p-4
+"
+
+>
+
+
+<option value="">
+Select Template
+</option>
+
+
+
+{
+templates?.map((template:any)=>(
+
+<option
+
+key={template.id}
+
+value={template.id}
+
+>
+
+{template.title}
+
+</option>
+
+))
+
+}
+
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div>
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
+
 Employee
 
 </label>
+
 
 
 <select
@@ -308,7 +516,6 @@ Select Employee
 
 
 {
-
 employees?.map((employee:any)=>(
 
 
@@ -320,6 +527,7 @@ value={employee.id}
 
 >
 
+
 {employee.roblox_username}
 
 {" - "}
@@ -330,172 +538,16 @@ value={employee.id}
 
 {employee.divisions?.name || "DHS"}
 
+
 </option>
 
 
 ))
 
-
 }
 
 
 </select>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Contract Title
-
-</label>
-
-
-<input
-
-name="title"
-
-required
-
-placeholder="Example: Operational Assignment Agreement"
-
-className="
-w-full
-border
-p-4
-"
-
-/>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Contract Type
-
-</label>
-
-
-
-<select
-
-name="type"
-
-className="
-w-full
-border
-p-4
-"
-
->
-
-
-<option>
-Employment Agreement
-</option>
-
-
-<option>
-Promotion Agreement
-</option>
-
-
-<option>
-Operational Assignment
-</option>
-
-
-<option>
-Confidentiality Agreement
-</option>
-
-
-<option>
-Other
-</option>
-
-
-</select>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Contract Terms
-
-</label>
-
-
-<textarea
-
-name="content"
-
-required
-
-rows={12}
-
-placeholder="
-Enter official contract wording here...
-"
-
-className="
-w-full
-border
-p-4
-"
-
-/>
 
 
 </div>
@@ -517,9 +569,9 @@ p-6
 
 <label className="
 flex
-items-center
 gap-3
 font-bold
+items-center
 ">
 
 
@@ -532,7 +584,7 @@ name="public"
 />
 
 
-Allow public viewing of this contract
+Allow public viewing of contract
 
 
 </label>
@@ -545,13 +597,12 @@ text-gray-500
 mt-2
 ">
 
-Public viewers will only see the contract and completed signatures.
+Public users will only see the released contract and signatures.
 
 </p>
 
 
 </div>
-
 
 
 
@@ -586,10 +637,15 @@ Create Contract
 </div>
 
 
+
 </form>
 
 
+
+
 </section>
+
+
 
 
 </main>
