@@ -1,4 +1,154 @@
-<section>
+import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
+import { getEmployeeSession } from "@/app/lib/employee-auth";
+
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+
+
+export default async function EmployeeContractsPage(){
+
+
+const session = await getEmployeeSession();
+
+
+
+if(!session){
+
+    redirect("/employee/login");
+
+}
+
+
+
+
+const {data:contracts,error}=await supabaseAdmin
+
+.from("contracts")
+
+.select("*")
+
+.eq(
+"employee_id",
+session.employees.id
+)
+
+.order(
+"created_at",
+{
+ascending:false
+}
+);
+
+
+
+
+if(error){
+
+    console.error(error);
+
+}
+
+
+
+
+
+return (
+
+<main className="
+min-h-screen
+bg-[#F5F8FB]
+py-16
+">
+
+
+<section className="
+max-w-7xl
+mx-auto
+px-6
+">
+
+
+<div className="
+bg-white
+shadow-2xl
+border
+overflow-hidden
+">
+
+
+
+<div className="
+h-3
+bg-[#F2C94C]
+"/>
+
+
+
+
+
+<div className="
+bg-gradient-to-r
+from-[#003B6F]
+to-[#005AA7]
+text-white
+p-10
+">
+
+
+<p className="
+uppercase
+tracking-[0.35em]
+text-[#F2C94C]
+font-black
+text-sm
+">
+
+Department of Homeland Security
+
+</p>
+
+
+
+<h1 className="
+text-5xl
+font-black
+mt-4
+">
+
+My Contracts
+
+</h1>
+
+
+
+<p className="
+mt-3
+text-blue-100
+">
+
+Review and sign your assigned Department agreements.
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div className="
+p-10
+">
 
 
 <h2 className="
@@ -7,7 +157,7 @@ font-black
 text-[#003B6F]
 ">
 
-Employee Acceptance
+Contract Registry
 
 </h2>
 
@@ -16,191 +166,153 @@ Employee Acceptance
 
 
 <div className="
-border
-bg-[#F5F8FB]
-p-8
-mt-6
+mt-8
+space-y-6
 ">
-
-
-<p className="
-text-gray-700
-leading-relaxed
-">
-
-By signing this agreement, I acknowledge that I have read,
-understood, and agree to comply with all provisions contained
-within this Department of Homeland Security employment contract.
-
-</p>
-
-
-
 
 
 
 {
 
-!contract.employee_signed && (
-
-<form
-
-action={async()=>{
-
-await signEmployeeContract(
-contract.id
-);
-
-}}
-
-className="mt-8"
-
->
+contracts?.map((contract:any)=>(
 
 
-<button
+<div
 
-type="submit"
+key={contract.id}
 
 className="
-bg-[#003B6F]
-text-white
-px-8
-py-4
-font-black
-text-lg
-hover:bg-[#005AA7]
-transition
+border
+bg-[#F5F8FB]
+p-7
+flex
+justify-between
+items-center
 "
 
 >
 
-Sign Contract
 
-</button>
-
-
-</form>
-
-)
-
-}
+<div>
 
 
+<h3 className="
+text-xl
+font-black
+text-[#003B6F]
+">
+
+{contract.title}
+
+</h3>
 
 
 
 
+<p className="
+mt-2
+text-gray-600
+">
 
-{
+{contract.contract_type}
 
-contract.employee_signed && (
+</p>
+
+
+
+
 
 <div className="
-mt-6
-bg-green-100
+mt-3
+">
+
+<span className="
+bg-white
 border
-border-green-400
-p-5
+px-4
+py-2
 font-bold
-text-green-800
-">
-
-
-<p>
-
-You have signed this agreement.
-
-</p>
-
-
-
-
-<div className="
-mt-4
-space-y-2
 text-sm
-font-normal
 ">
 
+{contract.status}
+
+</span>
 
 
-<p>
-
-<strong>
-Signed By:
-</strong>
-
-{" "}
-
-{contract.employee_signature_name || "Unknown"}
-
-</p>
+</div>
 
 
 
 
-
-<p>
-
-<strong>
-Roblox ID:
-</strong>
-
-{" "}
-
-{contract.employee_signature_id || "Unknown"}
-
-</p>
+</div>
 
 
 
 
 
-<p>
 
-<strong>
-Signed Date:
-</strong>
 
-{" "}
+
+<Link
+
+href={`/employee/contracts/${contract.id}`}
+
+className="
+bg-[#003B6F]
+text-white
+px-5
+py-3
+font-bold
+"
+
+>
+
+View
+
+</Link>
+
+
+
+
+
+
+</div>
+
+
+))
+
+}
+
+
+
+
 
 {
 
-contract.employee_signature_date
+(!contracts || contracts.length === 0) && (
 
-?
+<p className="
+text-gray-500
+">
 
-new Date(
-contract.employee_signature_date
-).toLocaleString(
-"en-GB"
-)
-
-:
-
-"Unknown"
-
-}
+No contracts assigned.
 
 </p>
 
-
-
-
-
-</div>
-
-
-
-
-</div>
-
 )
 
 }
 
 
+
+
+
+</div>
+
+
+
+</div>
 
 
 
@@ -208,3 +320,12 @@ contract.employee_signature_date
 
 
 </section>
+
+
+</main>
+
+
+);
+
+
+}
