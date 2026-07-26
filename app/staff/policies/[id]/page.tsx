@@ -1,16 +1,29 @@
 import { redirect } from "next/navigation";
-import { supabaseAdmin } from "@/app/lib/supabase-admin";
+import Link from "next/link";
 
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
 import { getEmployeeSession } from "@/app/lib/employee-auth";
 
 import {
-    canApprovePolicy
-} from "@/app/lib/policy-permissions";
-
+approvePolicy,
+rejectPolicy
+} from "./actions";
 
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+
+
+const approvalRoles = [
+
+"Secretary of Homeland Security",
+"Deputy Secretary of Homeland Security",
+"Chief of Staff",
+"Under Secretary"
+
+];
+
 
 
 
@@ -22,13 +35,10 @@ params
 }:{
 
 params:Promise<{
-    id:string
+id:string
 }>
 
 }){
-
-
-const {id}=await params;
 
 
 
@@ -38,31 +48,15 @@ const session = await getEmployeeSession();
 
 if(!session){
 
-redirect("/staff");
+redirect("/employee/login");
 
 }
 
 
 
-const employee = session.employees;
 
 
-
-
-
-
-const {data:position}=await supabaseAdmin
-
-.from("positions")
-
-.select("title")
-
-.eq(
-"id",
-employee.position_id
-)
-
-.single();
+const {id}=await params;
 
 
 
@@ -70,13 +64,7 @@ employee.position_id
 
 
 
-const {
-
-data:policy,
-
-error
-
-}=await supabaseAdmin
+const {data:policy,error}=await supabaseAdmin
 
 .from("policies")
 
@@ -90,13 +78,19 @@ name
 
 ),
 
-creator:employees!policies_created_by_fkey(
+created_employee:employees!policies_created_by_fkey(
 
-roblox_username
+roblox_username,
+
+positions(
+
+title
+
+)
 
 ),
 
-approver:employees!policies_approved_by_fkey(
+approved_employee:employees!policies_approved_by_fkey(
 
 roblox_username
 
@@ -122,10 +116,7 @@ return (
 
 <main className="p-12">
 
-<h1 className="
-text-4xl
-font-black
-">
+<h1 className="text-3xl font-black">
 
 Policy Not Found
 
@@ -133,82 +124,56 @@ Policy Not Found
 
 </main>
 
-);
+)
 
 }
 
 
+
+
+
+
+
+
+const {data:currentEmployee}=await supabaseAdmin
+
+.from("employees")
+
+.select(`
+
+positions(
+
+title
+
+)
+
+`)
+
+.eq(
+"id",
+session.employees.id
+)
+
+.single();
+
+
+
+
+
+
+const currentPosition =
+
+(currentEmployee?.positions as any)?.title || "";
 
 
 
 
 
 const canApprove =
-canApprovePolicy(
-position?.title
+
+approvalRoles.includes(
+currentPosition
 );
-
-
-
-
-
-
-
-
-
-async function approvePolicy(){
-
-"use server";
-
-
-
-const session =
-await getEmployeeSession();
-
-
-
-if(!session){
-
-throw new Error(
-"Unauthorized"
-);
-
-}
-
-
-
-
-await supabaseAdmin
-
-.from("policies")
-
-.update({
-
-status:"Published",
-
-approved_by:
-session.employees.id,
-
-updated_at:
-new Date()
-
-})
-
-.eq(
-"id",
-id
-);
-
-
-
-redirect(
-`/staff/policies/${id}`
-);
-
-
-
-}
-
 
 
 
@@ -227,6 +192,7 @@ py-16
 ">
 
 
+
 <section className="
 max-w-6xl
 mx-auto
@@ -235,12 +201,16 @@ px-6
 
 
 
+
+
 <div className="
 bg-white
-shadow-2xl
 border
+shadow-2xl
 overflow-hidden
 ">
+
+
 
 
 
@@ -248,6 +218,7 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
+
 
 
 
@@ -262,12 +233,37 @@ p-10
 ">
 
 
+
+<Link
+
+href="/staff/policies"
+
+className="
+bg-[#F2C94C]
+text-[#003B6F]
+px-5
+py-3
+font-black
+inline-block
+"
+
+>
+
+← Back to Policies
+
+</Link>
+
+
+
+
+
 <p className="
 uppercase
 tracking-[0.35em]
 text-[#F2C94C]
 font-black
 text-sm
+mt-8
 ">
 
 Department of Homeland Security
@@ -338,7 +334,6 @@ Policy Information
 
 
 
-
 <div className="
 grid
 md:grid-cols-3
@@ -352,9 +347,7 @@ mt-6
 
 title="Policy Number"
 
-value={
-policy.policy_number
-}
+value={policy.policy_number}
 
 />
 
@@ -374,7 +367,6 @@ policy.classification
 
 
 
-
 <Info
 
 title="Status"
@@ -384,6 +376,7 @@ policy.status
 }
 
 />
+
 
 
 
@@ -417,13 +410,14 @@ Ownership
 
 
 
-
 <div className="
-bg-[#F5F8FB]
 border
+bg-[#F5F8FB]
 p-6
 mt-6
+space-y-3
 ">
+
 
 
 <p>
@@ -433,10 +427,9 @@ Created By:
 {" "}
 
 <b>
-{
-policy.creator?.roblox_username ||
-"Unknown"
-}
+
+{policy.created_employee?.roblox_username || "Unknown"}
+
 </b>
 
 </p>
@@ -444,17 +437,36 @@ policy.creator?.roblox_username ||
 
 
 
-<p className="mt-2">
+
+<p>
+
+Position:
+
+{" "}
+
+<b>
+
+{policy.created_employee?.positions?.title || "Unknown"}
+
+</b>
+
+</p>
+
+
+
+
+
+
+<p>
 
 Division:
 
 {" "}
 
 <b>
-{
-policy.divisions?.name ||
-"Department Wide"
-}
+
+{policy.divisions?.name || "Department Wide"}
+
 </b>
 
 </p>
@@ -463,20 +475,21 @@ policy.divisions?.name ||
 
 
 
+
 {
 
-policy.approver && (
+policy.approved_employee && (
 
-<p className="mt-2">
+<p>
 
 Approved By:
 
 {" "}
 
 <b>
-{
-policy.approver.roblox_username
-}
+
+{policy.approved_employee.roblox_username}
+
 </b>
 
 </p>
@@ -487,125 +500,7 @@ policy.approver.roblox_username
 
 
 
-
 </div>
-
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<section>
-
-
-<h2 className="
-text-3xl
-font-black
-text-[#003B6F]
-">
-
-Approval
-
-</h2>
-
-
-
-
-<div className="
-border
-bg-[#F5F8FB]
-p-8
-mt-6
-">
-
-
-
-
-
-{
-
-policy.status !== "Published" && canApprove && (
-
-<form action={approvePolicy}>
-
-
-<button
-
-className="
-bg-[#003B6F]
-text-white
-px-8
-py-4
-font-black
-"
-
->
-
-Approve & Publish Policy
-
-</button>
-
-
-</form>
-
-)
-
-}
-
-
-
-
-
-{
-
-policy.status === "Published" && (
-
-<p className="
-text-green-700
-font-black
-">
-
-✓ Policy Published
-
-</p>
-
-)
-
-}
-
-
-
-
-
-{
-
-policy.status !== "Published" && !canApprove && (
-
-<p className="
-text-gray-600
-">
-
-Awaiting executive approval.
-
-</p>
-
-)
-
-}
-
-
-
-
-
-</div>
-
 
 
 </section>
@@ -633,20 +528,27 @@ Policy Content
 
 
 
-
 <div className="
 mt-6
 border
 bg-[#F5F8FB]
 p-8
-whitespace-pre-wrap
-leading-relaxed
+prose
+max-w-none
 ">
 
-{policy.content}
+<div
+
+dangerouslySetInnerHTML={{
+
+__html:policy.content
+
+}}
+
+/>
+
 
 </div>
-
 
 
 
@@ -658,26 +560,152 @@ leading-relaxed
 
 
 
+
+
+{
+
+canApprove && policy.status !== "Approved" && (
+
+
+<section>
+
+
+<h2 className="
+text-3xl
+font-black
+text-[#003B6F]
+">
+
+Executive Actions
+
+</h2>
+
+
+
+
+
+<div className="
+mt-6
+flex
+gap-4
+">
+
+
+
+<form action={approvePolicy}>
+
+<input
+
+type="hidden"
+
+name="policyId"
+
+value={policy.id}
+
+/>
+
+
+<button
+
+className="
+bg-green-600
+text-white
+px-6
+py-3
+font-black
+"
+
+>
+
+Approve Policy
+
+</button>
+
+
+</form>
+
+
+
+
+
+
+
+<form action={rejectPolicy}>
+
+<input
+
+type="hidden"
+
+name="policyId"
+
+value={policy.id}
+
+/>
+
+
+<button
+
+className="
+bg-red-600
+text-white
+px-6
+py-3
+font-black
+"
+
+>
+
+Reject Policy
+
+</button>
+
+
+</form>
+
+
+
+
+
+
 </div>
 
-
-
-
-
-</div>
 
 
 </section>
+
+
+)
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+</section>
+
 
 
 </main>
 
+
+
 );
 
 
+
 }
-
-
 
 
 
@@ -720,22 +748,19 @@ text-gray-500
 </p>
 
 
-
 <p className="
 mt-3
 font-black
 text-[#003B6F]
 ">
 
-{value}
+{value || "Unknown"}
 
 </p>
 
 
-
 </div>
 
-);
-
+)
 
 }
