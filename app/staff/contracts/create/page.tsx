@@ -107,32 +107,26 @@ const { data: division } = await supabaseAdmin
 
 
 async function createContract(
-formData:FormData
+    formData:FormData
 ){
 
 "use server";
 
 
-
-
 const employee_id =
 String(
-formData.get("employee")
+    formData.get("employee")
 );
-
 
 
 const template_id =
 String(
-formData.get("template")
+    formData.get("template")
 );
-
 
 
 const public_visible =
 formData.get("public") === "on";
-
-
 
 
 
@@ -167,28 +161,13 @@ if(templateError || !template){
 
 
 
+// GET EMPLOYEE
 
-const {data:employee,error:employeeError}=await supabaseAdmin
+const { data: employee, error: employeeError } = await supabaseAdmin
 
 .from("employees")
 
-.select(`
-
-*,
-
-positions(
-
-title
-
-),
-
-divisions(
-
-name
-
-)
-
-`)
+.select("*")
 
 .eq(
 "id",
@@ -214,6 +193,44 @@ if(employeeError || !employee){
 
 
 
+// GET POSITION
+
+const { data: position } = await supabaseAdmin
+
+.from("positions")
+
+.select("title")
+
+.eq(
+"id",
+employee.position_id
+)
+
+.single();
+
+
+
+
+
+
+// GET DIVISION
+
+const { data: division } = await supabaseAdmin
+
+.from("divisions")
+
+.select("name")
+
+.eq(
+"id",
+employee.division_id
+)
+
+.single();
+
+
+
+
 
 
 
@@ -221,15 +238,15 @@ const variables = {
 
 
 employee_name:
-employee.roblox_username,
+employee.roblox_username || "",
 
 
 roblox_username:
-employee.roblox_username,
+employee.roblox_username || "",
 
 
 roblox_id:
-employee.roblox_user_id,
+String(employee.roblox_user_id || ""),
 
 
 employee_number:
@@ -239,12 +256,14 @@ employee.employee_number || "Pending",
 division:
 division?.name || "Department of Homeland Security",
 
+
 position:
 position?.title || "Employee",
 
 
 effective_date:
-new Date().toLocaleDateString(),
+new Date().toLocaleDateString("en-GB"),
+
 
 
 executive_name:
@@ -259,12 +278,14 @@ executive_roblox_id:
 "333195903",
 
 
+
 employee_signature:
-employee.roblox_username,
+employee.roblox_username || "",
 
 
 employee_signature_date:
-new Date().toLocaleDateString(),
+new Date().toLocaleDateString("en-GB"),
+
 
 
 executive_signature:
@@ -272,8 +293,7 @@ executive_signature:
 
 
 executive_signature_date:
-new Date().toLocaleDateString()
-
+new Date().toLocaleDateString("en-GB")
 
 };
 
@@ -284,17 +304,13 @@ new Date().toLocaleDateString()
 
 
 
-
 const generatedContent = replaceVariables(
 
-template.content,
+String(template.content),
 
 variables
 
 );
-
-
-
 
 
 
@@ -357,7 +373,6 @@ if(error){
     throw new Error(error.message);
 
 }
-
 
 
 
