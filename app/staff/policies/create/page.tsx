@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import Editor from "../../../../components/Editor";
@@ -21,17 +21,27 @@ const [category,setCategory] = useState(
 "Security"
 );
 
+
 const [scope,setScope] = useState(
 "UNIVERSAL"
 );
 
+
 const [divisionId,setDivisionId] = useState("");
+
 
 const [classification,setClassification] = useState(
 "PUBLIC"
 );
 
+
 const [content,setContent] = useState("");
+
+
+
+const [divisions,setDivisions] = useState<any[]>([]);
+
+
 
 const [attachments,setAttachments] = useState<
 {
@@ -41,7 +51,42 @@ url:string;
 >([]);
 
 
+
 const [loading,setLoading] = useState(false);
+
+
+
+
+
+
+
+useEffect(()=>{
+
+
+async function loadDivisions(){
+
+
+const response = await fetch(
+"/api/divisions"
+);
+
+
+const data = await response.json();
+
+
+setDivisions(data.divisions || []);
+
+
+}
+
+
+
+loadDivisions();
+
+
+},[]);
+
+
 
 
 
@@ -53,7 +98,6 @@ async function createPolicy(){
 
 
 setLoading(true);
-
 
 
 
@@ -80,18 +124,26 @@ category,
 
 scope,
 
+
 division_id:
+
 scope === "DIVISIONAL"
+
 ?
+
 divisionId
+
 :
+
 null,
+
 
 classification,
 
 content,
 
 attachments
+
 
 })
 
@@ -104,8 +156,10 @@ attachments
 
 
 
+
 const result =
 await response.json();
+
 
 
 
@@ -121,6 +175,7 @@ result.error || "Failed to create policy"
 
 
 setLoading(false);
+
 
 return;
 
@@ -178,6 +233,7 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
+
 
 
 
@@ -249,6 +305,8 @@ space-y-8
 
 
 
+
+
 <div>
 
 
@@ -262,6 +320,7 @@ mb-2
 Policy Title
 
 </label>
+
 
 
 <input
@@ -305,7 +364,7 @@ text-[#003B6F]
 mb-2
 ">
 
-Category
+Policy Category
 
 </label>
 
@@ -361,6 +420,7 @@ Administrative
 </select>
 
 
+
 </div>
 
 
@@ -414,13 +474,12 @@ Department Wide Policy
 
 <option value="DIVISIONAL">
 
-Divisional Policy
+Division Specific Policy
 
 </option>
 
 
 </select>
-
 
 
 </div>
@@ -437,6 +496,7 @@ Divisional Policy
 
 scope === "DIVISIONAL" && (
 
+
 <div>
 
 
@@ -447,21 +507,18 @@ text-[#003B6F]
 mb-2
 ">
 
-Division ID
+Applicable Division
 
 </label>
 
 
-<input
+
+<select
 
 className="
 w-full
 border
 p-4
-"
-
-placeholder="
-Division UUID
 "
 
 value={divisionId}
@@ -470,21 +527,49 @@ onChange={(e)=>
 setDivisionId(e.target.value)
 }
 
-/>
+>
 
 
-<p className="
-text-sm
-text-gray-500
-mt-2
-">
+<option value="">
 
-Enter the division ID this policy applies to.
+Select Division
 
-</p>
+</option>
+
+
+
+
+{
+
+divisions.map((division)=>(
+
+
+<option
+
+key={division.id}
+
+value={division.id}
+
+>
+
+{division.name}
+
+</option>
+
+
+))
+
+
+}
+
+
+
+</select>
+
 
 
 </div>
+
 
 )
 
@@ -511,6 +596,7 @@ mb-2
 Classification
 
 </label>
+
 
 
 
@@ -577,6 +663,7 @@ Policy Content
 
 
 
+
 <div className="
 border
 p-5
@@ -612,7 +699,7 @@ attachments={attachments}
 
 setAttachments={setAttachments}
 
-featuredImage={""}
+featuredImage=""
 
 setFeaturedImage={()=>{}}
 
@@ -663,6 +750,8 @@ loading
 
 
 </button>
+
+
 
 
 
