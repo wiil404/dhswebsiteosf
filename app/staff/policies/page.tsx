@@ -54,18 +54,20 @@ session.employees.id
 
 
 
+console.log(
+"CURRENT EMPLOYEE:",
+JSON.stringify(currentEmployee, null, 2)
+);
+
+
 const position =
 currentEmployee?.positions?.[0]?.title || "";
-
-
-
 
 
 console.log(
 "CURRENT POSITION:",
 position
 );
-
 
 
 
