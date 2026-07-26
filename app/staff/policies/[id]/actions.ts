@@ -91,3 +91,82 @@ export async function rejectPolicy(formData: FormData){
     );
 
 }
+
+
+
+
+
+
+
+export async function deletePolicy(formData: FormData){
+
+    const policyId = String(
+        formData.get("policyId")
+    );
+
+
+
+    if(!policyId){
+
+        throw new Error(
+            "Missing policy ID"
+        );
+
+    }
+
+
+
+
+
+    // Delete acknowledgements first
+    // so foreign key constraints do not block deletion
+
+    await supabaseAdmin
+
+    .from("policy_acknowledgements")
+
+    .delete()
+
+    .eq(
+        "policy_id",
+        policyId
+    );
+
+
+
+
+
+
+
+    const {error}=await supabaseAdmin
+
+    .from("policies")
+
+    .delete()
+
+    .eq(
+        "id",
+        policyId
+    );
+
+
+
+
+
+
+    if(error){
+
+        throw new Error(error.message);
+
+    }
+
+
+
+
+
+    redirect(
+        "/staff/policies"
+    );
+
+
+}
