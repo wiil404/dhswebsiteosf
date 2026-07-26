@@ -135,7 +135,25 @@ Review and sign your assigned Department agreements.
 
 </p>
 
+<Link
 
+href="/employee"
+
+className="
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
+py-3
+font-black
+hover:scale-105
+transition
+"
+
+>
+
+← Dashboard
+
+</Link>
 
 </div>
 
