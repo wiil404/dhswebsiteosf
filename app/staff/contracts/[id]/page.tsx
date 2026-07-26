@@ -15,6 +15,27 @@ export default async function ContractViewPage({
 
 const { id } = await params;
 
+const {
+
+data:auditLogs
+
+}=await supabaseAdmin
+
+.from("audit_logs")
+
+.select("*")
+
+.ilike(
+"details",
+`%${contract.id}%`
+)
+
+.order(
+"created_at",
+{
+ascending:true
+}
+);    
 
 console.log("CONTRACT ID:", id);
 
