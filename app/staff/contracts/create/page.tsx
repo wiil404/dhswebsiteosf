@@ -81,45 +81,25 @@ true
 
 
 
-const {data:employees}=await supabaseAdmin
-
+const { data: employee, error: employeeError } = await supabaseAdmin
 .from("employees")
-
-.select(`
-
-id,
-
-roblox_username,
-
-roblox_user_id,
-
-employee_number,
-
-positions(
-
-title
-
-),
-
-divisions(
-
-name
-
-)
-
-`)
-
-.eq(
-"status",
-"Active"
-)
-
-.order(
-"roblox_username"
-);
+.select("*")
+.eq("id", employee_id)
+.single();
 
 
+const { data: position } = await supabaseAdmin
+.from("positions")
+.select("title")
+.eq("id", employee.position_id)
+.single();
 
+
+const { data: division } = await supabaseAdmin
+.from("divisions")
+.select("name")
+.eq("id", employee.division_id)
+.single();
 
 
 
@@ -257,11 +237,10 @@ employee.employee_number || "Pending",
 
 
 division:
-employee.divisions?.name || "Department of Homeland Security",
-
+division?.name || "Department of Homeland Security",
 
 position:
-employee.positions?.title || "Employee",
+position?.title || "Employee",
 
 
 effective_date:
