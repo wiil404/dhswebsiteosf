@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 import { getEmployeeSession } from "@/app/lib/employee-auth";
 
+import AcknowledgePolicy from "@/components/AcknowledgePolicy";
+
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -34,7 +36,6 @@ id:string
 }>
 
 }){
-
 
 
 const {
@@ -209,6 +210,7 @@ Policy Not Found
 
 </h1>
 
+
 <p className="
 mt-4
 text-gray-600
@@ -217,6 +219,7 @@ text-gray-600
 This policy does not exist or has not been approved.
 
 </p>
+
 
 </section>
 
@@ -235,7 +238,7 @@ This policy does not exist or has not been approved.
 
 
 //
-// Permission check
+// Permission Check
 //
 
 if(!isExecutive){
@@ -314,6 +317,38 @@ You do not have permission to view this policy.
 
 
 }
+
+
+
+
+
+
+
+
+
+const {data:acknowledgement}=await supabaseAdmin
+
+.from("policy_acknowledgements")
+
+.select("*")
+
+.eq(
+
+"policy_id",
+
+id
+
+)
+
+.eq(
+
+"employee_id",
+
+employee.id
+
+)
+
+.maybeSingle();
 
 
 
@@ -510,7 +545,7 @@ mt-5
 
 title="Category"
 
-value={policy.category}
+value={policy.category || "Unknown"}
 
 />
 
@@ -545,7 +580,7 @@ title="Division"
 
 value={
 
-policy.divisions?.name ||
+(policy.divisions as any)?.name ||
 
 "All Departments"
 
@@ -579,6 +614,8 @@ policy.featured_image && (
 <img
 
 src={policy.featured_image}
+
+alt="Policy Image"
 
 className="
 w-full
@@ -724,6 +761,65 @@ hover:bg-blue-50
 )
 
 }
+
+
+
+
+
+
+
+
+
+<section className="
+border
+bg-white
+p-6
+">
+
+
+<h2 className="
+text-2xl
+font-black
+text-[#003B6F]
+">
+
+Policy Acknowledgement
+
+</h2>
+
+
+
+<p className="
+mt-2
+text-gray-600
+">
+
+Employees are required to acknowledge that they have reviewed and understood this policy.
+
+</p>
+
+
+
+
+<div className="
+mt-5
+">
+
+
+<AcknowledgePolicy
+
+policyId={policy.id}
+
+alreadyAcknowledged={!!acknowledgement}
+
+/>
+
+
+</div>
+
+
+
+</section>
 
 
 
