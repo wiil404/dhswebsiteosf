@@ -537,16 +537,10 @@ max-w-none
 ">
 
 <div
-
 dangerouslySetInnerHTML={{
-
 __html: policy.content || ""
-
 }}
-
->
-
-</div>
+/>
 
 
 </div>
@@ -560,14 +554,11 @@ __html: policy.content || ""
 
 
 
-
 {
 
 canApprove && policy.status !== "Approved" && (
 
-
 <section>
-
 
 <h2 className="
 text-3xl
@@ -578,8 +569,6 @@ text-[#003B6F]
 Executive Actions
 
 </h2>
-
-
 
 
 
@@ -594,13 +583,9 @@ gap-4
 <form action={approvePolicy}>
 
 <input
-
 type="hidden"
-
 name="policyId"
-
 value={policy.id}
-
 />
 
 
@@ -627,18 +612,12 @@ Approve Policy
 
 
 
-
-
 <form action={rejectPolicy}>
 
 <input
-
 type="hidden"
-
 name="policyId"
-
 value={policy.id}
-
 />
 
 
@@ -664,20 +643,14 @@ Reject Policy
 
 
 
-
-
 </div>
 
 
-
 </section>
-
 
 )
 
-
-
-
+}
 
 
 
@@ -686,22 +659,16 @@ Reject Policy
 </div>
 
 
-
-
 </div>
-
 
 
 </section>
-
 
 
 </main>
 
 
-
 );
-
 
 
 }
@@ -760,6 +727,7 @@ text-[#003B6F]
 
 </div>
 
-)
+);
+
 
 }
