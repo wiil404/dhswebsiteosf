@@ -157,92 +157,42 @@ template_id
 
 
 
-const {data:employee}=await supabaseAdmin
+const { error } = await supabaseAdmin
 
-.from("employees")
+.from("contracts")
 
-.select(`
+.insert({
 
-*,
+contract_number: generateContractNumber(),
 
-positions(
+employee_id,
 
-title
+title: template.title,
 
-),
+contract_type: template.contract_type,
 
-divisions(
+content,
 
-name
+status: "Pending Employee Signature",
 
-)
+public_visible: publicVisible,
 
-`)
+employee_signed: false,
 
-.eq(
-"id",
-employee_id
-)
+executive_signed: false,
 
-.single();
+created_by: null
 
+});
 
 
+if(error){
 
+    console.error(error);
 
-
-if(!template || !employee){
-
-    throw new Error(
-        "Invalid contract data"
-    );
+    throw new Error(error.message);
 
 }
-
-
-
-
-
-const content =
-replaceVariables(
-
-template.content,
-
-{
-
-employee_name:
-employee.roblox_username,
-
-
-roblox_username:
-employee.roblox_username,
-
-
-roblox_id:
-employee.roblox_user_id,
-
-
-employee_number:
-employee.employee_number || "Pending",
-
-
-division:
-employee.divisions?.name || "Unknown",
-
-
-position:
-employee.positions?.title || "Employee",
-
-
-effective_date:
-new Date()
-.toLocaleDateString(),
-
-
-}
-
-);
-
 
 
 
