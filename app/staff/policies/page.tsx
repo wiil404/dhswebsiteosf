@@ -72,7 +72,10 @@ policyRoles.includes(
 position?.title?.trim()
 );
 
-
+console.log(
+"CURRENT POSITION:",
+position?.title
+);
 
 
 
