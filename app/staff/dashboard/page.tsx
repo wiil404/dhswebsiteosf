@@ -507,7 +507,7 @@ text-blue-100
 
 {
 
-positionTitle
+    {positionTitle}
 
 }
 
@@ -523,7 +523,7 @@ text-blue-200
 
 {
 
-divisionName
+    {divisionName}
 
 }
 
