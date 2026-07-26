@@ -418,7 +418,7 @@ text-blue-100
 
 {
 
-employee?.positions?.title ||
+employee?.positions?.[0]?.title ||
 
 "Staff Member"
 
@@ -436,7 +436,7 @@ text-blue-200
 
 {
 
-employee?.divisions?.name ||
+employee?.divisions?.[0]?.name ||
 
 "Department of Homeland Security"
 
@@ -522,7 +522,7 @@ mt-10
 title="Position"
 
 value={
-employee?.positions?.title ||
+employee?.positions?.[0]?.title ||
 "Unknown"
 }
 
@@ -536,7 +536,7 @@ employee?.positions?.title ||
 title="Division"
 
 value={
-employee?.divisions?.name ||
+employee?.divisions?.[0]?.name ||
 "Unknown"
 }
 
