@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 import { getUser } from "../../lib/auth";
 
@@ -20,6 +21,47 @@ import { logout } from "../actions/logout";
 
 
 
+export const dynamic = "force-dynamic";
+
+
+
+
+
+async function getRobloxAvatar(id:number){
+
+    try{
+
+        const response = await fetch(
+
+            `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=true`,
+
+            {
+                cache:"no-store"
+            }
+
+        );
+
+
+        const data = await response.json();
+
+
+        return data.data?.[0]?.imageUrl || null;
+
+
+    }catch{
+
+        return null;
+
+    }
+
+}
+
+
+
+
+
+
+
 export default async function Dashboard(){
 
 
@@ -37,6 +79,7 @@ if(!user){
 const profile = await getProfile();
 
 
+
 if(!profile){
 
     redirect("/staff/login");
@@ -47,7 +90,13 @@ if(!profile){
 
 
 
-const {data:employee}=await supabaseAdmin
+
+
+const {
+
+data:employee
+
+}=await supabaseAdmin
 
 .from("employees")
 
@@ -55,26 +104,47 @@ const {data:employee}=await supabaseAdmin
 
 roblox_username,
 
+roblox_user_id,
+
 employee_number,
 
 status,
 
 positions(
-    title
+
+title
+
 ),
 
 divisions(
-    name
+
+name
+
 )
 
 `)
 
 .eq(
+
 "user_id",
+
 user.id
+
 )
 
 .maybeSingle();
+
+
+
+
+
+
+const avatar = employee?.roblox_user_id
+
+? await getRobloxAvatar(employee.roblox_user_id)
+
+: null;
+
 
 
 
@@ -98,36 +168,26 @@ await canManageUsers();
 
 
 const viewAudit =
-await hasPermission(
-"audit.view"
-);
+await hasPermission("audit.view");
 
 
 const manageClearance =
 await canManageClearance();
 
 
-
 const policyCreate =
-await hasPermission(
-"policies.create"
-);
+await hasPermission("policies.create");
 
 
 const policyManage =
-await hasPermission(
-"policies.manage"
-);
+await hasPermission("policies.manage");
 
 
 const contractsManage =
-await hasPermission(
-"contracts.manage"
-);
+await hasPermission("contracts.manage");
 
 
-
-const manageOrganisation =
+const administrator =
 profile.role === "Administrator";
 
 
@@ -173,6 +233,8 @@ bg-[#F2C94C]
 
 
 
+
+
 <header className="
 bg-gradient-to-r
 from-[#003B6F]
@@ -181,7 +243,6 @@ text-white
 p-10
 md:p-14
 ">
-
 
 
 <p className="
@@ -198,7 +259,6 @@ Department of Homeland Security
 
 
 
-
 <h1 className="
 text-5xl
 font-black
@@ -208,7 +268,6 @@ mt-4
 Staff Operations Portal
 
 </h1>
-
 
 
 
@@ -226,9 +285,7 @@ administrative operations.
 </p>
 
 
-
 </header>
-
 
 
 
@@ -264,13 +321,16 @@ items-center
 
 
 
+
 <div className="
+relative
 w-32
 h-32
 rounded-full
 bg-white/10
 border-4
 border-[#F2C94C]
+overflow-hidden
 flex
 items-center
 justify-center
@@ -278,16 +338,32 @@ text-5xl
 font-black
 ">
 
+
 {
 
-employee?.roblox_username
-?.charAt(0)
-||
-"S"
+avatar ?
+
+<Image
+
+src={avatar}
+
+alt="Staff Avatar"
+
+fill
+
+className="object-cover"
+
+/>
+
+:
+
+employee?.roblox_username?.charAt(0)
 
 }
 
+
 </div>
+
 
 
 
@@ -306,9 +382,11 @@ text-blue-200
 font-bold
 ">
 
-Staff Member
+{profile.role || "Staff Member"}
 
 </p>
+
+
 
 
 
@@ -320,8 +398,8 @@ mt-2
 
 {
 
-employee?.roblox_username
-||
+employee?.roblox_username ||
+
 profile.email
 
 }
@@ -340,8 +418,8 @@ text-blue-100
 
 {
 
-employee?.positions?.[0]?.title
-||
+employee?.positions?.title ||
+
 "Staff Member"
 
 }
@@ -358,13 +436,14 @@ text-blue-200
 
 {
 
-employee?.divisions?.[0]?.name
-||
+employee?.divisions?.name ||
+
 "Department of Homeland Security"
 
 }
 
 </p>
+
 
 
 
@@ -392,6 +471,7 @@ font-bold
 
 
 
+
 {
 
 employee?.employee_number && (
@@ -416,13 +496,11 @@ font-bold
 </div>
 
 
-
 </div>
 
 
 
 </div>
-
 
 
 
@@ -438,16 +516,18 @@ mt-10
 ">
 
 
+
 <InfoCard
 
 title="Position"
 
 value={
-employee?.positions?.[0]?.title ||
+employee?.positions?.title ||
 "Unknown"
 }
 
 />
+
 
 
 
@@ -456,11 +536,12 @@ employee?.positions?.[0]?.title ||
 title="Division"
 
 value={
-employee?.divisions?.[0]?.name ||
+employee?.divisions?.name ||
 "Unknown"
 }
 
 />
+
 
 
 
@@ -477,7 +558,10 @@ employee?.status ||
 
 
 
+
 </div>
+
+
 
 
 
@@ -492,6 +576,7 @@ title="Communications"
 description="Manage official Department announcements and public messaging."
 
 >
+
 
 
 {
@@ -511,6 +596,8 @@ description="Publish official DHS statements and releases."
 )
 
 }
+
+
 
 
 
@@ -543,6 +630,7 @@ description="Edit, publish and maintain existing communications."
 
 
 
+
 <PortalSection
 
 title="Policy & Directives"
@@ -550,6 +638,7 @@ title="Policy & Directives"
 description="Create, review and maintain Department policies."
 
 >
+
 
 
 {
@@ -569,6 +658,7 @@ description="Draft and submit new DHS directives."
 )
 
 }
+
 
 
 
@@ -595,6 +685,14 @@ description="Review, approve and maintain policy records."
 
 </PortalSection>
 
+
+
+
+
+
+
+
+
 <PortalSection
 
 title="Personnel Operations"
@@ -602,6 +700,7 @@ title="Personnel Operations"
 description="Manage employees, contracts and workforce records."
 
 >
+
 
 
 {
@@ -752,7 +851,7 @@ description="Maintain the DHS organisational structure."
 
 {
 
-manageOrganisation && (
+administrator && (
 
 <PortalCard
 
@@ -774,7 +873,7 @@ description="Manage divisions and department structure."
 
 {
 
-manageOrganisation && (
+administrator && (
 
 <PortalCard
 
