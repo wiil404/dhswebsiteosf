@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 import { signExecutiveContract } from "./actions";
 
@@ -12,8 +11,8 @@ export default async function ContractViewPage({
     params: Promise<{id:string}>
 }){
 
-   
 
+const { id } = await params;
 
 
 
