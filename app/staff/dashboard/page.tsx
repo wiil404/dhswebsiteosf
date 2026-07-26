@@ -92,16 +92,17 @@ if(!profile){
 
 
 
-const {
-    data:employee,
-    error:employeeError
-}=await supabaseAdmin
+const {data:employee}=await supabaseAdmin
 
 .from("employees")
 
 .select(`
 
-*
+roblox_username,
+employee_number,
+status,
+division_id,
+position_id
 
 `)
 
@@ -111,6 +112,66 @@ user.id
 )
 
 .maybeSingle();
+
+
+
+let positionTitle = "Staff Member";
+let divisionName = "Department of Homeland Security";
+
+
+if(employee?.position_id){
+
+const {data:position}=await supabaseAdmin
+
+.from("positions")
+
+.select("title")
+
+.eq(
+"id",
+employee.position_id
+)
+
+.single();
+
+
+if(position){
+
+    positionTitle = position.title;
+
+}
+
+}
+
+
+
+if(employee?.division_id){
+
+const {data:division}=await supabaseAdmin
+
+.from("divisions")
+
+.select("name")
+
+.eq(
+"id",
+employee.division_id
+)
+
+.single();
+
+
+if(division){
+
+    divisionName = division.name;
+
+}
+
+}
+
+
+
+console.log("EMPLOYEE:", employee);
 
 
 console.log("EMPLOYEE:", employee);
@@ -446,9 +507,7 @@ text-blue-100
 
 {
 
-employee?.positions?.[0]?.title ||
-
-"Staff Member"
+positionTitle
 
 }
 
@@ -464,9 +523,7 @@ text-blue-200
 
 {
 
-employee?.divisions?.[0]?.name ||
-
-"Department of Homeland Security"
+divisionName
 
 }
 
@@ -550,8 +607,7 @@ mt-10
 title="Position"
 
 value={
-employee?.positions?.[0]?.title ||
-"Unknown"
+positionTitle
 }
 
 />
@@ -564,8 +620,7 @@ employee?.positions?.[0]?.title ||
 title="Division"
 
 value={
-employee?.divisions?.[0]?.name ||
-"Unknown"
+divisionName
 }
 
 />
