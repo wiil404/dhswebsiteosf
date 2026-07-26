@@ -6,7 +6,8 @@ import { getEmployeeSession } from "@/app/lib/employee-auth";
 
 import {
 approvePolicy,
-rejectPolicy
+rejectPolicy,
+deletePolicy
 } from "./actions";
 
 
@@ -41,9 +42,7 @@ id:string
 }){
 
 
-
 const session = await getEmployeeSession();
-
 
 
 if(!session){
@@ -51,7 +50,6 @@ if(!session){
 redirect("/employee/login");
 
 }
-
 
 
 
@@ -109,7 +107,6 @@ id
 
 
 
-
 if(error || !policy){
 
 return (
@@ -124,10 +121,9 @@ Policy Not Found
 
 </main>
 
-)
+);
 
 }
-
 
 
 
@@ -180,9 +176,6 @@ currentPosition
 
 
 
-
-
-
 return (
 
 <main className="
@@ -192,15 +185,11 @@ py-16
 ">
 
 
-
 <section className="
 max-w-6xl
 mx-auto
 px-6
 ">
-
-
-
 
 
 <div className="
@@ -211,13 +200,11 @@ overflow-hidden
 ">
 
 
-
-
-
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
+
 
 
 
@@ -252,6 +239,7 @@ inline-block
 ← Back to Policies
 
 </Link>
+
 
 
 
@@ -295,7 +283,6 @@ Official Department Policy Record
 </p>
 
 
-
 </div>
 
 
@@ -319,7 +306,6 @@ space-y-10
 
 <section>
 
-
 <h2 className="
 text-3xl
 font-black
@@ -332,15 +318,12 @@ Policy Information
 
 
 
-
-
 <div className="
 grid
 md:grid-cols-3
 gap-6
 mt-6
 ">
-
 
 
 <Info
@@ -353,17 +336,13 @@ value={policy.policy_number}
 
 
 
-
 <Info
 
 title="Classification"
 
-value={
-policy.classification
-}
+value={policy.classification}
 
 />
-
 
 
 
@@ -371,17 +350,13 @@ policy.classification
 
 title="Status"
 
-value={
-policy.status
-}
+value={policy.status}
 
 />
 
 
 
-
 </div>
-
 
 
 </section>
@@ -395,7 +370,6 @@ policy.status
 
 
 <section>
-
 
 <h2 className="
 text-3xl
@@ -419,7 +393,6 @@ space-y-3
 ">
 
 
-
 <p>
 
 Created By:
@@ -437,7 +410,6 @@ Created By:
 
 
 
-
 <p>
 
 Position:
@@ -446,13 +418,11 @@ Position:
 
 <b>
 
-{policy.created_employee?.positions?.title || "Unknown"}
+{(policy.created_employee?.positions as any)?.title || "Unknown"}
 
 </b>
 
 </p>
-
-
 
 
 
@@ -465,12 +435,11 @@ Division:
 
 <b>
 
-{policy.divisions?.name || "Department Wide"}
+{(policy.divisions as any)?.name || "Department Wide"}
 
 </b>
 
 </p>
-
 
 
 
@@ -527,6 +496,7 @@ Policy Content
 
 
 
+
 <div className="
 mt-6
 border
@@ -536,10 +506,15 @@ prose
 max-w-none
 ">
 
+
 <div
+
 dangerouslySetInnerHTML={{
-__html: policy.content || ""
+
+__html:policy.content || ""
+
 }}
+
 />
 
 
@@ -554,11 +529,138 @@ __html: policy.content || ""
 
 
 
+
+
+<section>
+
+<h2 className="
+text-3xl
+font-black
+text-[#003B6F]
+">
+
+Policy Management
+
+</h2>
+
+
+
+<div className="
+mt-6
+flex
+flex-wrap
+gap-4
+">
+
+
+
+
+
+
+<Link
+
+href={`/staff/policies/${policy.id}/edit`}
+
+className="
+bg-blue-700
+text-white
+px-6
+py-3
+font-black
+"
+
+>
+
+Edit Policy
+
+</Link>
+
+
+
+
+
+
+<Link
+
+href={`/staff/policies/${policy.id}/acknowledgements`}
+
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-black
+"
+
+>
+
+View Acknowledgements
+
+</Link>
+
+
+
+
+
+
+
+<form action={deletePolicy}>
+
+<input
+
+type="hidden"
+
+name="policyId"
+
+value={policy.id}
+
+/>
+
+
+
+<button
+
+className="
+bg-red-600
+text-white
+px-6
+py-3
+font-black
+"
+
+>
+
+Delete Policy
+
+</button>
+
+
+</form>
+
+
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
 {
 
 canApprove && policy.status !== "Approved" && (
 
+
 <section>
+
 
 <h2 className="
 text-3xl
@@ -582,11 +684,17 @@ gap-4
 
 <form action={approvePolicy}>
 
+
 <input
+
 type="hidden"
+
 name="policyId"
+
 value={policy.id}
+
 />
+
 
 
 <button
@@ -606,7 +714,11 @@ Approve Policy
 </button>
 
 
+
 </form>
+
+
+
 
 
 
@@ -614,17 +726,23 @@ Approve Policy
 
 <form action={rejectPolicy}>
 
+
 <input
+
 type="hidden"
+
 name="policyId"
+
 value={policy.id}
+
 />
+
 
 
 <button
 
 className="
-bg-red-600
+bg-red-700
 text-white
 px-6
 py-3
@@ -638,6 +756,7 @@ Reject Policy
 </button>
 
 
+
 </form>
 
 
@@ -647,6 +766,7 @@ Reject Policy
 
 
 </section>
+
 
 )
 
@@ -666,7 +786,6 @@ Reject Policy
 
 
 </main>
-
 
 );
 
