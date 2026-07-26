@@ -27,7 +27,7 @@ const {
 
 data:contract,
 
-error:contractError
+error
 
 }=await supabaseAdmin
 
@@ -40,17 +40,26 @@ error:contractError
 params.id
 )
 
-.single();
+.maybeSingle();
 
 
 
+console.log(
+"CONTRACT LOOKUP:",
+{
+    id: params.id,
+    contract,
+    error
+}
+);
 
 
-if(contractError || !contract){
 
-console.error(contractError);
+if(!contract){
 
-redirect("/staff/contracts");
+throw new Error(
+`Contract not found: ${params.id}`
+);
 
 }
 
