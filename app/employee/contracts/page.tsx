@@ -38,6 +38,7 @@ within this Department of Homeland Security employment contract.
 
 
 
+
 {
 
 !contract.employee_signed && (
@@ -46,9 +47,9 @@ within this Department of Homeland Security employment contract.
 
 action={async()=>{
 
-"use server";
-
-await signEmployeeContract(contract.id);
+await signEmployeeContract(
+contract.id
+);
 
 }}
 
@@ -58,6 +59,8 @@ className="mt-8"
 
 
 <button
+
+type="submit"
 
 className="
 bg-[#003B6F]
@@ -87,6 +90,8 @@ Sign Contract
 
 
 
+
+
 {
 
 contract.employee_signed && (
@@ -110,15 +115,21 @@ You have signed this agreement.
 
 
 
+
 <div className="
 mt-4
 space-y-2
 text-sm
+font-normal
 ">
+
+
 
 <p>
 
+<strong>
 Signed By:
+</strong>
 
 {" "}
 
@@ -127,9 +138,14 @@ Signed By:
 </p>
 
 
+
+
+
 <p>
 
+<strong>
 Roblox ID:
+</strong>
 
 {" "}
 
@@ -138,9 +154,14 @@ Roblox ID:
 </p>
 
 
+
+
+
 <p>
 
+<strong>
 Signed Date:
+</strong>
 
 {" "}
 
@@ -152,7 +173,9 @@ contract.employee_signature_date
 
 new Date(
 contract.employee_signature_date
-).toLocaleString("en-GB")
+).toLocaleString(
+"en-GB"
+)
 
 :
 
@@ -163,7 +186,11 @@ contract.employee_signature_date
 </p>
 
 
+
+
+
 </div>
+
 
 
 
