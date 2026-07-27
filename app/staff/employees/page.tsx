@@ -92,27 +92,21 @@ title
 
 
 
-const divisionMap:any={};
-
+const divisionMap:any = {};
 
 for(const division of divisionsData || []){
 
-divisionMap[division.id]=division.name;
+    divisionMap[division.id] = division.name;
 
 }
 
-
-
-
-const positionMap:any={};
-
+const positionMap:any = {};
 
 for(const position of positionsData || []){
 
-positionMap[position.id]=position.title;
+    positionMap[position.id] = position.title;
 
 }
-
 
 
 
