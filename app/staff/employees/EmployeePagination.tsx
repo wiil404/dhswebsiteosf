@@ -19,11 +19,11 @@ const slider = useRef<HTMLDivElement>(null);
 
 
 
-function move(amount:number){
+function move(direction:number){
 
 slider.current?.scrollBy({
 
-left:amount,
+left: direction,
 
 behavior:"smooth"
 
@@ -44,10 +44,12 @@ ref={slider}
 
 className="
 flex
-gap-6
+gap-8
 overflow-x-auto
 scroll-smooth
-pb-4
+pb-6
+snap-x
+snap-mandatory
 "
 
 >
@@ -63,9 +65,9 @@ employees.map((employee:any)=>(
 key={employee.id}
 
 className="
-min-w-[350px]
-max-w-[350px]
-flex-shrink-0
+w-[380px]
+flex-none
+snap-start
 "
 
 >
@@ -93,6 +95,8 @@ employee={employee}
 
 
 
+
+
 {
 
 employees.length > 3 && (
@@ -100,19 +104,19 @@ employees.length > 3 && (
 <div className="
 flex
 justify-center
-gap-5
-mt-6
+gap-6
+mt-8
 ">
 
 
 <button
 
-onClick={()=>move(-400)}
+onClick={()=>move(-450)}
 
 className="
 bg-[#003B6F]
 text-white
-px-6
+px-8
 py-3
 font-black
 hover:bg-[#005AA7]
@@ -121,7 +125,7 @@ transition
 
 >
 
-←
+← Previous
 
 </button>
 
@@ -130,12 +134,12 @@ transition
 
 <button
 
-onClick={()=>move(400)}
+onClick={()=>move(450)}
 
 className="
 bg-[#003B6F]
 text-white
-px-6
+px-8
 py-3
 font-black
 hover:bg-[#005AA7]
@@ -144,7 +148,7 @@ transition
 
 >
 
-→
+Next →
 
 </button>
 
