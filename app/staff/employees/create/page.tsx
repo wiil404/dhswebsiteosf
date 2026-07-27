@@ -1,10 +1,9 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-import { getUser } from "@/app/lib/auth";
 
 import { createEmployee } from "./actions";
+
 
 
 export const dynamic = "force-dynamic";
@@ -17,38 +16,16 @@ export default async function CreateEmployeePage(){
 
 
 
-const user = await getUser();
-
-
-
-if(!user){
-
-redirect("/staff/login");
-
-}
-
-
-
-
-
-
 const {data:divisions}=await supabaseAdmin
 
 .from("divisions")
 
 .select(`
-
 id,
-
 name
-
 `)
 
-.order(
-"name"
-);
-
-
+.order("name");
 
 
 
@@ -59,18 +36,11 @@ const {data:positions}=await supabaseAdmin
 .from("positions")
 
 .select(`
-
 id,
-
 title
-
 `)
 
-.order(
-"title"
-);
-
-
+.order("title");
 
 
 
@@ -88,23 +58,19 @@ py-16
 
 
 <section className="
-max-w-5xl
+max-w-4xl
 mx-auto
 px-6
 ">
 
 
 
-
-
 <div className="
 bg-white
-shadow-2xl
 border
+shadow-xl
 overflow-hidden
 ">
-
-
 
 
 
@@ -112,9 +78,6 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
-
-
-
 
 
 
@@ -129,11 +92,11 @@ p-10
 
 
 <p className="
+text-[#F2C94C]
+font-black
 uppercase
 tracking-[0.35em]
 text-sm
-font-black
-text-[#F2C94C]
 ">
 
 Department of Homeland Security
@@ -142,19 +105,10 @@ Department of Homeland Security
 
 
 
-<div className="
-flex
-justify-between
-items-center
-flex-wrap
-gap-4
-mt-4
-">
-
-
 <h1 className="
-text-5xl
+text-4xl
 font-black
+mt-4
 ">
 
 Create Employee
@@ -163,38 +117,12 @@ Create Employee
 
 
 
-
-<Link
-
-href="/staff/employees"
-
-className="
-bg-[#F2C94C]
-text-[#003B6F]
-px-6
-py-3
-font-black
-"
-
->
-
-← Back
-
-</Link>
-
-
-
-</div>
-
-
-
-
 <p className="
-mt-4
 text-blue-100
+mt-3
 ">
 
-Create a new DHS personnel record.
+Add a new DHS personnel record.
 
 </p>
 
@@ -208,30 +136,23 @@ Create a new DHS personnel record.
 
 
 
-
-
 <form
 
 action={createEmployee}
 
 className="
 p-10
-space-y-8
+space-y-6
 "
 
 >
 
 
 
-
-
-
-
 <div>
 
-
 <label className="
-font-black
+font-bold
 text-[#003B6F]
 ">
 
@@ -240,14 +161,11 @@ Roblox Username
 </label>
 
 
-
 <input
 
 name="roblox_username"
 
 required
-
-placeholder="Example: Wiil404"
 
 className="
 mt-2
@@ -258,10 +176,7 @@ p-4
 
 />
 
-
-
 </div>
-
 
 
 
@@ -271,9 +186,8 @@ p-4
 
 <div>
 
-
 <label className="
-font-black
+font-bold
 text-[#003B6F]
 ">
 
@@ -282,16 +196,13 @@ Roblox User ID
 </label>
 
 
-
 <input
 
 name="roblox_user_id"
 
-required
-
 type="number"
 
-placeholder="Example: 333195903"
+required
 
 className="
 mt-2
@@ -302,7 +213,40 @@ p-4
 
 />
 
+</div>
 
+
+
+
+
+
+
+<div>
+
+<label className="
+font-bold
+text-[#003B6F]
+">
+
+Employee Number
+
+</label>
+
+
+<input
+
+name="employee_number"
+
+placeholder="Optional"
+
+className="
+mt-2
+w-full
+border
+p-4
+"
+
+/>
 
 </div>
 
@@ -312,23 +256,10 @@ p-4
 
 
 
-
-
-<div className="
-grid
-md:grid-cols-2
-gap-6
-">
-
-
-
-
-
 <div>
 
-
 <label className="
-font-black
+font-bold
 text-[#003B6F]
 ">
 
@@ -349,22 +280,20 @@ mt-2
 w-full
 border
 p-4
+bg-white
 "
 
 >
 
 
 <option value="">
-
 Select Division
-
 </option>
-
 
 
 {
 
-divisions?.map((division:any)=>(
+(divisions || []).map((division:any)=>(
 
 
 <option
@@ -386,6 +315,7 @@ value={division.id}
 }
 
 
+
 </select>
 
 
@@ -399,9 +329,8 @@ value={division.id}
 
 <div>
 
-
 <label className="
-font-black
+font-bold
 text-[#003B6F]
 ">
 
@@ -422,22 +351,21 @@ mt-2
 w-full
 border
 p-4
+bg-white
 "
 
 >
 
 
 <option value="">
-
 Select Position
-
 </option>
 
 
 
 {
 
-positions?.map((position:any)=>(
+(positions || []).map((position:any)=>(
 
 
 <option
@@ -459,17 +387,11 @@ value={position.id}
 }
 
 
+
 </select>
 
 
 </div>
-
-
-
-
-
-</div>
-
 
 
 
@@ -480,34 +402,51 @@ value={position.id}
 
 <div>
 
-
 <label className="
-font-black
+font-bold
 text-[#003B6F]
 ">
 
-Email
+Status
 
 </label>
 
 
 
-<input
+<select
 
-name="email"
+name="status"
 
-type="email"
-
-placeholder="employee@gov.us"
+defaultValue="Active"
 
 className="
 mt-2
 w-full
 border
 p-4
+bg-white
 "
 
-/>
+>
+
+
+<option value="Active">
+Active
+</option>
+
+
+<option value="Inactive">
+Inactive
+</option>
+
+
+<option value="Suspended">
+Suspended
+</option>
+
+
+
+</select>
 
 
 </div>
@@ -518,9 +457,16 @@ p-4
 
 
 
+<div className="
+flex
+gap-4
+pt-6
+">
 
 
 <button
+
+type="submit"
 
 className="
 bg-[#003B6F]
@@ -528,7 +474,6 @@ text-white
 px-8
 py-4
 font-black
-text-lg
 hover:bg-[#005AA7]
 transition
 "
@@ -539,6 +484,28 @@ Create Employee
 
 </button>
 
+
+
+<Link
+
+href="/staff/employees"
+
+className="
+border
+px-8
+py-4
+font-black
+"
+
+>
+
+Cancel
+
+</Link>
+
+
+
+</div>
 
 
 
@@ -552,11 +519,7 @@ Create Employee
 
 
 
-
 </div>
-
-
-
 
 
 </section>
