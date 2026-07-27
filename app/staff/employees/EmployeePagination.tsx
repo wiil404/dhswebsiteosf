@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef } from "react";
 import EmployeeCard from "./EmployeeCard";
 
 
@@ -15,24 +15,23 @@ employees:any[];
 }){
 
 
-const [page,setPage] = useState(0);
+const sliderRef = useRef<HTMLDivElement>(null);
 
 
-const perPage = 9;
+
+function scroll(direction:number){
 
 
-const totalPages = Math.ceil(
-employees.length / perPage
-);
+sliderRef.current?.scrollBy({
+
+left: direction,
+
+behavior:"smooth"
+
+});
 
 
-const currentEmployees = employees.slice(
-
-page * perPage,
-
-(page + 1) * perPage
-
-);
+}
 
 
 
@@ -41,25 +40,53 @@ return (
 <div>
 
 
-<div className="
-grid
-md:grid-cols-3
+<div
+
+ref={sliderRef}
+
+className="
+flex
+overflow-x-auto
 gap-6
-">
+scroll-smooth
+snap-x
+snap-mandatory
+pb-5
+scrollbar-thin
+"
+
+>
+
 
 
 {
 
-currentEmployees.map((employee:any)=>(
+employees.map((employee:any)=>(
+
+
+<div
+
+key={employee.id}
+
+className="
+min-w-[85%]
+sm:min-w-[45%]
+lg:min-w-[30%]
+xl:min-w-[23%]
+snap-start
+"
+
+>
 
 
 <EmployeeCard
 
-key={employee.id}
-
 employee={employee}
 
 />
+
+
+</div>
 
 
 ))
@@ -74,76 +101,61 @@ employee={employee}
 
 
 
+
+
 {
 
-totalPages > 1 && (
+employees.length > 4 && (
 
 <div className="
 flex
-justify-between
-items-center
+justify-center
+gap-5
 mt-8
 ">
 
 
 <button
 
-disabled={page===0}
-
-onClick={()=>setPage(page-1)}
+onClick={()=>scroll(-500)}
 
 className="
-px-6
-py-3
 bg-[#003B6F]
 text-white
+px-6
+py-3
 font-black
-disabled:opacity-40
 hover:bg-[#005AA7]
 transition
 "
 
 >
 
-← Previous
+←
 
 </button>
 
 
 
 
-<p className="
-font-bold
-text-[#003B6F]
-">
-
-Page {page+1} / {totalPages}
-
-</p>
-
-
-
 
 <button
 
-disabled={page===totalPages-1}
-
-onClick={()=>setPage(page+1)}
+onClick={()=>scroll(500)}
 
 className="
-px-6
-py-3
 bg-[#003B6F]
 text-white
+px-6
+py-3
 font-black
-disabled:opacity-40
 hover:bg-[#005AA7]
 transition
 "
 
 >
 
-Next →
+→
 
 </button>
 
@@ -161,6 +173,5 @@ Next →
 
 
 );
-
 
 }
