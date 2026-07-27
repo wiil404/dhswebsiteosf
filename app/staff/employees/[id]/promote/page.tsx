@@ -1,203 +1,54 @@
-"use client";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import {
-    useEffect,
-    useState,
-    use
-} from "react";
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
-import {
-    useRouter
-} from "next/navigation";
+import { changePosition } from "./actions";
+
+
+export const dynamic = "force-dynamic";
 
 
 
-export default function PromotePage({
+export default async function PromoteEmployeePage({
 
 params
 
 }:{
 
-params: Promise<{
-    id:string
+params:Promise<{
+id:string
 }>
 
 }){
 
 
-const { id } = use(params);
+const {id}=await params;
 
 
-const router = useRouter();
 
 
 
-const [employee,setEmployee] =
-useState<any>(null);
+const {data:employee}=await supabaseAdmin
 
+.from("employees")
 
+.select(`
 
-const [positions,setPositions] =
-useState<any[]>([]);
+*,
 
+positions(
+title
+)
 
+`)
 
-const [selectedPosition,setSelectedPosition] =
-useState("");
+.eq(
+"id",
+id
+)
 
-
-
-const [reason,setReason] =
-useState("");
-
-
-
-const [loading,setLoading] =
-useState(false);
-
-
-
-
-
-
-useEffect(()=>{
-
-load();
-
-},[]);
-
-
-
-
-
-
-async function load(){
-
-
-const employeeResponse =
-await fetch(
-    `/api/staff/employees/${id}`
-);
-
-
-const employeeData =
-await employeeResponse.json();
-
-console.log(
-"POSITION DATA:",
-employeeData.positions
-);
-
-console.log(
-"DIVISION DATA:",
-employeeData.divisions
-);
-
-setEmployee(employeeData);
-
-
-
-
-const positionResponse =
-await fetch(
-    "/api/staff/positions"
-);
-
-
-const positionData =
-await positionResponse.json();
-
-
-setPositions(positionData);
-
-
-}
-
-
-
-
-
-
-
-
-async function promote(){
-
-
-if(!selectedPosition){
-
-alert(
-"Please select a position"
-);
-
-return;
-
-}
-
-
-
-setLoading(true);
-
-
-
-
-
-const response =
-await fetch(
-    "/api/staff/employees/promote",
-    {
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-
-            employee_id:id,
-
-            position_id:selectedPosition,
-
-            reason
-
-        })
-    }
-);
-
-
-
-
-
-const data =
-await response.json();
-
-
-
-
-
-if(data.error){
-
-alert(data.error);
-
-setLoading(false);
-
-return;
-
-}
-
-
-
-
-router.push(
-
-`/staff/employees/${id}`
-
-);
-
-
-
-}
-
-
-
-
+.single();
 
 
 
@@ -205,18 +56,29 @@ router.push(
 
 if(!employee){
 
-return (
-
-<main className="p-12">
-
-Loading...
-
-</main>
-
-);
+redirect("/staff/employees");
 
 }
 
+
+
+
+
+const {data:positions}=await supabaseAdmin
+
+.from("positions")
+
+.select(`
+
+id,
+
+title
+
+`)
+
+.order(
+"title"
+);
 
 
 
@@ -227,38 +89,148 @@ Loading...
 return (
 
 <main className="
-max-w-4xl
-mx-auto
-px-6
-py-12
+min-h-screen
+bg-[#F5F8FB]
+py-16
 ">
 
 
+<section className="
+max-w-4xl
+mx-auto
+px-6
+">
+
+
+<div className="
+bg-white
+shadow-2xl
+border
+overflow-hidden
+">
+
+
+<div className="
+h-3
+bg-[#F2C94C]
+"/>
+
+
+
+<header className="
+bg-gradient-to-r
+from-[#003B6F]
+to-[#005AA7]
+text-white
+p-10
+">
+
+
+<p className="
+uppercase
+tracking-[0.35em]
+text-sm
+font-black
+text-[#F2C94C]
+">
+
+Department of Homeland Security
+
+</p>
 
 
 
 <h1 className="
-text-4xl
-font-bold
-text-[#003B6F]
+text-5xl
+font-black
+mt-4
 ">
 
-Promote Employee
+Change Position
 
 </h1>
+
+
+
+<p className="
+mt-3
+text-blue-100
+">
+
+Promote or demote {employee.roblox_username}
+
+</p>
+
+
+</header>
+
+
+
+
+
+
+
+<form
+
+action={changePosition}
+
+className="
+p-10
+space-y-8
+"
+
+>
+
+
+<input
+
+type="hidden"
+
+name="employeeId"
+
+value={employee.id}
+
+/>
 
 
 
 
 
 <div className="
-mt-8
-bg-white
+bg-[#F5F8FB]
 border
-rounded-lg
-shadow
-p-8
+p-6
 ">
+
+
+<p className="
+font-bold
+text-gray-500
+uppercase
+text-sm
+">
+
+Current Position
+
+</p>
+
+
+
+<p className="
+text-2xl
+font-black
+text-[#003B6F]
+mt-2
+">
+
+{employee.positions?.title || "None"}
+
+</p>
+
+
+</div>
+
+
 
 
 
@@ -267,76 +239,10 @@ p-8
 
 <div>
 
-<p className="
-text-gray-500
-">
-
-Employee
-
-</p>
-
-
-<h2 className="
-text-2xl
-font-bold
-">
-
-{employee.roblox_username}
-
-</h2>
-
-
-</div>
-
-
-
-
-
-
-
-<div className="
-mt-6
-">
-
-
-<p className="text-gray-500">
-
-Current Position
-
-</p>
-
-
-<p className="
-font-bold
-text-lg
-">
-
-{
-Array.isArray(employee.positions)
-?
-employee.positions[0]?.title
-:
-employee.positions?.title
-||
-"No Position"
-}
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-
 
 <label className="
-block
-mt-8
-font-semibold
+font-black
+text-[#003B6F]
 ">
 
 New Position
@@ -347,22 +253,16 @@ New Position
 
 <select
 
+name="positionId"
+
+required
+
 className="
-border
-w-full
-p-3
-rounded
 mt-2
+border
+p-4
+w-full
 "
-
-
-value={selectedPosition}
-
-
-onChange={(e)=>
-setSelectedPosition(e.target.value)
-}
-
 
 >
 
@@ -377,7 +277,7 @@ Select Position
 
 {
 
-positions.map(position=>(
+positions?.map((position:any)=>(
 
 
 <option
@@ -395,98 +295,11 @@ value={position.id}
 
 ))
 
-}
 
+}
 
 
 </select>
-
-
-
-
-
-
-
-
-
-
-<label className="
-block
-mt-6
-font-semibold
-">
-
-Reason
-
-</label>
-
-
-
-<textarea
-
-className="
-border
-w-full
-p-3
-rounded
-mt-2
-"
-
-rows={5}
-
-
-value={reason}
-
-
-onChange={(e)=>
-setReason(e.target.value)
-}
-
-
-placeholder="
-Promotion justification...
-"
-
-/>
-
-
-
-
-
-
-
-<button
-
-onClick={promote}
-
-disabled={loading}
-
-className="
-mt-8
-bg-[#003B6F]
-text-white
-px-6
-py-3
-rounded
-font-bold
-"
-
->
-
-{
-
-loading
-?
-"Processing..."
-:
-"Confirm Promotion"
-
-}
-
-
-</button>
-
-
 
 
 
@@ -497,8 +310,114 @@ loading
 
 
 
-</main>
 
+
+
+<div>
+
+
+<label className="
+font-black
+text-[#003B6F]
+">
+
+Reason
+
+</label>
+
+
+
+<textarea
+
+name="reason"
+
+required
+
+placeholder="Reason for promotion/demotion..."
+
+className="
+mt-2
+border
+p-4
+w-full
+h-32
+"
+
+/>
+
+
+</div>
+
+
+
+
+
+
+
+
+<button
+
+className="
+bg-[#003B6F]
+text-white
+px-8
+py-4
+font-black
+hover:bg-[#005AA7]
+transition
+"
+
+>
+
+Confirm Change
+
+</button>
+
+
+
+
+
+
+
+<Link
+
+href={`/staff/employees/${employee.id}`}
+
+className="
+ml-4
+bg-[#F2C94C]
+text-[#003B6F]
+px-8
+py-4
+font-black
+"
+
+>
+
+Cancel
+
+</Link>
+
+
+
+
+
+
+</form>
+
+
+
+
+
+
+
+</div>
+
+
+</section>
+
+
+</main>
 
 );
 
