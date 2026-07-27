@@ -405,20 +405,109 @@ employees={activeEmployees}
 
 </div>
 
-function DivisionSection({
+ <div className="
+mt-16
+space-y-16
+">
 
-division,
+{
 
-employees
+Object.entries(divisionGroups).map(
 
-}:{
+([division, staff]:any)=>(
 
-division:string;
+<DivisionSection
 
-employees:any[];
+key={division}
 
-}){
+division={division}
 
+employees={staff}
+
+/>
+
+)
+
+)
+
+}
+
+</div>
+
+{
+
+formerEmployees.length > 0 && (
+
+<section className="
+mt-20
+">
+
+<div className="
+border-l-4
+border-red-500
+pl-5
+mb-8
+">
+
+<h2 className="
+text-4xl
+font-black
+text-red-700
+">
+
+Former DHS Personnel
+
+</h2>
+
+
+<p className="
+text-gray-500
+mt-2
+">
+
+Inactive employees and previous Department members.
+
+</p>
+
+</div>
+
+
+
+<div className="
+grid
+md:grid-cols-2
+gap-6
+">
+
+
+{
+
+formerEmployees.map((employee:any)=>(
+
+<EmployeeCard
+
+key={employee.id}
+
+employee={employee}
+
+former={true}
+
+/>
+
+))
+
+
+}
+
+
+</div>
+
+
+</section>
+
+)
+
+}
 
 const pages = Math.ceil(employees.length / 10);
 
