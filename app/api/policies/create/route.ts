@@ -221,8 +221,49 @@ status:403
 
 
 
+//
+// Civil policies are always public
+//
+
+const finalScope =
+tag === "Civil"
+
+?
+"UNIVERSAL"
+
+:
+
+scope;
+
+
+
+const finalClassification =
+
+tag === "Civil"
+
+?
+
+"PUBLIC"
+
+:
+
+classification;
+
+
+
+
+
+
+
 const autoApprove =
-executiveRoles.includes(position);
+
+executiveRoles.includes(position)
+
+||
+
+tag === "Civil";
+
+
 
 
 
@@ -258,17 +299,19 @@ content,
 
 
 
-classification,
+classification:
+finalClassification,
 
 
 
-scope,
+scope:
+finalScope,
 
 
 
 division_id:
 
-scope === "DIVISIONAL"
+finalScope === "DIVISIONAL"
 
 ?
 
