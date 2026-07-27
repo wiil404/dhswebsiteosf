@@ -124,7 +124,7 @@ const formattedEmployees = (employees || [])
     null,
 
     position:
-    positionsMap[employee.position_id]
+    positionMap[employee.position_id]
     ??
     "No Position"
 
