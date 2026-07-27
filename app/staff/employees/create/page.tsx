@@ -221,34 +221,6 @@ p-4
 
 
 
-<div>
-
-<label className="
-font-bold
-text-[#003B6F]
-">
-
-Employee Number
-
-</label>
-
-
-<input
-
-name="employee_number"
-
-placeholder="Optional"
-
-className="
-mt-2
-w-full
-border
-p-4
-"
-
-/>
-
-</div>
 
 
 
