@@ -83,6 +83,8 @@ title,
 
 category,
 
+tag,
+
 scope,
 
 division_id,
@@ -175,6 +177,7 @@ const allowedRoles=[
 "Deputy Secretary of Homeland Security",
 "Chief of Staff",
 "Under Secretary",
+
 "Secret Service Director",
 "CBP Commissioner",
 "Special Response Team Commander",
@@ -237,16 +240,26 @@ policy_number:
 generatePolicyNumber(),
 
 
+
 title,
+
 
 
 category,
 
 
+
+tag:
+tag || "Internal",
+
+
+
 content,
 
 
+
 classification,
+
 
 
 scope,
