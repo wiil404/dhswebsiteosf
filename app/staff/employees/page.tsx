@@ -169,7 +169,7 @@ employee.status?.toLowerCase() !== "active"
 
 
 
-const divisionGroups:any = {};
+const divisionGroups:any={};
 
 
 for(const employee of activeEmployees){
@@ -177,7 +177,7 @@ for(const employee of activeEmployees){
 
 if(
 !employee.division ||
-employee.division.toLowerCase() === "unassigned"
+employee.division === "Unassigned"
 ){
 
 continue;
@@ -198,7 +198,6 @@ divisionGroups[employee.division].push(employee);
 
 
 }
-
 
 
 
