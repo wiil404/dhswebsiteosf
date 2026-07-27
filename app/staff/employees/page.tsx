@@ -680,41 +680,6 @@ employees={employees}
 }
 
 
-
-
-
-
-
-
-
-
-<Link
-
-href={`/staff/employees/${employee.id}`}
-
-className="
-bg-[#003B6F]
-text-white
-px-5
-py-2
-font-black
-hover:bg-[#005AA7]
-transition
-"
-
->
-
-View
-
-</Link>
-
-
-
-
-
-</div>
-
-
 );
 
 
