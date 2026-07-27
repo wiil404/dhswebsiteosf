@@ -1,17 +1,37 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { supabaseAdmin } from "../../../../lib/supabase-admin";
+
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
+
+import { updateEmployee } from "./actions";
+
+
+export const dynamic = "force-dynamic";
 
 
 
-async function getEmployee(id:string){
 
 
-const {
+export default async function EditEmployeePage({
 
-data:employee
+params
 
-}=await supabaseAdmin
+}:{
+
+params:Promise<{
+id:string
+}>
+
+}){
+
+
+const {id}=await params;
+
+
+
+
+
+const {data:employee}=await supabaseAdmin
 
 .from("employees")
 
@@ -20,13 +40,13 @@ data:employee
 *,
 
 positions(
-id,
-title
+    id,
+    title
 ),
 
 divisions(
-id,
-name
+    id,
+    name
 )
 
 `)
@@ -40,36 +60,12 @@ id
 
 
 
-return employee;
-
-
-}
 
 
 
+if(!employee){
 
-
-
-
-async function getPositions(){
-
-
-const {
-
-data
-
-}=await supabaseAdmin
-
-.from("positions")
-
-.select("*")
-
-.order(
-"title"
-);
-
-
-return data || [];
+redirect("/staff/employees");
 
 }
 
@@ -79,14 +75,7 @@ return data || [];
 
 
 
-async function getDivisions(){
-
-
-const {
-
-data
-
-}=await supabaseAdmin
+const {data:divisions}=await supabaseAdmin
 
 .from("divisions")
 
@@ -97,61 +86,24 @@ data
 );
 
 
-return data || [];
-
-}
 
 
 
 
 
 
+const {data:positions}=await supabaseAdmin
 
-export default async function EditEmployee({
+.from("positions")
 
-params
+.select("*")
 
-}:{
-
-params:Promise<{
-id:string
-}>
-
-}){
-
-
-const {
-id
-
-}=await params;
-
-
-
-
-const employee =
-await getEmployee(id);
-
-
-
-
-if(!employee){
-
-redirect(
-"/staff/employees"
+.order(
+"title"
 );
 
-}
 
 
-
-
-
-const positions =
-await getPositions();
-
-
-const divisions =
-await getDivisions();
 
 
 
@@ -161,31 +113,72 @@ await getDivisions();
 return (
 
 <main className="
+min-h-screen
+bg-[#F5F8FB]
+py-16
+">
+
+
+
+<section className="
 max-w-5xl
 mx-auto
 px-6
-py-12
 ">
+
+
 
 
 
 <div className="
 bg-white
-shadow-xl
+shadow-2xl
 border
-border-gray-200
-p-8
-md:p-12
+overflow-hidden
 ">
+
+
+
+<div className="
+h-3
+bg-[#F2C94C]
+"/>
+
+
+
+
+
+
+
+<header className="
+bg-gradient-to-r
+from-[#003B6F]
+to-[#005AA7]
+text-white
+p-10
+">
+
+
+<p className="
+uppercase
+tracking-[0.35em]
+text-sm
+font-black
+text-[#F2C94C]
+">
+
+Department of Homeland Security
+
+</p>
 
 
 
 
 
 <h1 className="
-text-4xl
+text-5xl
 font-black
-text-[#003B6F]
+mt-4
 ">
 
 Edit Employee
@@ -194,14 +187,21 @@ Edit Employee
 
 
 
+
 <p className="
 mt-3
-text-gray-500
+text-blue-100
 ">
 
-Update DHS personnel information.
+Update personnel information and assignments.
 
 </p>
+
+
+
+</header>
+
+
 
 
 
@@ -211,126 +211,86 @@ Update DHS personnel information.
 
 <form
 
-action={`/api/staff/employees/${id}/edit`}
-
-method="POST"
+action={updateEmployee}
 
 className="
-mt-10
-space-y-6
+p-10
+space-y-8
 "
 
 >
 
 
+<input
+
+type="hidden"
+
+name="id"
+
+value={employee.id}
+
+/>
 
 
 
 
 
-<div>
 
-<label className="
-font-bold
+
+<div className="
+grid
+md:grid-cols-2
+gap-6
 ">
 
-Roblox Username
-
-</label>
 
 
-<input
+
+
+<Field
+
+label="Roblox Username"
 
 name="roblox_username"
 
-defaultValue={
-employee.roblox_username
-}
-
-className="
-mt-2
-w-full
-border
-p-4
-"
+value={employee.roblox_username}
 
 />
 
-</div>
 
 
 
 
 
 
+<Field
 
-
-<div>
-
-<label className="
-font-bold
-">
-
-Roblox User ID
-
-</label>
-
-
-<input
+label="Roblox User ID"
 
 name="roblox_user_id"
 
-defaultValue={
-employee.roblox_user_id
-}
-
-className="
-mt-2
-w-full
-border
-p-4
-"
+value={employee.roblox_user_id}
 
 />
 
-</div>
 
 
 
 
 
 
+<Field
 
-
-
-<div>
-
-<label className="
-font-bold
-">
-
-Email
-
-</label>
-
-
-<input
+label="Email"
 
 name="email"
 
-defaultValue={
-employee.email
-}
-
-className="
-mt-2
-w-full
-border
-p-4
-"
+value={employee.email}
 
 />
 
+
+
 </div>
 
 
@@ -341,40 +301,12 @@ p-4
 
 
 
-<div>
-
-<label className="
-font-bold
+<div className="
+grid
+md:grid-cols-2
+gap-6
 ">
 
-Employee Number
-
-</label>
-
-
-<input
-
-name="employee_number"
-
-defaultValue={
-employee.employee_number
-}
-
-className="
-mt-2
-w-full
-border
-p-4
-"
-
-/>
-
-</div>
-
-
-
-
-
 
 
 
@@ -382,70 +314,8 @@ p-4
 <div>
 
 <label className="
-font-bold
-">
-
-Position
-
-</label>
-
-
-
-<select
-
-name="position_id"
-
-defaultValue={
-employee.position_id
-}
-
-className="
-mt-2
-w-full
-border
-p-4
-"
-
->
-
-
-{
-
-positions.map((position:any)=>(
-
-<option
-
-key={position.id}
-
-value={position.id}
-
->
-
-{position.title}
-
-</option>
-
-))
-
-}
-
-
-</select>
-
-</div>
-
-
-
-
-
-
-
-
-
-<div>
-
-<label className="
-font-bold
+font-black
+text-[#003B6F]
 ">
 
 Division
@@ -453,20 +323,17 @@ Division
 </label>
 
 
-
 <select
 
 name="division_id"
 
-defaultValue={
-employee.division_id
-}
+defaultValue={employee.division_id}
 
 className="
 mt-2
-w-full
 border
 p-4
+w-full
 "
 
 >
@@ -474,7 +341,8 @@ p-4
 
 {
 
-divisions.map((division:any)=>(
+divisions?.map((division:any)=>(
+
 
 <option
 
@@ -488,12 +356,87 @@ value={division.id}
 
 </option>
 
+
 ))
+
 
 }
 
 
+
 </select>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div>
+
+<label className="
+font-black
+text-[#003B6F]
+">
+
+Position
+
+</label>
+
+
+<select
+
+name="position_id"
+
+defaultValue={employee.position_id}
+
+className="
+mt-2
+border
+p-4
+w-full
+"
+
+>
+
+
+{
+
+positions?.map((position:any)=>(
+
+
+<option
+
+key={position.id}
+
+value={position.id}
+
+>
+
+{position.title}
+
+</option>
+
+
+))
+
+
+}
+
+
+
+</select>
+
+
+</div>
+
+
+
+
 
 </div>
 
@@ -508,7 +451,8 @@ value={division.id}
 <div>
 
 <label className="
-font-bold
+font-black
+text-[#003B6F]
 ">
 
 Status
@@ -521,34 +465,79 @@ Status
 
 name="status"
 
-defaultValue={
-employee.status
-}
+defaultValue={employee.status}
 
 className="
 mt-2
-w-full
 border
 p-4
+w-full
 "
 
 >
 
-<option value="Active">
 
+<option>
 Active
-
 </option>
 
 
-<option value="Inactive">
-
+<option>
 Inactive
-
 </option>
+
+
+<option>
+Suspended
+</option>
+
+
+<option>
+Terminated
+</option>
+
 
 
 </select>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div>
+
+<label className="
+font-black
+text-[#003B6F]
+">
+
+Personnel Notes
+
+</label>
+
+
+
+<textarea
+
+name="notes"
+
+defaultValue={employee.notes || ""}
+
+className="
+mt-2
+border
+p-4
+w-full
+h-40
+"
+
+/>
 
 
 </div>
@@ -564,6 +553,7 @@ Inactive
 <div className="
 flex
 gap-4
+flex-wrap
 ">
 
 
@@ -573,8 +563,10 @@ className="
 bg-[#003B6F]
 text-white
 px-8
-py-3
-font-bold
+py-4
+font-black
+hover:bg-[#005AA7]
+transition
 "
 
 >
@@ -586,15 +578,18 @@ Save Changes
 
 
 
+
+
 <Link
 
-href={`/staff/employees/${id}`}
+href={`/staff/employees/${employee.id}`}
 
 className="
-bg-gray-200
+bg-[#F2C94C]
+text-[#003B6F]
 px-8
-py-3
-font-bold
+py-4
+font-black
 "
 
 >
@@ -602,6 +597,8 @@ font-bold
 Cancel
 
 </Link>
+
+
 
 
 </div>
@@ -616,10 +613,84 @@ Cancel
 
 
 
+
+
 </div>
 
 
+
+</section>
+
+
 </main>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function Field({
+
+label,
+
+name,
+
+value
+
+}:{
+
+label:string;
+
+name:string;
+
+value:any;
+
+}){
+
+
+return (
+
+<div>
+
+
+<label className="
+font-black
+text-[#003B6F]
+">
+
+{label}
+
+</label>
+
+
+
+<input
+
+name={name}
+
+defaultValue={value || ""}
+
+className="
+mt-2
+border
+p-4
+w-full
+"
+
+/>
+
+
+
+</div>
 
 
 );
