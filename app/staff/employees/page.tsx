@@ -119,25 +119,19 @@ positionMap[position.id]=position.title;
 
 
 
-const formattedEmployees=(employees || []).map((employee:any)=>({
+const formattedEmployees = (employees || [])
+.map((employee:any)=>({
 
-...employee,
+    ...employee,
 
-division:
+    division:
+    divisionsMap[employee.division_id] || null,
 
-divisionMap[employee.division_id] 
-||
-null,
+    position:
+    positionsMap[employee.position_id] || "No Position"
 
-
-position:
-
-positionMap[employee.position_id]
-||
-"No Position"
-
-
-}));
+}))
+.filter((employee:any)=>employee.division);
 
 
 
