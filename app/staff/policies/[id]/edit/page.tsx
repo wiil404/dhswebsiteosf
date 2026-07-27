@@ -20,33 +20,31 @@ const id = params.id as string;
 
 
 
+const [loading,setLoading] = useState(true);
+
+const [saving,setSaving] = useState(false);
 
 
-const [title,setTitle]=useState("");
 
-const [category,setCategory]=useState("Security");
+const [title,setTitle] = useState("");
 
-const [tag,setTag]=useState("Internal");
+const [category,setCategory] = useState("Security");
 
-const [scope,setScope]=useState("UNIVERSAL");
+const [tag,setTag] = useState("Internal");
 
-const [divisionId,setDivisionId]=useState("");
+const [scope,setScope] = useState("UNIVERSAL");
 
-const [classification,setClassification]=useState("PUBLIC");
+const [divisionId,setDivisionId] = useState("");
 
-const [content,setContent]=useState("");
+const [classification,setClassification] = useState("PUBLIC");
 
-const [attachments,setAttachments]=useState<any[]>([]);
+const [content,setContent] = useState("");
 
-const [featuredImage,setFeaturedImage]=useState("");
+const [attachments,setAttachments] = useState<any[]>([]);
 
-const [divisions,setDivisions]=useState<any[]>([]);
+const [featuredImage,setFeaturedImage] = useState("");
 
-
-const [loading,setLoading]=useState(true);
-
-const [saving,setSaving]=useState(false);
-
+const [divisions,setDivisions] = useState<any[]>([]);
 
 
 
@@ -55,21 +53,28 @@ const [saving,setSaving]=useState(false);
 useEffect(()=>{
 
 
-async function loadPolicy(){
+async function load(){
 
 
-const response = await fetch(
+try{
+
+
+const policyResponse = await fetch(
 `/api/policies/${id}`
 );
 
 
-const data = await response.json();
+const policyData = await policyResponse.json();
 
 
 
-if(!response.ok){
+if(!policyResponse.ok){
 
-alert(data.error || "Failed loading policy");
+alert(
+policyData.error || "Failed loading policy"
+);
+
+router.push("/staff/policies");
 
 return;
 
@@ -77,64 +82,112 @@ return;
 
 
 
-const policy = data.policy;
+const policy = policyData.policy;
 
 
 
-setTitle(policy.title || "");
-
-setCategory(policy.category || "Security");
-
-setTag(policy.tag || "Internal");
-
-setScope(policy.scope || "UNIVERSAL");
-
-setDivisionId(policy.division_id || "");
-
-setClassification(policy.classification || "PUBLIC");
-
-setContent(policy.content || "");
-
-setAttachments(policy.attachments || []);
-
-setFeaturedImage(policy.featured_image || "");
+setTitle(
+policy.title || ""
+);
 
 
-
-}
-
-
-
-async function loadDivisions(){
+setCategory(
+policy.category || "Security"
+);
 
 
-const response = await fetch(
+setTag(
+policy.tag || "Internal"
+);
+
+
+setScope(
+policy.scope || "UNIVERSAL"
+);
+
+
+setDivisionId(
+policy.division_id || ""
+);
+
+
+setClassification(
+policy.classification || "PUBLIC"
+);
+
+
+setContent(
+policy.content || ""
+);
+
+
+setAttachments(
+policy.attachments || []
+);
+
+
+setFeaturedImage(
+policy.featured_image || ""
+);
+
+
+
+
+
+
+
+const divisionResponse = await fetch(
 "/api/divisions"
 );
 
 
-const data = await response.json();
+const divisionData =
+await divisionResponse.json();
+
 
 
 setDivisions(
-data.divisions || []
+divisionData.divisions || []
 );
 
-
-}
-
-
-
-loadPolicy();
-
-loadDivisions();
 
 
 setLoading(false);
 
 
 
-},[id]);
+}catch(error){
+
+
+console.error(error);
+
+
+alert(
+"Failed loading policy"
+);
+
+
+router.push("/staff/policies");
+
+
+}
+
+
+
+}
+
+
+
+if(id){
+
+load();
+
+}
+
+
+
+},[id,router]);
+
 
 
 
@@ -146,7 +199,29 @@ setLoading(false);
 async function updatePolicy(){
 
 
+
+if(
+tag !== "Civil"
+&&
+scope==="DIVISIONAL"
+&&
+!divisionId
+){
+
+alert(
+"Please select a division."
+);
+
+return;
+
+}
+
+
+
+
 setSaving(true);
+
+
 
 
 
@@ -172,10 +247,32 @@ category,
 
 tag,
 
+
+scope:
+
+tag==="Civil"
+
+?
+
+"UNIVERSAL"
+
+:
+
 scope,
+
+
 
 division_id:
 
+tag==="Civil"
+
+?
+
+null
+
+:
+
+(
 scope==="DIVISIONAL"
 
 ?
@@ -184,10 +281,24 @@ divisionId
 
 :
 
-null,
+null
+),
 
+
+
+classification:
+
+tag==="Civil"
+
+?
+
+"PUBLIC"
+
+:
 
 classification,
+
+
 
 content,
 
@@ -205,7 +316,13 @@ featuredImage
 
 
 
-const data = await response.json();
+
+
+
+const data =
+await response.json();
+
+
 
 
 
@@ -242,6 +359,7 @@ router.push(
 
 
 
+
 if(loading){
 
 
@@ -264,6 +382,8 @@ Loading Policy...
 
 
 }
+
+
 
 
 
@@ -336,7 +456,20 @@ Edit Policy
 </h1>
 
 
+
+<p className="
+text-blue-100
+mt-3
+">
+
+Update policy information and release settings.
+
+</p>
+
+
 </header>
+
+
 
 
 
@@ -369,101 +502,51 @@ setValue={setTitle}
 
 
 
-<div>
+<Select
 
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Category
-
-</label>
-
-
-<select
-
-className="
-w-full
-border
-p-4
-"
+label="Category"
 
 value={category}
 
-onChange={(e)=>setCategory(e.target.value)}
+setValue={setCategory}
 
->
+options={[
 
-<option>Security</option>
-<option>Operations</option>
-<option>Personnel</option>
-<option>Training</option>
-<option>Aviation</option>
-<option>Administrative</option>
+"Security",
+"Operations",
+"Personnel",
+"Training",
+"Aviation",
+"Administrative"
 
-</select>
+]}
 
-
-</div>
-
+/>
 
 
 
 
 
 
-<div>
 
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
+<Select
 
-Policy Tag
-
-</label>
-
-
-<select
-
-className="
-w-full
-border
-p-4
-"
+label="Policy Tag"
 
 value={tag}
 
-onChange={(e)=>setTag(e.target.value)}
+setValue={setTag}
 
->
+options={[
 
-<option value="Internal">
-Internal
-</option>
+"Internal",
+"Operational",
+"Security",
+"Civil"
 
-<option value="Operational">
-Operational
-</option>
+]}
 
-<option value="Security">
-Security
-</option>
-
-<option value="Civil">
-Civil
-</option>
-
-
-</select>
-
-
-</div>
+/>
 
 
 
@@ -471,48 +554,23 @@ Civil
 
 
 
-<div>
+<Select
 
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
-
-Scope
-
-</label>
-
-
-<select
-
-className="
-w-full
-border
-p-4
-"
+label="Scope"
 
 value={scope}
 
-onChange={(e)=>setScope(e.target.value)}
+setValue={setScope}
 
->
+options={[
 
-<option value="UNIVERSAL">
-Department Wide Policy
-</option>
+"UNIVERSAL",
+"DIVISIONAL"
 
+]}
 
-<option value="DIVISIONAL">
-Division Specific Policy
-</option>
+/>
 
-
-</select>
-
-
-</div>
 
 
 
@@ -522,7 +580,12 @@ Division Specific Policy
 
 {
 
-scope==="DIVISIONAL" && (
+scope==="DIVISIONAL"
+&&
+tag!=="Civil"
+&&
+
+(
 
 <div>
 
@@ -539,6 +602,7 @@ Division
 </label>
 
 
+
 <select
 
 className="
@@ -549,7 +613,9 @@ p-4
 
 value={divisionId}
 
-onChange={(e)=>setDivisionId(e.target.value)}
+onChange={(e)=>
+setDivisionId(e.target.value)
+}
 
 >
 
@@ -559,9 +625,11 @@ Select Division
 </option>
 
 
+
 {
 
 divisions.map((division:any)=>(
+
 
 <option
 
@@ -575,9 +643,11 @@ value={division.id}
 
 </option>
 
+
 ))
 
 }
+
 
 
 </select>
@@ -596,63 +666,30 @@ value={division.id}
 
 
 
-<div>
+<Select
 
-<label className="
-block
-font-black
-text-[#003B6F]
-mb-2
-">
+label="Classification"
 
-Classification
+value={
+tag==="Civil"
+?
+"PUBLIC"
+:
+classification
+}
 
-</label>
+setValue={setClassification}
 
+options={[
 
-<select
+"PUBLIC",
+"FOUO"
+
+]}
 
 disabled={tag==="Civil"}
 
-className="
-w-full
-border
-p-4
-"
-
-value={
-
-tag==="Civil"
-
-?
-
-"PUBLIC"
-
-:
-
-classification
-
-}
-
-onChange={(e)=>setClassification(e.target.value)}
-
->
-
-
-<option value="PUBLIC">
-Public Release
-</option>
-
-
-<option value="FOUO">
-For Official Use Only
-</option>
-
-
-</select>
-
-
-</div>
+/>
 
 
 
@@ -664,6 +701,7 @@ For Official Use Only
 
 <div>
 
+
 <label className="
 block
 font-black
@@ -671,9 +709,10 @@ text-[#003B6F]
 mb-2
 ">
 
-Content
+Policy Content
 
 </label>
+
 
 
 <div className="
@@ -702,6 +741,7 @@ onChange={setContent}
 
 
 
+
 <FileUpload
 
 attachments={attachments}
@@ -713,6 +753,7 @@ featuredImage={featuredImage}
 setFeaturedImage={setFeaturedImage}
 
 />
+
 
 
 
@@ -732,9 +773,13 @@ text-white
 px-10
 py-4
 font-black
+text-lg
+hover:bg-[#005AA7]
+transition
 "
 
 >
+
 
 {
 
@@ -832,9 +877,117 @@ p-4
 
 value={value}
 
-onChange={(e)=>setValue(e.target.value)}
+onChange={(e)=>
+setValue(e.target.value)
+}
 
 />
+
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function Select({
+
+label,
+
+value,
+
+setValue,
+
+options,
+
+disabled=false
+
+}:{
+
+label:string;
+
+value:string;
+
+setValue:(v:string)=>void;
+
+options:string[];
+
+disabled?:boolean;
+
+}){
+
+
+return (
+
+<div>
+
+
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
+
+{label}
+
+</label>
+
+
+
+<select
+
+disabled={disabled}
+
+className="
+w-full
+border
+p-4
+disabled:bg-gray-100
+"
+
+value={value}
+
+onChange={(e)=>
+setValue(e.target.value)
+}
+
+>
+
+
+{
+
+options.map(option=>(
+
+<option
+
+key={option}
+
+value={option}
+
+>
+
+{option}
+
+</option>
+
+
+))
+
+}
+
+
+</select>
 
 
 </div>
