@@ -1,53 +1,23 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
-import { redirect } from "next/navigation";
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
-import { supabaseAdmin } from "../../../lib/supabase-admin";
 
 
 export const dynamic = "force-dynamic";
+
 export const revalidate = 0;
 
 
 
-async function getRobloxAvatar(userId:string){
-
-    try{
-
-        const response = await fetch(
-            `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=420x420&format=Png&isCircular=true`,
-            {
-                cache:"no-store"
-            }
-        );
-
-
-        const data = await response.json();
-
-        return data?.data?.[0]?.imageUrl || null;
-
-
-    }catch{
-
-        return null;
-
-    }
-
-}
-
-
-
-
-
-
-
-export default async function EmployeeProfile({
+export default async function EmployeeProfilePage({
 
 params
 
 }:{
 
-params:Promise<{
+params: Promise<{
 id:string
 }>
 
@@ -58,92 +28,20 @@ const {id}=await params;
 
 
 
-
-const {
-
-data:employee,
-
-error
-
-}=await supabaseAdmin
+const {data:employee,error}=await supabaseAdmin
 
 .from("employees")
 
 .select(`
 
-*
-
-,
+*,
 
 positions(
-title
-)
-
-,
+    title
+),
 
 divisions(
-name
-)
-
-,
-
-employee_awards(
-id,
-award_name,
-description,
-awarded_date
-)
-
-,
-
-employment_history!employment_history_employee_id_fkey(
-
-id,
-
-action,
-
-notes,
-
-effective_date,
-
-created_at,
-
-old_position:positions!employment_history_old_position_fkey(
-title
-),
-
-new_position:positions!employment_history_new_position_fkey(
-title
-),
-
-old_division:divisions!employment_history_old_division_fkey(
-name
-),
-
-new_division:divisions!employment_history_new_division_fkey(
-name
-)
-
-)
-
-,
-
-disciplinary_records(
-id,
-description,
-created_at
-)
-
-,
-
-contracts(
-id,
-title,
-contract_number,
-status,
-employee_signed,
-executive_signed,
-created_at
+    name
 )
 
 `)
@@ -165,9 +63,18 @@ if(error || !employee){
 
 return (
 
-<main className="p-12">
+<main className="
+min-h-screen
+bg-[#F5F8FB]
+p-16
+">
 
-<h1 className="text-3xl font-bold">
+
+<h1 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
 
 Employee Not Found
 
@@ -178,23 +85,8 @@ Employee Not Found
 
 );
 
+
 }
-
-
-
-
-
-const avatar = employee.roblox_user_id
-
-?
-
-await getRobloxAvatar(
-employee.roblox_user_id
-)
-
-:
-
-null;
 
 
 
@@ -205,126 +97,53 @@ null;
 return (
 
 <main className="
-max-w-7xl
-mx-auto
-px-6
-py-12
+min-h-screen
+bg-[#F5F8FB]
+py-16
 ">
-
-
-
 
 
 <section className="
-bg-[#003B6F]
-text-white
-rounded-lg
-shadow-xl
-p-8
-">
-
-
-
-
-
-<Link
-
-href="/staff/employees"
-
-className="
-inline-block
-bg-[#F2C94C]
-text-[#003B6F]
+max-w-5xl
+mx-auto
 px-6
-py-3
-rounded
-font-black
-hover:scale-105
-transition
-"
-
->
-
-← Return to Employee Registry
-
-</Link>
-
-
-
+">
 
 
 
 <div className="
-flex
-items-center
-gap-8
-mt-8
+bg-white
+border
+shadow-2xl
+overflow-hidden
 ">
 
 
 
-
-
-{
-
-avatar ?
-
-<img
-
-src={avatar}
-
-alt="Avatar"
-
-className="
-w-36
-h-36
-rounded-full
-border-4
-border-white
-"
-
-/>
-
-:
-
-<div
-
-className="
-w-36
-h-36
-rounded-full
-bg-white
-text-[#003B6F]
-flex
-items-center
-justify-center
-text-5xl
-font-bold
-"
-
->
-
-{employee.roblox_username?.charAt(0)}
-
-</div>
-
-}
+<div className="
+h-3
+bg-[#F2C94C]
+"/>
 
 
 
 
 
-
-
-
-<div>
+<header className="
+bg-gradient-to-r
+from-[#003B6F]
+to-[#005AA7]
+text-white
+p-10
+">
 
 
 <p className="
 uppercase
-tracking-widest
+tracking-[0.35em]
+text-[#F2C94C]
+font-black
 text-sm
-opacity-80
 ">
 
 Department of Homeland Security
@@ -335,8 +154,8 @@ Department of Homeland Security
 
 <h1 className="
 text-5xl
-font-bold
-mt-2
+font-black
+mt-4
 ">
 
 {employee.roblox_username}
@@ -345,209 +164,18 @@ mt-2
 
 
 
-<h2 className="
-text-2xl
-mt-2
-">
-
-{employee.positions?.title || "No Position Assigned"}
-
-</h2>
-
-
-
-
-<p>
-
-{employee.divisions?.name || "No Division Assigned"}
-
-</p>
-
-
-
 <p className="
-mt-2
+mt-3
 text-blue-100
-font-bold
+text-xl
 ">
 
-Employee Number:
-
-{" "}
-
-{employee.employee_number || "Pending"}
+Employee Record
 
 </p>
 
 
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div className="
-mt-8
-flex
-gap-4
-flex-wrap
-">
-
-
-
-<Link
-
-href={`/staff/employees/${id}/edit`}
-
-className="
-bg-white
-text-[#003B6F]
-px-5
-py-3
-rounded
-font-bold
-"
-
->
-
-Edit Profile
-
-</Link>
-
-
-
-
-<Link
-
-href={`/staff/employees/${id}/promote`}
-
-className="
-bg-yellow-500
-text-black
-px-5
-py-3
-rounded
-font-bold
-"
-
->
-
-Promote
-
-</Link>
-
-
-
-
-<Link
-
-href={`/staff/employees/${id}/demote`}
-
-className="
-bg-orange-500
-text-white
-px-5
-py-3
-rounded
-font-bold
-"
-
->
-
-Demote
-
-</Link>
-
-
-
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-
-
-
-<div className="
-grid
-md:grid-cols-3
-gap-6
-mt-10
-">
-
-
-
-<InfoCard
-
-title="Identity"
-
-items={[
-
-`Roblox ID: ${employee.roblox_user_id || "N/A"}`,
-
-`Employee Number: ${employee.employee_number || "N/A"}`
-
-]}
-
-/>
-
-
-
-
-<InfoCard
-
-title="Assignment"
-
-items={[
-
-`Position: ${employee.positions?.title || "N/A"}`,
-
-`Division: ${employee.divisions?.name || "N/A"}`,
-
-`Status: ${employee.status || "Unknown"}`
-
-]}
-
-/>
-
-
-
-
-<InfoCard
-
-title="Account"
-
-items={[
-
-`Joined: ${
-employee.created_at
-?
-new Date(employee.created_at).toLocaleDateString()
-:
-"N/A"
-}`
-
-]}
-
-/>
-
-
-
-</div>
-
+</header>
 
 
 
@@ -558,122 +186,129 @@ new Date(employee.created_at).toLocaleDateString()
 
 
 <section className="
-mt-10
-border
-rounded-lg
-bg-white
-shadow-sm
-p-6
+p-10
 ">
-
-
-<h2 className="
-text-2xl
-font-bold
-text-[#003B6F]
-">
-
-Employment Contracts
-
-</h2>
-
-
-
 
 
 <div className="
-mt-6
-space-y-4
+grid
+md:grid-cols-2
+gap-6
 ">
 
 
-{
 
-employee.contracts?.length ?
+<Info
 
-employee.contracts.map((contract:any)=>(
+title="Employee Number"
 
-
-<div
-
-key={contract.id}
-
-className="
-border
-bg-[#F5F8FB]
-p-5
-flex
-justify-between
-items-center
-"
-
->
-
-
-<div>
-
-
-<h3 className="
-font-bold
-text-lg
-text-[#003B6F]
-">
-
-{contract.title}
-
-</h3>
-
-
-
-<p className="
-text-sm
-text-gray-500
-">
-
-{contract.contract_number}
-
-</p>
-
-
-
-<span className="
-inline-block
-mt-3
-bg-white
-border
-px-3
-py-1
-font-bold
-text-sm
-">
-
-{
-
-contract.employee_signed && contract.executive_signed
-
-?
-
-"Completed"
-
-:
-
-contract.employee_signed
-
-?
-
-"Awaiting Executive Signature"
-
-:
-
-"Pending Employee Signature"
-
+value={
+employee.employee_number
 }
 
-</span>
+/>
+
+
+
+<Info
+
+title="Status"
+
+value={
+employee.status
+}
+
+/>
+
+
+
+<Info
+
+title="Division"
+
+value={
+employee.divisions?.name ||
+"Unknown"
+}
+
+/>
+
+
+
+<Info
+
+title="Position"
+
+value={
+employee.positions?.title ||
+"Unknown"
+}
+
+/>
+
+
+
+<Info
+
+title="Roblox Username"
+
+value={
+employee.roblox_username
+}
+
+/>
+
+
+
+<Info
+
+title="Roblox ID"
+
+value={
+String(employee.roblox_user_id)
+}
+
+/>
+
 
 
 </div>
 
+
+
+
+
+
+
+
+
+<section className="
+mt-12
+flex
+gap-4
+flex-wrap
+">
+
+
+<Link
+
+href={`/staff/employees/${employee.id}/edit`}
+
+className="
+bg-[#003B6F]
+text-white
+px-6
+py-3
+font-black
+hover:bg-[#005AA7]
+transition
+"
+
+>
+
+Edit Employee
+
+</Link>
 
 
 
@@ -681,45 +316,22 @@ contract.employee_signed
 
 <Link
 
-href={`/staff/contracts/${contract.id}`}
+href="/staff/employees"
 
 className="
-bg-[#003B6F]
-text-white
-px-5
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
 py-3
-font-bold
+font-black
 "
 
 >
 
-View Contract
+Back To Registry
 
 </Link>
 
-
-
-</div>
-
-
-))
-
-
-:
-
-<p className="
-text-gray-500
-">
-
-No contracts assigned.
-
-</p>
-
-
-}
-
-
-</div>
 
 
 </section>
@@ -730,10 +342,62 @@ No contracts assigned.
 
 
 
+<section className="
+mt-12
+border-l-4
+border-[#F2C94C]
+bg-[#F5F8FB]
+p-6
+">
+
+
+<h2 className="
+text-2xl
+font-black
+text-[#003B6F]
+">
+
+Personnel Notes
+
+</h2>
+
+
+
+<p className="
+mt-3
+text-gray-700
+">
+
+{
+employee.notes ||
+"No personnel notes recorded."
+}
+
+</p>
+
+
+</section>
+
+
+
+
+
+</section>
+
+
+
+
+
+</div>
+
+
+</section>
+
 
 </main>
 
 );
+
 
 }
 
@@ -743,17 +407,17 @@ No contracts assigned.
 
 
 
-function InfoCard({
+function Info({
 
 title,
 
-items
+value
 
 }:{
 
 title:string;
 
-items:string[];
+value:string;
 
 }){
 
@@ -761,51 +425,43 @@ items:string[];
 return (
 
 <div className="
+bg-[#F5F8FB]
 border
-rounded-lg
 p-6
-bg-white
-shadow-sm
 ">
 
 
-<h2 className="
+<p className="
+uppercase
+tracking-widest
+text-xs
 font-bold
-text-xl
-text-[#003B6F]
+text-gray-500
 ">
 
 {title}
 
-</h2>
+</p>
 
 
 
-<div className="
-mt-4
-space-y-2
-text-gray-600
+<p className="
+mt-3
+text-xl
+font-black
+text-[#003B6F]
 ">
 
-{
-
-items.map((item,index)=>(
-
-<p key={index}>
-
-{item}
+{value || "Unknown"}
 
 </p>
 
-))
-
-}
-
-</div>
 
 
 </div>
+
 
 );
+
 
 }
