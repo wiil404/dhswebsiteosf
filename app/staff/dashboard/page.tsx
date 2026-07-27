@@ -105,6 +105,8 @@ id,
 
 roblox_username,
 
+roblox_user_id,
+
 employee_number,
 
 status,
