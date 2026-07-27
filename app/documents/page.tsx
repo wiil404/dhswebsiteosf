@@ -11,13 +11,6 @@ bg-[#F5F8FB]
 ">
 
 
-
-
-
-
-{/* HERO */}
-
-
 <section className="
 bg-[#003B6F]
 text-white
@@ -45,8 +38,6 @@ Department of Homeland Security
 </p>
 
 
-
-
 <h1 className="
 text-5xl
 md:text-6xl
@@ -59,21 +50,17 @@ Resources & Documents
 </h1>
 
 
-
-
 <p className="
 mt-5
 max-w-3xl
 text-blue-100
 text-lg
-leading-relaxed
 ">
 
-Access official Department resources, operational
-documents, guidance materials, and public information.
+Access official Department resources, policies,
+publications, and guidance materials.
 
 </p>
-
 
 
 </div>
@@ -85,22 +72,12 @@ documents, guidance materials, and public information.
 
 
 
-
-
-
-
-{/* RESOURCE CARDS */}
-
-
 <section className="
 max-w-7xl
 mx-auto
 px-6
 py-16
 ">
-
-
-
 
 
 <div className="
@@ -110,6 +87,18 @@ gap-8
 ">
 
 
+
+<ResourceCard
+
+title="Civil Policies"
+
+description="
+Public policies and guidance released by the Department for civilian access.
+"
+
+href="/documents/civil-policies"
+
+/>
 
 
 
@@ -121,12 +110,9 @@ description="
 Official statements, reports, announcements, and public releases.
 "
 
-button="View Publications"
+href="/documents/publications"
 
 />
-
-
-
 
 
 
@@ -135,17 +121,12 @@ button="View Publications"
 title="Operational Documents"
 
 description="
-Policies, procedures, and guidance documents for authorised personnel.
+Internal procedures, policies, and authorised personnel documents.
 "
 
-button="View Documents"
+href="/documents/operational"
 
 />
-
-
-
-
-
 
 
 
@@ -154,23 +135,16 @@ button="View Documents"
 title="Security Information"
 
 description="
-Clearance information, verification resources, and security guidance.
+Security resources, verification information, and guidance.
 "
 
-button="View Security Resources"
+href="/documents/security"
 
 />
 
 
 
-
-
-
 </div>
-
-
-
-
 
 
 </section>
@@ -179,20 +153,12 @@ button="View Security Resources"
 
 
 
-
-
-
-
-{/* INFORMATION PANEL */}
-
-
 <section className="
 max-w-7xl
 mx-auto
 px-6
 pb-20
 ">
-
 
 
 <div className="
@@ -212,8 +178,6 @@ mb-10
 
 
 
-
-
 <h2 className="
 text-4xl
 font-black
@@ -226,106 +190,34 @@ Public Information Portal
 
 
 
-
 <p className="
 mt-5
 text-gray-700
 text-lg
-leading-relaxed
 max-w-4xl
 ">
 
 The Department of Homeland Security maintains this
-resource centre to provide transparent access to
-public information, departmental guidance, and
-official documentation.
+portal to provide transparent access to official
+documentation, public guidance, and released information.
 
 </p>
 
 
 
-
-
-
-<div className="
-grid
-md:grid-cols-3
-gap-6
-mt-10
-">
-
-
-
-
-
-<InfoBox
-
-title="Documents"
-
-value="Public Records"
-
-/>
-
-
-
-
-
-
-<InfoBox
-
-title="Access"
-
-value="Open Availability"
-
-/>
-
-
-
-
-
-
-
-<InfoBox
-
-title="Status"
-
-value="Active Portal"
-
-/>
-
-
-
-
-
 </div>
-
-
-
-
-
-</div>
-
 
 
 </section>
 
 
-
-
-
-
-
 </main>
+
 
 );
 
 
 }
-
-
-
-
-
 
 
 
@@ -336,7 +228,7 @@ title,
 
 description,
 
-button
+href
 
 }:{
 
@@ -344,14 +236,18 @@ title:string;
 
 description:string;
 
-button:string;
+href:string;
 
 }){
 
 
 return (
 
-<div className="
+<Link
+
+href={href}
+
+className="
 bg-white
 border
 shadow-sm
@@ -361,8 +257,11 @@ p-8
 relative
 overflow-hidden
 group
-">
+block
+"
 
+
+>
 
 
 <div className="
@@ -375,8 +274,6 @@ bg-[#003B6F]
 group-hover:bg-[#F2C94C]
 transition
 "/>
-
-
 
 
 
@@ -393,7 +290,6 @@ mt-3
 
 
 
-
 <p className="
 mt-4
 text-gray-600
@@ -406,95 +302,19 @@ leading-relaxed
 
 
 
-
-
-
-<button className="
-mt-8
-bg-[#003B6F]
-text-white
-px-6
-py-3
-font-black
-hover:bg-[#002B52]
-transition
-">
-
-{button}
-
-</button>
-
-
-
-
-
-</div>
-
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-function InfoBox({
-
-title,
-
-value
-
-}:{
-
-title:string;
-
-value:string;
-
-}){
-
-
-return (
-
 <div className="
-bg-[#F5F8FB]
-border
-p-6
-">
-
-
-<p className="
-text-xs
-uppercase
-font-black
-text-gray-500
-">
-
-{title}
-
-</p>
-
-
-
-<p className="
-mt-3
-text-xl
+mt-8
 font-black
 text-[#003B6F]
 ">
 
-{value}
-
-</p>
-
-
+View Resources →
 
 </div>
+
+
+
+</Link>
 
 
 );
