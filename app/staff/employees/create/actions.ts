@@ -1,8 +1,36 @@
 "use server";
 
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
-
 import { redirect } from "next/navigation";
+
+
+
+function generateEmployeeNumber(){
+
+const chars =
+"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+
+let code = "";
+
+
+
+for(let i = 0; i < 6; i++){
+
+code += chars.charAt(
+Math.floor(Math.random() * chars.length)
+);
+
+}
+
+
+
+return `DHS-${code}`;
+
+}
+
+
+
 
 
 
@@ -17,13 +45,6 @@ String(formData.get("roblox_username") || "")
 
 const roblox_user_id =
 Number(formData.get("roblox_user_id"));
-
-
-
-const employee_number =
-String(formData.get("employee_number") || "")
-.trim()
-|| null;
 
 
 
@@ -56,13 +77,52 @@ throw new Error(
 
 
 
+
+
 if(!roblox_user_id){
 
 throw new Error(
-"Roblox user ID is required"
+"Roblox User ID is required"
 );
 
 }
+
+
+
+
+
+
+
+let employee_number = generateEmployeeNumber();
+
+
+
+
+// Make sure the number does not already exist
+
+const {data:existing}=await supabaseAdmin
+
+.from("employees")
+
+.select("id")
+
+.eq(
+"employee_number",
+employee_number
+)
+
+.single();
+
+
+
+
+if(existing){
+
+employee_number = generateEmployeeNumber();
+
+}
+
+
 
 
 
@@ -92,6 +152,7 @@ new Date()
 .split("T")[0]
 
 });
+
 
 
 
