@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+
 
 
 export default function EmployeeSearch({
@@ -10,36 +11,47 @@ employees
 
 }:{
 
-employees:any[]
+employees:any[];
 
 }){
+
 
 
 const [search,setSearch] = useState("");
 
 
 
-const filteredEmployees = employees.filter((employee)=>{
+const filtered = employees.filter((employee)=>{
 
 
-const text = `
-
-${employee.roblox_username}
-
-${employee.employee_number}
-
-${employee.positions?.title}
-
-${employee.divisions?.name}
-
-`
-
-.toLowerCase();
+const value = search.toLowerCase();
 
 
 
-return text.includes(
-search.toLowerCase()
+return (
+
+employee.roblox_username
+?.toLowerCase()
+.includes(value)
+
+||
+
+employee.employee_number
+?.toLowerCase()
+.includes(value)
+
+||
+
+employee.positions?.title
+?.toLowerCase()
+.includes(value)
+
+||
+
+employee.divisions?.name
+?.toLowerCase()
+.includes(value)
+
 );
 
 
@@ -54,38 +66,68 @@ return (
 <div>
 
 
+<div className="
+flex
+justify-between
+items-center
+flex-wrap
+gap-4
+mb-8
+">
+
+
+<h2 className="
+text-3xl
+font-black
+text-[#003B6F]
+">
+
+Search Personnel
+
+</h2>
+
+
+
 <input
-
-type="text"
-
-placeholder="Search employees..."
 
 value={search}
 
 onChange={(e)=>setSearch(e.target.value)}
 
+placeholder="Search name, position, division..."
+
 className="
-w-full
 border
 p-4
-mb-8
-text-lg
+w-full
+md:w-96
+outline-none
+focus:ring-2
+focus:ring-[#005AA7]
 "
 
 />
+
+
+</div>
+
+
 
 
 
 
 
 <div className="
-space-y-5
+grid
+md:grid-cols-2
+gap-6
 ">
 
 
 {
 
-filteredEmployees.map((employee:any)=>(
+
+filtered.map((employee)=>(
 
 
 <div
@@ -93,44 +135,79 @@ filteredEmployees.map((employee:any)=>(
 key={employee.id}
 
 className="
+bg-white
 border
-bg-[#F5F8FB]
+shadow-sm
 p-6
+hover:shadow-xl
+transition
 flex
-justify-between
 items-center
-flex-wrap
-gap-4
+gap-5
 "
 
 >
 
 
-<div>
+<div className="
+w-16
+h-16
+rounded-full
+bg-[#003B6F]
+text-white
+flex
+items-center
+justify-center
+font-black
+text-2xl
+border-2
+border-[#F2C94C]
+">
+
+{
+
+employee.roblox_username
+?.charAt(0)
+
+}
 
 
-<h2 className="
-text-xl
+</div>
+
+
+
+
+
+
+
+<div className="
+flex-1
+">
+
+
+<h3 className="
 font-black
 text-[#003B6F]
+text-xl
 ">
 
 {employee.roblox_username}
 
-</h2>
+</h3>
 
 
 
 <p className="
-mt-2
 text-gray-600
 ">
 
-Employee Number:
+{
 
-{" "}
+employee.positions?.title ||
 
-{employee.employee_number || "Pending"}
+"No Position"
+
+}
 
 </p>
 
@@ -139,38 +216,22 @@ Employee Number:
 <p className="
 text-sm
 text-gray-500
-mt-1
 ">
 
-{employee.positions?.title || "No Position"}
+{
 
-{" • "}
+employee.divisions?.name ||
 
-{employee.divisions?.name || "No Division"}
+"Unassigned"
+
+}
 
 </p>
 
 
 
 
-<span className="
-inline-block
-mt-3
-bg-white
-border
-px-3
-py-1
-font-bold
-text-sm
-">
-
-{employee.status || "Unknown"}
-
-</span>
-
-
 </div>
-
 
 
 
@@ -185,15 +246,18 @@ className="
 bg-[#003B6F]
 text-white
 px-5
-py-3
+py-2
 font-bold
+hover:bg-[#005AA7]
+transition
 "
 
 >
 
-View Profile
+View
 
 </Link>
+
 
 
 
@@ -207,17 +271,25 @@ View Profile
 
 
 
+
+
 {
 
-filteredEmployees.length === 0 && (
+filtered.length === 0 && (
 
-<p className="
+<div className="
+col-span-full
+bg-gray-50
+border
+p-8
+text-center
+font-bold
 text-gray-500
 ">
 
 No employees found.
 
-</p>
+</div>
 
 )
 
@@ -228,8 +300,12 @@ No employees found.
 </div>
 
 
+
+
 </div>
 
+
 );
+
 
 }
