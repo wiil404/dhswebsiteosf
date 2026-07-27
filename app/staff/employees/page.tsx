@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
-import EmployeeSearch from "./EmployeeSearch";
+
 import EmployeePagination from "./EmployeePagination";
 import EmployeeCard from "./EmployeeCard";
 
@@ -403,56 +403,21 @@ value={String(Object.keys(divisionGroups).length)}
 mt-12
 ">
 
-<EmployeeSearch
+
+
+
+
+
+
+
+
+
+
+<EmployeePagination
 
 employees={activeEmployees}
 
 />
-
-</div>
-
-
-
-
-
-
-
-
-
-<div className="
-mt-16
-space-y-16
-">
-
-
-{
-
-Object.entries(divisionGroups).map(
-
-([division,staff]:any)=>(
-
-
-<DivisionSection
-
-key={division}
-
-division={division}
-
-employees={staff}
-
-/>
-
-
-)
-
-
-)
-
-
-}
-
-
-</div>
 
 
 
