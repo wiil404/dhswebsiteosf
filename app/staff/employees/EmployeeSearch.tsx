@@ -77,11 +77,13 @@ const groups:any = {};
 filtered.forEach((employee)=>{
 
 
-const division =
+const division = employee.division;
 
-employee.divisions?.name ||
+if(!division){
 
-"Unassigned";
+    return;
+
+}
 
 
 
