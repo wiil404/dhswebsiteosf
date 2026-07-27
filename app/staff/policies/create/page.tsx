@@ -22,6 +22,11 @@ const [category,setCategory]=useState(
 );
 
 
+const [tag,setTag]=useState(
+"Internal"
+);
+
+
 const [scope,setScope]=useState(
 "UNIVERSAL"
 );
@@ -148,6 +153,8 @@ body:JSON.stringify({
 title,
 
 category,
+
+tag,
 
 scope,
 
@@ -400,7 +407,72 @@ setCategory(e.target.value)
 
 
 
+<div>
 
+<label className="
+block
+font-black
+text-[#003B6F]
+mb-2
+">
+
+Policy Tag
+
+</label>
+
+
+<select
+
+className="
+w-full
+border
+p-4
+"
+
+value={tag}
+
+onChange={(e)=>
+setTag(e.target.value)
+}
+
+>
+
+
+<option value="Internal">
+Internal
+</option>
+
+
+<option value="Operational">
+Operational
+</option>
+
+
+<option value="Security">
+Security
+</option>
+
+
+<option value="Civil">
+Civil
+</option>
+
+
+</select>
+
+
+<p className="
+text-sm
+text-gray-500
+mt-2
+">
+
+Civil policies are automatically released publicly and do not require acknowledgement.
+
+</p>
+
+
+</div>
 
 
 
@@ -559,17 +631,32 @@ Classification
 
 <select
 
+disabled={tag==="Civil"}
+
 className="
 w-full
 border
 p-4
 "
 
-value={classification}
+value={
+
+tag==="Civil"
+
+?
+
+"PUBLIC"
+
+:
+
+classification
+
+}
 
 onChange={(e)=>
 setClassification(e.target.value)
 }
+
 
 >
 
