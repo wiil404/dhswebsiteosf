@@ -107,7 +107,7 @@ for(const employee of employees || []){
 
 const divisionName =
 
-employee.divisions?.name ||
+employee.divisions?.[0]?.name ||
 
 "Unassigned";
 
@@ -669,7 +669,7 @@ text-[#003B6F]
 text-gray-600
 ">
 
-{employee.positions?.title || "No Position"}
+{employee.positions?.[0]?.title || "No Position"}
 
 </p>
 
