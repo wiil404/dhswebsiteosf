@@ -1,18 +1,14 @@
 "use client";
 
-import EmployeeCard from "./EmployeeCard";
 import { useRef } from "react";
+import EmployeeCard from "./EmployeeCard";
 
 
 export default function EmployeePagination({
 
-division,
-
 employees
 
 }:{
-
-division:string;
 
 employees:any[];
 
@@ -22,36 +18,17 @@ employees:any[];
 const container = useRef<HTMLDivElement>(null);
 
 
-const scroll = (amount:number)=>{
+function scroll(direction:number){
+
 
 container.current?.scrollBy({
 
-left: amount,
+left: direction,
 
 behavior:"smooth"
 
 });
 
-};
-
-
-
-const perPage = 10;
-
-
-const pages = [];
-
-
-for(let i = 0; i < employees.length; i += perPage){
-
-pages.push(
-
-employees.slice(
-i,
-i + perPage
-)
-
-);
 
 }
 
@@ -68,53 +45,43 @@ ref={container}
 
 className="
 flex
-overflow-hidden
+overflow-x-auto
 scroll-smooth
+snap-x
+snap-mandatory
+gap-6
+pb-4
+scrollbar-thin
 "
 
 >
 
 
-
 {
 
-pages.map((page,index)=>(
+employees.map((employee:any)=>(
 
 
 <div
 
-key={index}
+key={employee.id}
 
 className="
-min-w-full
-grid
-md:grid-cols-2
-gap-6
+min-w-[90%]
+md:min-w-[48%]
+snap-start
 "
 
 >
 
 
-{
-
-page.map((employee:any)=>(
-
-
 <EmployeeCard
-
-key={employee.id}
 
 employee={employee}
 
 />
 
 
-))
-
-
-}
-
-
 </div>
 
 
@@ -122,7 +89,6 @@ employee={employee}
 
 
 }
-
 
 
 </div>
@@ -133,20 +99,19 @@ employee={employee}
 
 {
 
-pages.length > 1 && (
-
+employees.length > 2 && (
 
 <div className="
 flex
 justify-center
 gap-4
-mt-8
+mt-6
 ">
 
 
 <button
 
-onClick={()=>scroll(-window.innerWidth)}
+onClick={()=>scroll(-350)}
 
 className="
 bg-[#003B6F]
@@ -160,17 +125,15 @@ transition
 
 >
 
-← Previous
+←
 
 </button>
-
-
 
 
 
 <button
 
-onClick={()=>scroll(window.innerWidth)}
+onClick={()=>scroll(350)}
 
 className="
 bg-[#003B6F]
@@ -184,13 +147,12 @@ transition
 
 >
 
-Next →
+→
 
 </button>
 
 
 </div>
-
 
 )
 
@@ -202,6 +164,5 @@ Next →
 
 
 );
-
 
 }
