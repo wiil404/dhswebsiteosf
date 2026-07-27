@@ -183,7 +183,6 @@ console.log("EMPLOYEE:", employee);
 
 
 console.log("EMPLOYEE:", employee);
-console.log("EMPLOYEE ERROR:", employeeError);
 
 
 
