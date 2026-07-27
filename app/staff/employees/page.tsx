@@ -662,8 +662,6 @@ font-semibold
 
 <EmployeePagination
 
-division={division}
-
 employees={employees}
 
 />
