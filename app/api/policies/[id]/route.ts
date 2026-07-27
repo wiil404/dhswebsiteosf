@@ -43,7 +43,6 @@ id:string
 
 ){
 
-
 try{
 
 
@@ -55,15 +54,12 @@ await getEmployeeSession();
 if(!session){
 
 return NextResponse.json(
-
 {
 error:"Unauthorized"
 },
-
 {
 status:401
 }
-
 );
 
 }
@@ -72,10 +68,10 @@ status:401
 
 
 
-
 const {
 id
 }=await params;
+
 
 
 
@@ -93,7 +89,33 @@ error
 
 .select(`
 
-*,
+id,
+
+policy_number,
+
+title,
+
+category,
+
+tag,
+
+scope,
+
+division_id,
+
+classification,
+
+content,
+
+attachments,
+
+featured_image,
+
+status,
+
+created_at,
+
+effective_date,
 
 divisions(
 
@@ -119,7 +141,6 @@ id
 
 if(error || !policy){
 
-
 return NextResponse.json(
 
 {
@@ -138,12 +159,13 @@ status:404
 
 
 
+
+
 return NextResponse.json({
 
 policy
 
 });
-
 
 
 
@@ -165,11 +187,10 @@ status:500
 
 );
 
-}
-
 
 }
 
+}
 
 
 
