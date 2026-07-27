@@ -770,6 +770,10 @@ hover:bg-blue-50
 
 
 
+{
+
+policy.tag !== "Civil" && (
+
 <section className="
 border
 bg-white
@@ -821,6 +825,9 @@ alreadyAcknowledged={!!acknowledgement}
 
 </section>
 
+)
+
+}
 
 
 
