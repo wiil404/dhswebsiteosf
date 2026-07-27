@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 import EmployeePagination from "./EmployeePagination";
 import EmployeeCard from "./EmployeeCard";
+
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -14,30 +15,17 @@ export default async function StaffEmployeesPage(){
 
 
 const {data:employees,error:employeeError}=await supabaseAdmin
-
 .from("employees")
-
 .select(`
-
 id,
-
 roblox_username,
-
 roblox_user_id,
-
 employee_number,
-
 status,
-
 division_id,
-
 position_id
-
 `)
-
-.order(
-"roblox_username"
-);
+.order("roblox_username");
 
 
 
@@ -59,16 +47,9 @@ const {data:divisionsData}=await supabaseAdmin
 .from("divisions")
 
 .select(`
-
 id,
-
 name
-
-`)
-
-.order(
-"name"
-);
+`);
 
 
 
@@ -79,11 +60,8 @@ const {data:positionsData}=await supabaseAdmin
 .from("positions")
 
 .select(`
-
 id,
-
 title
-
 `);
 
 
@@ -91,61 +69,61 @@ title
 
 
 
-const divisionMap:any = {};
+const divisionMap:any={};
 
 
-for(const division of divisionsData || []){
+(divisionsData || []).forEach((division:any)=>{
 
-divisionMap[division.id] = division.name;
+divisionMap[division.id]=division.name;
 
-}
-
-
-
-
-
-const positionMap:any = {};
-
-
-for(const position of positionsData || []){
-
-positionMap[position.id] = position.title;
-
-}
+});
 
 
 
 
 
+const positionMap:any={};
 
 
-//
-// Attach readable division + position data
-// Employees without a real division are removed
-//
+(positionsData || []).forEach((position:any)=>{
 
-const formattedEmployees = (employees || [])
+positionMap[position.id]=position.title;
+
+});
+
+
+
+
+
+
+
+const formattedEmployees=(employees || [])
 
 .map((employee:any)=>({
 
-    ...employee,
 
-    division:
-    divisionMap[employee.division_id],
+...employee,
 
-    position:
-    positionMap[employee.position_id] 
-    ||
-    "No Position"
+
+division:
+
+divisionMap[employee.division_id]
+||
+null,
+
+
+position:
+
+positionMap[employee.position_id]
+||
+"No Position"
+
 
 }))
 
-.filter(
 
-(employee:any)=>
+.filter((employee:any)=>
 
-employee.division !== undefined
-&&
 employee.division !== null
 
 );
@@ -155,20 +133,14 @@ employee.division !== null
 
 
 
-
-
-
-//
-// Active and former staff
-//
-
 const activeEmployees = formattedEmployees.filter(
 
 (employee:any)=>
 
-employee.status?.toLowerCase() === "active"
+employee.status?.toLowerCase()==="active"
 
 );
+
 
 
 
@@ -178,43 +150,9 @@ const formerEmployees = formattedEmployees.filter(
 
 (employee:any)=>
 
-employee.status?.toLowerCase() !== "active"
+employee.status?.toLowerCase()!=="active"
 
 );
-
-
-
-
-
-
-
-
-
-//
-// Group active staff by division
-//
-
-const divisionGroups:any = {};
-
-
-
-for(const employee of activeEmployees){
-
-
-if(!divisionGroups[employee.division]){
-
-divisionGroups[employee.division] = [];
-
-}
-
-
-
-divisionGroups[employee.division].push(employee);
-
-
-}
-
-
 
 
 
@@ -245,6 +183,7 @@ overflow-hidden
 ">
 
 
+
 <div className="
 h-3
 bg-[#F2C94C]
@@ -273,7 +212,6 @@ text-[#F2C94C]
 Department of Homeland Security
 
 </p>
-
 
 
 
@@ -314,10 +252,6 @@ Manage DHS personnel, assignments and workforce records.
 
 </div>
 
-
-
-
-
 <Link
 
 href="/staff/employees/create"
@@ -345,6 +279,12 @@ transition
 
 </header>
 
+
+
+
+
+
+
 <section className="
 p-10
 md:p-14
@@ -354,9 +294,10 @@ md:p-14
 
 
 
+
 <div className="
 grid
-md:grid-3
+md:grid-cols-3
 gap-6
 ">
 
@@ -385,7 +326,13 @@ value={String(formerEmployees.length)}
 
 title="Divisions"
 
-value={String(Object.keys(divisionGroups).length)}
+value={String(
+new Set(
+activeEmployees.map(
+(employee:any)=>employee.division
+)
+).size
+)}
 
 />
 
@@ -399,22 +346,10 @@ value={String(Object.keys(divisionGroups).length)}
 
 
 
+
+
 <div className="
 mt-12
-">
-
-
-
-
-
-
-
-
-
-
-
-<div className="
-mt-16
 ">
 
 
@@ -517,8 +452,9 @@ former={true}
 
 
 
-</section>
 
+
+</section>
 
 )
 
@@ -526,15 +462,25 @@ former={true}
 
 
 
-
-
 </section>
+
+
+
+
 
 
 </div>
 
 
+
+
+
+
 </section>
+
+
+
+
 
 
 </main>
@@ -544,6 +490,12 @@ former={true}
 
 
 }
+
+
+
+
+
+
 
 function Stat({
 
@@ -594,6 +546,7 @@ text-[#003B6F]
 {value}
 
 </p>
+
 
 
 </div>
