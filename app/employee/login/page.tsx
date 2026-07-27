@@ -198,28 +198,6 @@ Sign in with Roblox →
 
 
 
-<Link
-
-href="/employee/login/dev"
-
-className="
-mt-6
-block
-text-center
-bg-gray-200
-text-[#003B6F]
-font-bold
-px-6
-py-3
-"
-
->
-
-Developer Login (Temporary)
-
-</Link>
-
-
 
 <div className="
 mt-8
