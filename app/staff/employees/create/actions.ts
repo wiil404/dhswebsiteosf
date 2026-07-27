@@ -96,7 +96,7 @@ throw new Error(error.message);
 
 }
 
-
+console.log("CREATE EMPLOYEE ACTION LOADED");
 
 
 
