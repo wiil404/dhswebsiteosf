@@ -114,20 +114,25 @@ for(const position of positionsData || []){
 
 
 const formattedEmployees = (employees || [])
-
 .map((employee:any)=>({
 
     ...employee,
 
     division:
-    divisionMap[employee.division_id] || null,
+    divisionMap[employee.division_id]
+    ??
+    null,
 
     position:
-    positionMap[employee.position_id] || "No Position"
+    positionsMap[employee.position_id]
+    ??
+    "No Position"
 
 }))
-
-.filter((employee:any)=>employee.division);
+.filter(
+(employee:any)=>
+employee.division !== null
+);
 
 
 
@@ -164,32 +169,35 @@ employee.status?.toLowerCase() !== "active"
 
 
 
-const divisionGroups:any={};
-
+const divisionGroups:any = {};
 
 
 for(const employee of activeEmployees){
 
 
-if(!employee.division){
+if(
+!employee.division ||
+employee.division.toLowerCase() === "unassigned"
+){
 
-    continue;
+continue;
 
 }
+
 
 
 if(!divisionGroups[employee.division]){
 
-    divisionGroups[employee.division]=[];
+divisionGroups[employee.division]=[];
 
 }
+
 
 
 divisionGroups[employee.division].push(employee);
 
 
 }
-
 
 
 
