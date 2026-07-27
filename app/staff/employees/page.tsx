@@ -658,7 +658,22 @@ font-semibold
 </div>
 
 
+<EmployeePagination
 
+division={division}
+
+employees={employees}
+
+/>
+
+
+</section>
+
+
+);
+
+
+}
 
 
 function EmployeePagination({
@@ -873,6 +888,7 @@ Next →
 );
 
 }
+
 
 function EmployeeCard({
 
