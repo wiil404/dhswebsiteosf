@@ -125,7 +125,7 @@ division:
 
 divisionMap[employee.division_id] 
 ||
-"Unassigned",
+null,
 
 
 position:
@@ -177,9 +177,16 @@ const divisionGroups:any={};
 for(const employee of activeEmployees){
 
 
+if(!employee.division){
+
+    continue;
+
+}
+
+
 if(!divisionGroups[employee.division]){
 
-divisionGroups[employee.division]=[];
+    divisionGroups[employee.division]=[];
 
 }
 
@@ -654,32 +661,6 @@ font-semibold
 
 
 
-<EmployeePagination
-
-division={division}
-
-employees={employees}
-
-/>
-
-
-
-</section>
-
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
 function EmployeePagination({
 
 division,
@@ -698,9 +679,48 @@ employees:any[];
 const perPage = 10;
 
 
-const totalPages = Math.ceil(
+return (
 
-employees.length / perPage
+<div
+
+className="
+relative
+"
+
+>
+
+
+<div
+
+className="
+flex
+overflow-x-auto
+snap-x
+snap-mandatory
+scroll-smooth
+gap-6
+pb-4
+"
+
+id={`division-${division}`}
+
+>
+
+
+{
+
+Array.from({
+
+length:Math.ceil(employees.length / perPage)
+
+}).map((_,index)=>{
+
+
+const pageEmployees = employees.slice(
+
+index * perPage,
+
+(index + 1) * perPage
 
 );
 
@@ -708,53 +728,24 @@ employees.length / perPage
 
 return (
 
-<div>
-
-
-{
-
-Array.from({
-
-length:totalPages
-
-}).map((_,index)=>(
-
-
 <div
 
 key={index}
 
 className="
-
-mb-10
-
+min-w-full
+snap-center
+grid
+md:grid-cols-2
+gap-6
 "
-
 
 >
 
 
-<div className="
-grid
-md:grid-cols-2
-gap-6
-">
-
-
 {
 
-
-employees
-
-.slice(
-
-index * perPage,
-
-(index + 1) * perPage
-
-)
-
-.map((employee:any)=>(
+pageEmployees.map((employee:any)=>(
 
 
 <EmployeeCard
@@ -775,54 +766,111 @@ employee={employee}
 </div>
 
 
-
-{
-
-totalPages > 1 && (
+)
 
 
-<div className="
-mt-6
-flex
-gap-3
-">
+})
 
 
-<span className="
-px-5
-py-2
-bg-[#003B6F]
-text-white
-font-black
-">
-
-Page {index + 1}
-
-</span>
+}
 
 
 </div>
 
+
+
+
+
+{
+
+employees.length > perPage && (
+
+<div className="
+flex
+justify-center
+gap-4
+mt-8
+">
+
+
+<button
+
+onClick={()=>{
+
+document
+.getElementById(`division-${division}`)
+?.scrollBy({
+
+left:-window.innerWidth,
+
+behavior:"smooth"
+
+});
+
+}}
+
+className="
+bg-[#003B6F]
+text-white
+px-5
+py-3
+font-black
+"
+
+>
+
+← Previous
+
+</button>
+
+
+
+
+
+<button
+
+onClick={()=>{
+
+document
+.getElementById(`division-${division}`)
+?.scrollBy({
+
+left:window.innerWidth,
+
+behavior:"smooth"
+
+});
+
+}}
+
+className="
+bg-[#003B6F]
+text-white
+px-5
+py-3
+font-black
+"
+
+>
+
+Next →
+
+</button>
+
+
+
+</div>
 
 )
 
 }
 
 
-</div>
-
-
-))
-
-
-}
-
 
 </div>
 
 
 );
-
 
 }
 
