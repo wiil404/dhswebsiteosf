@@ -1,137 +1,74 @@
-"use client";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+
+import { supabaseAdmin } from "@/app/lib/supabase-admin";
+import { getUser } from "@/app/lib/auth";
+
+import { createEmployee } from "./actions";
 
 
-import {useState,useEffect} from "react";
-import {useRouter} from "next/navigation";
-
-
-
-export default function CreateEmployee(){
-
-
-const router = useRouter();
-
-
-
-const [divisions,setDivisions]=useState<any[]>([]);
-
-
-const [form,setForm]=useState({
-
-    roblox_username:"",
-
-    roblox_user_id:"",
-
-    email:"",
-
-    division_id:"",
-
-    position_id:"",
-
-    status:"Active",
-
-    hire_date:"",
-
-    notes:""
-
-});
+export const dynamic = "force-dynamic";
 
 
 
 
 
+export default async function CreateEmployeePage(){
 
 
 
-useEffect(()=>{
+const user = await getUser();
 
 
-async function load(){
 
+if(!user){
 
-const res = await fetch(
-"/api/staff/organisation/divisions"
-);
-
-
-const data = await res.json();
-
-
-setDivisions(data);
-
+redirect("/staff/login");
 
 }
 
 
-load();
-
-
-},[]);
 
 
 
 
+const {data:divisions}=await supabaseAdmin
 
+.from("divisions")
 
+.select(`
 
+id,
 
+name
 
-async function submit(){
+`)
 
-
-const response = await fetch(
-
-"/api/staff/employees",
-
-{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify(form)
-
-}
-
+.order(
+"name"
 );
 
 
 
 
 
-const result = await response.json();
 
 
+const {data:positions}=await supabaseAdmin
 
+.from("positions")
 
+.select(`
 
-if(!response.ok){
+id,
 
+title
 
-alert(
-result.error || "Failed creating employee"
+`)
+
+.order(
+"title"
 );
-
-
-return;
-
-
-}
-
-
-
-
-router.push(
-"/staff/employees"
-);
-
-
-}
-
 
 
 
@@ -142,132 +79,62 @@ router.push(
 
 return (
 
-<main
-
-className="
-relative
+<main className="
 min-h-screen
+bg-[#F5F8FB]
 py-16
-"
-
->
+">
 
 
 
-
-
-{/* BACKGROUND */}
-
-<div
-
-className="
-absolute
-inset-0
--z-10
-bg-[#003B6F]
-overflow-hidden
-"
-
->
-
-
-<div
-
-className="
-absolute
-inset-0
-opacity-10
-bg-[linear-gradient(45deg,transparent_45%,white_46%,transparent_47%),linear-gradient(-45deg,transparent_45%,white_46%,transparent_47%)]
-bg-[length:120px_120px]
-"
-
-/>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-<section
-
-className="
-max-w-4xl
+<section className="
+max-w-5xl
 mx-auto
 px-6
-"
-
->
+">
 
 
-<div
 
-className="
+
+
+<div className="
 bg-white
 shadow-2xl
 border
-border-gray-200
-"
-
->
+overflow-hidden
+">
 
 
-{/* GOLD BAR */}
 
-<div
 
-className="
-h-2
+
+<div className="
+h-3
 bg-[#F2C94C]
-"
-
-/>
+"/>
 
 
 
 
 
 
-<div
 
-className="
-p-8
-md:p-12
-"
-
->
-
-
+<header className="
+bg-gradient-to-r
+from-[#003B6F]
+to-[#005AA7]
+text-white
+p-10
+">
 
 
-
-
-<div
-
-className="
-border-b
-pb-8
-"
-
->
-
-
-<p
-
-className="
+<p className="
 uppercase
-tracking-[0.2em]
+tracking-[0.35em]
 text-sm
-font-bold
-text-[#003B6F]
-"
-
->
+font-black
+text-[#F2C94C]
+">
 
 Department of Homeland Security
 
@@ -275,17 +142,20 @@ Department of Homeland Security
 
 
 
-
-<h1
-
-className="
+<div className="
+flex
+justify-between
+items-center
+flex-wrap
+gap-4
 mt-4
-text-4xl
-font-bold
-text-[#003B6F]
-"
+">
 
->
+
+<h1 className="
+text-5xl
+font-black
+">
 
 Create Employee
 
@@ -293,18 +163,24 @@ Create Employee
 
 
 
-<p
+
+<Link
+
+href="/staff/employees"
 
 className="
-mt-3
-text-gray-600
+bg-[#F2C94C]
+text-[#003B6F]
+px-6
+py-3
+font-black
 "
 
 >
 
-Add a new member of personnel to the DHS employee directory.
+← Back
 
-</p>
+</Link>
 
 
 
@@ -313,20 +189,34 @@ Add a new member of personnel to the DHS employee directory.
 
 
 
+<p className="
+mt-4
+text-blue-100
+">
+
+Create a new DHS personnel record.
+
+</p>
+
+
+
+</header>
 
 
 
 
 
-{/* FORM */}
 
 
 
-<div
+
+<form
+
+action={createEmployee}
 
 className="
-mt-10
-space-y-5
+p-10
+space-y-8
 "
 
 >
@@ -337,80 +227,40 @@ space-y-5
 
 
 
+<div>
 
-<FormInput
 
-label="Roblox Username"
+<label className="
+font-black
+text-[#003B6F]
+">
 
-placeholder="Enter Roblox username"
+Roblox Username
 
-onChange={(value)=>
-
-setForm({
-
-...form,
-
-roblox_username:value
-
-})
-
-}
-
-/>
+</label>
 
 
 
+<input
 
+name="roblox_username"
 
+required
 
+placeholder="Example: Wiil404"
 
-<FormInput
-
-label="Roblox User ID"
-
-placeholder="Enter Roblox user ID"
-
-onChange={(value)=>
-
-setForm({
-
-...form,
-
-roblox_user_id:value
-
-})
-
-}
+className="
+mt-2
+w-full
+border
+p-4
+"
 
 />
 
 
 
-
-
-
-
-
-<FormInput
-
-label="DHS Email Address"
-
-placeholder="employee@dhs.gov"
-
-onChange={(value)=>
-
-setForm({
-
-...form,
-
-email:value
-
-})
-
-}
-
-/>
-
+</div>
 
 
 
@@ -422,16 +272,65 @@ email:value
 <div>
 
 
-<label
+<label className="
+font-black
+text-[#003B6F]
+">
+
+Roblox User ID
+
+</label>
+
+
+
+<input
+
+name="roblox_user_id"
+
+required
+
+type="number"
+
+placeholder="Example: 333195903"
 
 className="
-block
-font-bold
-text-gray-700
-mb-2
+mt-2
+w-full
+border
+p-4
 "
 
->
+/>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="
+grid
+md:grid-cols-2
+gap-6
+">
+
+
+
+
+
+<div>
+
+
+<label className="
+font-black
+text-[#003B6F]
+">
 
 Division
 
@@ -441,28 +340,16 @@ Division
 
 <select
 
+name="division_id"
+
+required
+
 className="
-border
-border-gray-300
-p-3
+mt-2
 w-full
-focus:border-[#003B6F]
-outline-none
+border
+p-4
 "
-
-value={form.division_id}
-
-onChange={(e)=>
-
-setForm({
-
-...form,
-
-division_id:e.target.value
-
-})
-
-}
 
 >
 
@@ -477,9 +364,7 @@ Select Division
 
 {
 
-divisions.map(
-
-division=>(
+divisions?.map((division:any)=>(
 
 
 <option
@@ -495,16 +380,13 @@ value={division.id}
 </option>
 
 
-)
+))
 
-)
 
 }
 
 
-
 </select>
-
 
 
 </div>
@@ -515,23 +397,15 @@ value={division.id}
 
 
 
-
-
 <div>
 
 
-<label
+<label className="
+font-black
+text-[#003B6F]
+">
 
-className="
-block
-font-bold
-text-gray-700
-mb-2
-"
-
->
-
-Status
+Position
 
 </label>
 
@@ -539,52 +413,59 @@ Status
 
 <select
 
+name="position_id"
+
+required
+
 className="
-border
-border-gray-300
-p-3
+mt-2
 w-full
+border
+p-4
 "
-
-value={form.status}
-
-onChange={(e)=>
-
-setForm({
-
-...form,
-
-status:e.target.value
-
-})
-
-}
 
 >
 
 
-<option>
+<option value="">
 
-Active
-
-</option>
-
-
-<option>
-
-Inactive
+Select Position
 
 </option>
 
 
-<option>
 
-Leave
+{
+
+positions?.map((position:any)=>(
+
+
+<option
+
+key={position.id}
+
+value={position.id}
+
+>
+
+{position.title}
 
 </option>
+
+
+))
+
+
+}
 
 
 </select>
+
+
+</div>
+
+
+
 
 
 </div>
@@ -600,56 +481,36 @@ Leave
 <div>
 
 
-<label
+<label className="
+font-black
+text-[#003B6F]
+">
 
-className="
-block
-font-bold
-text-gray-700
-mb-2
-"
-
->
-
-Notes
+Email
 
 </label>
 
 
 
+<input
 
-<textarea
+name="email"
+
+type="email"
+
+placeholder="employee@gov.us"
 
 className="
-border
-border-gray-300
-p-3
+mt-2
 w-full
-min-h-[120px]
+border
+p-4
 "
-
-placeholder="Additional employee information..."
-
-value={form.notes}
-
-onChange={(e)=>
-
-setForm({
-
-...form,
-
-notes:e.target.value
-
-})
-
-}
 
 />
 
 
-
 </div>
-
 
 
 
@@ -661,16 +522,14 @@ notes:e.target.value
 
 <button
 
-onClick={submit}
-
 className="
-mt-6
 bg-[#003B6F]
 text-white
 px-8
-py-3
-font-bold
-hover:bg-[#00284d]
+py-4
+font-black
+text-lg
+hover:bg-[#005AA7]
 transition
 "
 
@@ -684,111 +543,26 @@ Create Employee
 
 
 
+
+
+</form>
+
+
+
+
+
+
+
 </div>
 
 
 
-
-
-
-
-
-
-</div>
-
-</div>
 
 
 </section>
 
 
-
-
-
-
-
 </main>
-
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-function FormInput({
-
-label,
-
-placeholder,
-
-onChange
-
-}:{
-
-label:string;
-
-placeholder:string;
-
-onChange:(value:string)=>void;
-
-}){
-
-
-return (
-
-<div>
-
-
-<label
-
-className="
-block
-font-bold
-text-gray-700
-mb-2
-"
-
->
-
-{label}
-
-</label>
-
-
-
-<input
-
-className="
-border
-border-gray-300
-p-3
-w-full
-focus:outline-none
-focus:border-[#003B6F]
-"
-
-placeholder={placeholder}
-
-onChange={(e)=>
-
-onChange(
-e.target.value
-)
-
-}
-
-/>
-
-
-</div>
 
 
 );
