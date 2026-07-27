@@ -15,20 +15,21 @@ employees:any[];
 }){
 
 
-const scrollRef = useRef<HTMLDivElement>(null);
+const slider = useRef<HTMLDivElement>(null);
 
 
-const move = (amount:number)=>{
 
-scrollRef.current?.scrollBy({
+function move(amount:number){
 
-left: amount,
+slider.current?.scrollBy({
+
+left:amount,
 
 behavior:"smooth"
 
 });
 
-};
+}
 
 
 
@@ -39,16 +40,14 @@ return (
 
 <div
 
-ref={scrollRef}
+ref={slider}
 
 className="
 flex
 gap-6
 overflow-x-auto
 scroll-smooth
-pb-5
-snap-x
-snap-mandatory
+pb-4
 "
 
 >
@@ -64,9 +63,9 @@ employees.map((employee:any)=>(
 key={employee.id}
 
 className="
-w-[320px]
+min-w-[350px]
+max-w-[350px]
 flex-shrink-0
-snap-start
 "
 
 >
@@ -84,6 +83,7 @@ employee={employee}
 
 ))
 
+
 }
 
 
@@ -100,14 +100,14 @@ employees.length > 3 && (
 <div className="
 flex
 justify-center
-gap-6
-mt-8
+gap-5
+mt-6
 ">
 
 
 <button
 
-onClick={()=>move(-700)}
+onClick={()=>move(-400)}
 
 className="
 bg-[#003B6F]
@@ -127,9 +127,10 @@ transition
 
 
 
+
 <button
 
-onClick={()=>move(700)}
+onClick={()=>move(400)}
 
 className="
 bg-[#003B6F]
@@ -148,6 +149,7 @@ transition
 </button>
 
 
+
 </div>
 
 )
@@ -155,8 +157,10 @@ transition
 }
 
 
+
 </div>
 
 );
+
 
 }
