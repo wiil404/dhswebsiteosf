@@ -1,25 +1,17 @@
 import Link from "next/link";
-
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
 import EmployeeSearch from "./EmployeeSearch";
-
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 
 
-
 export default async function StaffEmployeesPage(){
 
 
-
-//
-// Get employees
-//
-
-const {data:employees,error}=await supabaseAdmin
+const {data:employees,error:employeeError}=await supabaseAdmin
 
 .from("employees")
 
@@ -37,11 +29,7 @@ status,
 
 division_id,
 
-position_id,
-
-positions(
-    title
-)
+position_id
 
 `)
 
@@ -51,13 +39,11 @@ positions(
 
 
 
-
-
-if(error){
+if(employeeError){
 
 console.error(
 "EMPLOYEE ERROR:",
-error
+employeeError
 );
 
 }
@@ -66,13 +52,11 @@ error
 
 
 
-
-
 //
-// Get divisions separately
+// Fetch divisions
 //
 
-const {data:divisionData}=await supabaseAdmin
+const {data:divisionsData}=await supabaseAdmin
 
 .from("divisions")
 
@@ -82,6 +66,30 @@ id,
 
 name
 
+`)
+
+.order(
+"name"
+);
+
+
+
+
+
+//
+// Fetch positions
+//
+
+const {data:positionsData}=await supabaseAdmin
+
+.from("positions")
+
+.select(`
+
+id,
+
+title
+
 `);
 
 
@@ -89,15 +97,12 @@ name
 
 
 
-const divisionMap:any = {};
+const divisionsMap:any={};
 
 
+for(const division of divisionsData || []){
 
-for(const division of divisionData || []){
-
-
-divisionMap[division.id] = division.name;
-
+divisionsMap[division.id]=division.name;
 
 }
 
@@ -105,21 +110,73 @@ divisionMap[division.id] = division.name;
 
 
 
+const positionsMap:any={};
+
+
+for(const position of positionsData || []){
+
+positionsMap[position.id]=position.title;
+
+}
+
 
 
 
 
 //
-// Separate active/former staff
+// Attach readable data
 //
 
-const activeStaff =
+const formattedEmployees = (employees || []).map((employee:any)=>({
 
-(employees || []).filter(
+
+...employee,
+
+
+division:
+
+divisionsMap[employee.division_id]
+||
+"Unassigned",
+
+
+
+position:
+
+positionsMap[employee.position_id]
+||
+"No Position"
+
+
+
+}));
+
+
+
+
+
+
+
+
+//
+// Active and former staff
+//
+
+const activeEmployees = formattedEmployees.filter(
 
 (employee:any)=>
 
-employee.status === "Active"
+employee.status?.toLowerCase()==="active"
+
+);
+
+
+
+const formerEmployees = formattedEmployees.filter(
+
+(employee:any)=>
+
+employee.status?.toLowerCase()!=="active"
 
 );
 
@@ -127,94 +184,31 @@ employee.status === "Active"
 
 
 
-const formerStaff =
-
-(employees || []).filter(
-
-(employee:any)=>
-
-employee.status !== "Active"
-
-);
-
-
-
-
-
-
-
 
 
 //
-// Group active employees by division
+// Group divisions
 //
 
-const divisions:any = {};
+const divisionGroups:any={};
 
 
+for(const employee of activeEmployees){
 
 
-for(const employee of activeStaff){
+if(!divisionGroups[employee.division]){
 
-
-const divisionName =
-
-divisionMap[employee.division_id] ||
-
-"Unassigned";
-
-
-
-
-if(!divisions[divisionName]){
-
-
-divisions[divisionName]=[];
+divisionGroups[employee.division]=[];
 
 }
 
 
 
-divisions[divisionName].push(employee);
+divisionGroups[employee.division].push(employee);
 
 
 
 }
-
-
-
-
-
-
-
-
-
-
-const totalEmployees =
-
-employees?.length || 0;
-
-
-
-const activeEmployees =
-
-activeStaff.length;
-
-
-
-const formerEmployees =
-
-formerStaff.length;
-
-
-
-const divisionCount =
-
-Object.keys(divisions).length;
-
-
-
-
 
 
 
@@ -247,13 +241,10 @@ overflow-hidden
 
 
 
-
-
 <div className="
 h-3
 bg-[#F2C94C]
 "/>
-
 
 
 
@@ -267,7 +258,6 @@ text-white
 p-10
 md:p-14
 ">
-
 
 
 <p className="
@@ -284,8 +274,6 @@ Department of Homeland Security
 
 
 
-
-
 <div className="
 flex
 justify-between
@@ -298,7 +286,6 @@ mt-5
 
 <div>
 
-
 <h1 className="
 text-5xl
 font-black
@@ -310,21 +297,18 @@ Employee Management System
 
 
 
-
 <p className="
 mt-4
 text-blue-100
 text-lg
 ">
 
-Manage DHS personnel records, assignments and workforce information.
+Manage DHS personnel, assignments and workforce records.
 
 </p>
 
 
-
 </div>
-
 
 
 
@@ -354,10 +338,7 @@ transition
 </div>
 
 
-
 </header>
-
-
 
 
 
@@ -369,36 +350,20 @@ md:p-14
 ">
 
 
-
 <div className="
 grid
-md:grid-cols-4
+md:grid-cols-3
 gap-6
 ">
 
 
-
 <Stat
 
-title="Total Personnel"
+title="Active Personnel"
 
-value={String(totalEmployees)}
-
-/>
-
-
-
-
-
-<Stat
-
-title="Active Staff"
-
-value={String(activeEmployees)}
+value={String(activeEmployees.length)}
 
 />
-
-
 
 
 
@@ -406,11 +371,9 @@ value={String(activeEmployees)}
 
 title="Former Staff"
 
-value={String(formerEmployees)}
+value={String(formerEmployees.length)}
 
 />
-
-
 
 
 
@@ -418,15 +381,13 @@ value={String(formerEmployees)}
 
 title="Divisions"
 
-value={String(divisionCount)}
+value={String(Object.keys(divisionGroups).length)}
 
 />
 
 
 
 </div>
-
-
 
 
 
@@ -438,211 +399,11 @@ mt-12
 
 <EmployeeSearch
 
-employees={employees || []}
+employees={activeEmployees}
 
 />
 
 </div>
-
-
-
-
-
-
-
-<div className="
-mt-16
-space-y-14
-">
-
-
-
-
-
-
-
-{
-
-Object.entries(divisions).map(
-
-([division,staff]:any)=>(
-
-
-<DivisionSection
-
-key={division}
-
-division={division}
-
-employees={staff}
-
-/>
-
-
-)
-
-)
-
-
-
-}
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-{
-
-formerStaff.length > 0 && (
-
-
-<section className="
-mt-20
-">
-
-
-
-
-<div className="
-border-l-4
-border-red-500
-pl-5
-mb-8
-">
-
-
-<h2 className="
-text-3xl
-font-black
-text-[#003B6F]
-">
-
-Former DHS Personnel
-
-</h2>
-
-
-
-
-<p className="
-text-gray-500
-mt-2
-">
-
-Inactive and separated employees.
-
-</p>
-
-
-
-</div>
-
-
-
-
-
-<div className="
-grid
-md:grid-cols-2
-gap-6
-">
-
-
-{
-
-formerStaff.map(
-
-(employee:any)=>(
-
-
-<EmployeeCard
-
-key={employee.id}
-
-employee={employee}
-
-former
-
-divisionName={
-divisionMap[employee.division_id] ||
-"Unknown Division"
-}
-
-/>
-
-
-)
-
-
-)
-
-
-}
-
-
-
-</div>
-
-
-
-
-
-</section>
-
-
-)
-
-}
-
-
-
-
-
-
-
-
-</section>
-
-
-
-
-
-</div>
-
-
-</section>
-
-
-</main>
-
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
 
 function DivisionSection({
 
@@ -659,19 +420,7 @@ employees:any[];
 }){
 
 
-
-const pageSize = 12;
-
-
-
-const pages = Math.ceil(
-
-employees.length / pageSize
-
-);
-
-
-
+const pages = Math.ceil(employees.length / 10);
 
 
 
@@ -689,7 +438,7 @@ mb-8
 
 
 <h2 className="
-text-3xl
+text-4xl
 font-black
 text-[#003B6F]
 ">
@@ -701,14 +450,14 @@ text-[#003B6F]
 
 
 <p className="
-text-gray-500
 mt-2
+text-gray-500
+font-semibold
 ">
 
-{employees.length} Personnel
+{employees.length} Personnel Assigned
 
 </p>
-
 
 
 </div>
@@ -724,19 +473,9 @@ gap-6
 ">
 
 
-
 {
 
-employees
-
-.slice(
-0,
-pageSize
-)
-
-.map(
-
-(employee:any)=>(
+employees.slice(0,10).map((employee:any)=>(
 
 
 <EmployeeCard
@@ -745,16 +484,10 @@ key={employee.id}
 
 employee={employee}
 
-divisionName={division}
-
 />
 
 
-)
-
-
-)
-
+))
 
 
 }
@@ -767,54 +500,57 @@ divisionName={division}
 
 
 
-
-
 {
 
-employees.length > pageSize && (
+pages > 1 && (
 
 
 <div className="
 mt-8
-bg-[#F5F8FB]
-border
-p-5
-text-center
+flex
+gap-3
+flex-wrap
 ">
 
+{
+
+Array.from({
+
+length:pages
+
+}).map((_,index)=>(
 
 
+<button
 
-<p className="
+key={index}
+
+className="
+px-4
+py-2
+bg-[#003B6F]
+text-white
 font-bold
-text-[#003B6F]
-">
+hover:bg-[#005AA7]
+transition
+"
 
-This division contains {employees.length} members across {pages} pages.
+>
 
-</p>
+{index+1}
 
-
-
-<p className="
-text-sm
-text-gray-500
-mt-2
-">
-
-Use the division search filter above to quickly locate personnel.
-
-</p>
+</button>
 
 
+))
 
+
+}
 
 </div>
 
 
 )
-
-
 
 }
 
@@ -826,10 +562,7 @@ Use the division search filter above to quickly locate personnel.
 );
 
 
-
 }
-
-
 
 
 
@@ -858,6 +591,7 @@ return (
 bg-[#F5F8FB]
 border
 p-6
+shadow-sm
 ">
 
 
@@ -876,10 +610,10 @@ text-gray-500
 
 
 <p className="
+mt-3
 text-4xl
 font-black
 text-[#003B6F]
-mt-3
 ">
 
 {value}
@@ -887,9 +621,7 @@ mt-3
 </p>
 
 
-
 </div>
-
 
 );
 
@@ -897,13 +629,17 @@ mt-3
 }
 
 
+
+
+
+
+
+
 function EmployeeCard({
 
 employee,
 
-former,
-
-divisionName
+former=false
 
 }:{
 
@@ -911,26 +647,35 @@ employee:any;
 
 former?:boolean;
 
-divisionName:string;
-
 }){
-
 
 
 return (
 
 <div className={`
+
 bg-white
+
 border
+
 shadow-sm
+
 p-6
-hover:shadow-xl
-transition
+
 flex
-gap-5
+
 items-center
-${former ? "opacity-75" : ""}
+
+gap-5
+
+hover:shadow-xl
+
+transition
+
+${former ? "opacity-70" : ""}
+
 `}>
+
 
 
 
@@ -938,29 +683,27 @@ ${former ? "opacity-75" : ""}
 w-20
 h-20
 rounded-full
-bg-gradient-to-br
-from-[#003B6F]
-to-[#005AA7]
+bg-[#003B6F]
+border-4
+border-[#F2C94C]
 text-white
 flex
 items-center
 justify-center
 font-black
 text-3xl
-border-4
-border-[#F2C94C]
-shrink-0
 ">
 
 {
 
 employee.roblox_username
 ?.charAt(0)
+||
+"?"
 
 }
 
 </div>
-
 
 
 
@@ -970,18 +713,13 @@ employee.roblox_username
 
 <div className="
 flex-1
-min-w-0
 ">
-
-
-
 
 
 <h3 className="
 text-xl
 font-black
 text-[#003B6F]
-truncate
 ">
 
 {employee.roblox_username}
@@ -991,40 +729,14 @@ truncate
 
 
 
-
-
 <p className="
-text-gray-600
+text-gray-700
 font-semibold
 ">
 
-{
-
-employee.positions?.[0]?.title ||
-
-"No Position"
-
-}
+{employee.position}
 
 </p>
-
-
-
-
-
-
-
-<p className="
-text-sm
-text-gray-500
-mt-1
-">
-
-{divisionName}
-
-</p>
-
-
 
 
 
@@ -1043,16 +755,26 @@ text-gray-500
 
 
 
+<div className="
+flex
+gap-3
+mt-3
+flex-wrap
+">
 
 
 <span className={`
-inline-block
-mt-3
+
 px-3
+
 py-1
+
 text-xs
+
 font-black
+
 rounded
+
 ${
 
 former
@@ -1066,31 +788,38 @@ former
 "bg-green-100 text-green-700"
 
 }
+
 `}>
 
-{
-
-former
-
-?
-
-"FORMER STAFF"
-
-:
-
-employee.status
-
-}
-
+{employee.status}
 
 </span>
 
 
 
 
+<span className="
+px-3
+py-1
+text-xs
+font-bold
+bg-blue-100
+text-blue-700
+rounded
+">
+
+{employee.division}
+
+</span>
+
+
 
 </div>
 
+
+
+
+</div>
 
 
 
@@ -1106,11 +835,10 @@ className="
 bg-[#003B6F]
 text-white
 px-5
-py-3
+py-2
 font-black
 hover:bg-[#005AA7]
 transition
-shrink-0
 "
 
 >
@@ -1122,8 +850,290 @@ View
 
 
 
+</div>
+
+
+);
+
+
+}
+
+function DivisionSection({
+
+division,
+
+employees
+
+}:{
+
+division:string;
+
+employees:any[];
+
+}){
+
+
+return (
+
+<section>
+
+
+<div className="
+border-l-4
+border-[#F2C94C]
+pl-5
+mb-8
+">
+
+
+<h2 className="
+text-4xl
+font-black
+text-[#003B6F]
+">
+
+{division}
+
+</h2>
+
+
+
+<p className="
+mt-2
+text-gray-500
+font-semibold
+">
+
+{employees.length} Personnel Assigned
+
+</p>
+
 
 </div>
+
+
+
+
+
+<EmployeePagination
+
+division={division}
+
+employees={employees}
+
+/>
+
+
+
+</section>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+function EmployeePagination({
+
+division,
+
+employees
+
+}:{
+
+division:string;
+
+employees:any[];
+
+}){
+
+
+const perPage = 10;
+
+
+const totalPages = Math.ceil(
+
+employees.length / perPage
+
+);
+
+
+
+
+return (
+
+<div>
+
+
+{
+
+Array.from({
+
+length:totalPages
+
+}).map((_,index)=>{
+
+
+const page = index + 1;
+
+
+
+return (
+
+<div
+
+key={page}
+
+className={
+
+index === 0
+
+?
+
+"block"
+
+:
+
+"hidden"
+
+}
+
+>
+
+
+
+<div className="
+grid
+md:grid-cols-2
+gap-6
+">
+
+
+{
+
+employees
+
+.slice(
+
+index * perPage,
+
+(index + 1) * perPage
+
+)
+
+.map((employee:any)=>(
+
+
+<EmployeeCard
+
+key={employee.id}
+
+employee={employee}
+
+/>
+
+
+))
+
+
+}
+
+
+</div>
+
+
+
+
+
+{
+
+totalPages > 1 && (
+
+
+<div className="
+mt-8
+flex
+gap-3
+flex-wrap
+">
+
+
+{
+
+Array.from({
+
+length:totalPages
+
+}).map((_,button)=>{
+
+
+return (
+
+<Link
+
+key={button}
+
+href={`/staff/employees?division=${encodeURIComponent(division)}&page=${button+1}`}
+
+className="
+px-5
+py-2
+bg-[#003B6F]
+text-white
+font-black
+hover:bg-[#005AA7]
+transition
+"
+
+>
+
+{button+1}
+
+</Link>
+
+
+)
+
+
+})
+
+
+}
+
+
+</div>
+
+
+)
+
+
+}
+
+
+
+</div>
+
+
+)
+
+
+})
+
+
+}
+
+
+
+</div>
+
 
 );
 
