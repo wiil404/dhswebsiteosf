@@ -537,36 +537,17 @@ profile.email
 
 
 
-<p className="
-mt-2
-text-xl
-text-blue-100
-">
-
-{
-
+<p className="mt-2 text-xl text-blue-100">
     {positionTitle}
-
-}
-
 </p>
 
 
 
 
 
-<p className="
-text-blue-200
-">
-
-{
-
+<p className="mt-2 text-xl text-blue-200">
     {divisionName}
-
-}
-
 </p>
-
 
 
 
