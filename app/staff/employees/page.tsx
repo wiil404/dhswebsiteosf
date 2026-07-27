@@ -114,25 +114,18 @@ for(const position of positionsData || []){
 
 
 const formattedEmployees = (employees || [])
+
 .map((employee:any)=>({
 
     ...employee,
 
     division:
-    divisionMap[employee.division_id]
-    ??
-    null,
+    divisionMap[employee.division_id] || null,
 
     position:
-    positionMap[employee.position_id]
-    ??
-    "No Position"
+    positionsMap[employee.position_id] || "No Position"
 
-}))
-.filter(
-(employee:any)=>
-employee.division !== null
-);
+}));
 
 
 
@@ -174,16 +167,11 @@ const divisionGroups:any={};
 
 for(const employee of activeEmployees){
 
-
-if(
-!employee.division ||
-employee.division === "Unassigned"
-){
+if(!employee.division){
 
 continue;
 
 }
-
 
 
 if(!divisionGroups[employee.division]){
@@ -193,12 +181,9 @@ divisionGroups[employee.division]=[];
 }
 
 
-
 divisionGroups[employee.division].push(employee);
 
-
 }
-
 
 
 
