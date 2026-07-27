@@ -123,7 +123,7 @@ const formattedEmployees = (employees || [])
     divisionMap[employee.division_id] || null,
 
     position:
-    positionsMap[employee.position_id] || "No Position"
+    positionMap[employee.position_id] || "No Position"
 
 }));
 
