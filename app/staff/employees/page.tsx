@@ -74,7 +74,6 @@ name
 
 
 
-
 const {data:positionsData}=await supabaseAdmin
 
 .from("positions")
@@ -94,17 +93,23 @@ title
 
 const divisionMap:any = {};
 
+
 for(const division of divisionsData || []){
 
-    divisionMap[division.id] = division.name;
+divisionMap[division.id] = division.name;
 
 }
+
+
+
+
 
 const positionMap:any = {};
 
+
 for(const position of positionsData || []){
 
-    positionMap[position.id] = position.title;
+positionMap[position.id] = position.title;
 
 }
 
@@ -112,6 +117,12 @@ for(const position of positionsData || []){
 
 
 
+
+
+//
+// Attach readable division + position data
+// Employees without a real division are removed
+//
 
 const formattedEmployees = (employees || [])
 
@@ -120,12 +131,24 @@ const formattedEmployees = (employees || [])
     ...employee,
 
     division:
-    divisionMap[employee.division_id] || null,
+    divisionMap[employee.division_id],
 
     position:
-    positionMap[employee.position_id] || "No Position"
+    positionMap[employee.position_id] 
+    ||
+    "No Position"
 
-}));
+}))
+
+.filter(
+
+(employee:any)=>
+
+employee.division !== undefined
+&&
+employee.division !== null
+
+);
 
 
 
@@ -133,14 +156,17 @@ const formattedEmployees = (employees || [])
 
 
 
+
+
+//
+// Active and former staff
+//
 
 const activeEmployees = formattedEmployees.filter(
 
 (employee:any)=>
 
-employee.status?.toLowerCase()==="active"
-&&
-employee.division
+employee.status?.toLowerCase() === "active"
 
 );
 
@@ -162,28 +188,35 @@ employee.status?.toLowerCase() !== "active"
 
 
 
-const divisionGroups:any={};
+
+
+//
+// Group active staff by division
+//
+
+const divisionGroups:any = {};
+
 
 
 for(const employee of activeEmployees){
 
-if(!employee.division){
-
-continue;
-
-}
-
 
 if(!divisionGroups[employee.division]){
 
-divisionGroups[employee.division]=[];
+divisionGroups[employee.division] = [];
 
 }
+
 
 
 divisionGroups[employee.division].push(employee);
 
+
 }
+
+
+
+
 
 
 
@@ -216,7 +249,6 @@ overflow-hidden
 h-3
 bg-[#F2C94C]
 "/>
-
 
 
 
@@ -285,6 +317,7 @@ Manage DHS personnel, assignments and workforce records.
 
 
 
+
 <Link
 
 href="/staff/employees/create"
@@ -312,11 +345,6 @@ transition
 
 </header>
 
-
-
-
-
-
 <section className="
 p-10
 md:p-14
@@ -328,7 +356,7 @@ md:p-14
 
 <div className="
 grid
-md:grid-cols-3
+md:grid-3
 gap-6
 ">
 
@@ -369,6 +397,8 @@ value={String(Object.keys(divisionGroups).length)}
 
 
 
+
+
 <div className="
 mt-12
 ">
@@ -380,6 +410,10 @@ employees={activeEmployees}
 />
 
 </div>
+
+
+
+
 
 
 
@@ -397,6 +431,7 @@ Object.entries(divisionGroups).map(
 
 ([division,staff]:any)=>(
 
+
 <DivisionSection
 
 key={division}
@@ -407,16 +442,26 @@ employees={staff}
 
 />
 
-)
 
 )
+
+
+)
+
 
 }
 
 
 </div>
 
-id="part2"
+
+
+
+
+
+
+
+
 {
 
 formerEmployees.length > 0 && (
@@ -456,7 +501,10 @@ Inactive employees and previous Department members.
 </p>
 
 
+
 </div>
+
+
 
 
 
@@ -473,6 +521,7 @@ gap-6
 
 formerEmployees.map((employee:any)=>(
 
+
 <EmployeeCard
 
 key={employee.id}
@@ -483,20 +532,26 @@ former={true}
 
 />
 
+
 ))
 
 
 }
 
 
+
 </div>
+
 
 
 </section>
 
+
 )
 
 }
+
+
 
 
 
@@ -516,13 +571,6 @@ former={true}
 
 
 }
-
-
-
-
-
-
-
 
 function Stat({
 
@@ -644,11 +692,15 @@ font-semibold
 </div>
 
 
+
+
+
 <EmployeePagination
 
 employees={employees}
 
 />
+
 
 
 </section>
