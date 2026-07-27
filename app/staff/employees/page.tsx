@@ -694,39 +694,23 @@ employees:any[];
 const perPage = 10;
 
 
+const totalPages = Math.ceil(
+
+employees.length / perPage
+
+);
+
+
 return (
 
-<div
-
-className="
-relative
-"
-
->
-
-
-<div
-
-className="
-flex
-overflow-x-auto
-snap-x
-snap-mandatory
-scroll-smooth
-gap-6
-pb-4
-"
-
-id={`division-${division}`}
-
->
+<div>
 
 
 {
 
 Array.from({
 
-length:Math.ceil(employees.length / perPage)
+length:totalPages
 
 }).map((_,index)=>{
 
@@ -748,14 +732,17 @@ return (
 key={index}
 
 className="
-min-w-full
-snap-center
-grid
-md:grid-cols-2
-gap-6
+mb-10
 "
 
 >
+
+
+<div className="
+grid
+md:grid-cols-2
+gap-6
+">
 
 
 {
@@ -781,6 +768,30 @@ employee={employee}
 </div>
 
 
+{
+
+totalPages > 1 && (
+
+<p className="
+mt-5
+text-sm
+font-bold
+text-gray-500
+">
+
+Page {index + 1} of {totalPages}
+
+</p>
+
+)
+
+}
+
+
+
+</div>
+
+
 )
 
 
@@ -793,102 +804,10 @@ employee={employee}
 </div>
 
 
-
-
-
-{
-
-employees.length > perPage && (
-
-<div className="
-flex
-justify-center
-gap-4
-mt-8
-">
-
-
-<button
-
-onClick={()=>{
-
-document
-.getElementById(`division-${division}`)
-?.scrollBy({
-
-left:-window.innerWidth,
-
-behavior:"smooth"
-
-});
-
-}}
-
-className="
-bg-[#003B6F]
-text-white
-px-5
-py-3
-font-black
-"
-
->
-
-← Previous
-
-</button>
-
-
-
-
-
-<button
-
-onClick={()=>{
-
-document
-.getElementById(`division-${division}`)
-?.scrollBy({
-
-left:window.innerWidth,
-
-behavior:"smooth"
-
-});
-
-}}
-
-className="
-bg-[#003B6F]
-text-white
-px-5
-py-3
-font-black
-"
-
->
-
-Next →
-
-</button>
-
-
-
-</div>
-
-)
-
-}
-
-
-
-</div>
-
-
 );
 
-}
 
+}
 
 function EmployeeCard({
 
