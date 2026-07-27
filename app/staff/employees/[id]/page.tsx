@@ -310,7 +310,25 @@ Edit Employee
 
 </Link>
 
+<Link
 
+href={`/staff/employees/${employee.id}/promote`}
+
+className="
+bg-green-600
+text-white
+px-6
+py-3
+font-black
+hover:bg-green-700
+transition
+"
+
+>
+
+Promote / Demote
+
+</Link>
 
 
 
