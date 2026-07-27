@@ -1,63 +1,68 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
 
+import { redirect } from "next/navigation";
 
 
 
-
-export async function createEmployee(formData:FormData){
-
+export async function createEmployee(formData: FormData){
 
 
 const roblox_username =
-String(
-formData.get("roblox_username")
-);
+String(formData.get("roblox_username") || "")
+.trim();
 
 
 
 const roblox_user_id =
-Number(
-formData.get("roblox_user_id")
-);
+Number(formData.get("roblox_user_id"));
 
 
 
 const employee_number =
-String(
-formData.get("employee_number")
-);
-
-
-
-const email =
-String(
-formData.get("email")
-);
+String(formData.get("employee_number") || "")
+.trim()
+|| null;
 
 
 
 const division_id =
-String(
-formData.get("division_id")
-);
+String(formData.get("division_id") || "")
+|| null;
 
 
 
 const position_id =
-String(
-formData.get("position_id")
-);
+String(formData.get("position_id") || "")
+|| null;
 
 
 
 const status =
-String(
-formData.get("status")
+String(formData.get("status") || "Active");
+
+
+
+
+
+if(!roblox_username){
+
+throw new Error(
+"Roblox username is required"
 );
+
+}
+
+
+
+if(!roblox_user_id){
+
+throw new Error(
+"Roblox user ID is required"
+);
+
+}
 
 
 
@@ -75,13 +80,16 @@ roblox_user_id,
 
 employee_number,
 
-email,
-
 division_id,
 
 position_id,
 
-status
+status,
+
+hire_date:
+new Date()
+.toISOString()
+.split("T")[0]
 
 });
 
@@ -89,20 +97,24 @@ status
 
 
 
-
 if(error){
 
-throw new Error(error.message);
+console.error(
+"CREATE EMPLOYEE ERROR:",
+error
+);
+
+
+throw new Error(
+error.message
+);
 
 }
 
-console.log("CREATE EMPLOYEE ACTION LOADED");
 
 
 
 
 redirect("/staff/employees");
-
-
 
 }
